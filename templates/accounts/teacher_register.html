@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Registration</title>
+</head>
+
+<body>
+
+    <h1>Teacher Registration</h1>
+
+    {% if form.errors %}
+        <div style="color: red; margin-bottom: 20px;">
+            <h3>Please correct the following errors:</h3>
+
+            {{ form.errors }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Register
+        </button>
+
+    </form>
+
+</body>
+</html>
