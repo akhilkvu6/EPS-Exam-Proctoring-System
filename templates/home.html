@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Examination System</title>
+</head>
+
+<body>
+
+    <h1>Online Examination System</h1>
+
+    <p>Development Navigation</p>
+
+    <hr>
+
+    <h2>Available Pages</h2>
+
+    <h3>Admin</h3>
+
+    <ul>
+        <li>
+            <a href="/admin/">
+                Django Admin
+            </a>
+        </li>
+    </ul>
+
+    <h3>Teacher</h3>
+
+    <ul>
+        <li>
+            <a href="{% url 'teacher_register' %}">
+                Teacher Registration
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'teacher_registration_success' %}">
+                Registration Success Page
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'teacher_login' %}">
+                Teacher Login
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'teacher_dashboard' %}">
+                Teacher Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'user_logout' %}">
+                Logout
+            </a>
+        </li>
+    </ul>
+
+    <hr>
+
+    <h2>Project Status</h2>
+
+    <p>✅ Django Project</p>
+    <p>✅ Admin</p>
+    <p>✅ Teacher Registration</p>
+    <p>✅ Teacher Verification</p>
+    <p>✅ Teacher Login</p>
+    <p>✅ Teacher Dashboard</p>
+
+    <p>🚧 Student Module — Coming Next</p>
+    <p>🚧 Exam Module — Coming Next</p>
+    <p>🚧 Results Module — Coming Next</p>
+
+</body>
+</html>
