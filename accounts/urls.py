@@ -1,0 +1,34 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path(
+        'teacher/register/',
+        views.teacher_register,
+        name='teacher_register'
+    ),
+
+    path(
+        'teacher/register/success/',
+        views.teacher_registration_success,
+        name='teacher_registration_success'
+    ),
+
+    path(
+        'teacher/login/',
+        views.teacher_login,
+        name='teacher_login'
+    ),
+
+    path(
+        'teacher/dashboard/',
+        views.teacher_dashboard,
+        name='teacher_dashboard'
+    ),
+
+    path(
+        'logout/',
+        views.user_logout,
+        name='user_logout'
+    ),
+]
