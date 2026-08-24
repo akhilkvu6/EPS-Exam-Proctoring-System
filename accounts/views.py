@@ -127,3 +127,59 @@ def student_registration_success(request):
         request,
         'accounts/student_registration_success.html'
     )
+
+
+def student_login(request):
+
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            user = authenticate(
+                request,
+                username=username,
+                password=password
+            )
+
+            if user is not None:
+
+                if user.role != 'student':
+                    form.add_error(
+                        None,
+                        'This login is only for students.'
+                    )
+
+                else:
+                    login(request, user)
+                    return redirect('student_dashboard')
+
+            else:
+                form.add_error(
+                    None,
+                    'Invalid username or password.'
+                )
+
+    else:
+        form = LoginForm()
+
+    return render(
+        request,
+        'accounts/student_login.html',
+        {'form': form}
+    )
+
+def student_dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('student_login')
+
+    if request.user.role != 'student':
+        return redirect('student_login')
+
+    return render(
+        request,
+        'accounts/student_dashboard.html'
+    )

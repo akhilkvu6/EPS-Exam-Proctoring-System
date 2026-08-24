@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+</head>
+<body>
+
+<h1>Welcome, {{ request.user.username }}!</h1>
+
+<p>You are successfully logged in.</p>
+
+<hr>
+
+<h2>Student Panel</h2>
+
+<ul>
+    <li>Available Exams</li>
+    <li>My Exams</li>
+    <li>Results</li>
+    <li>Profile</li>
+</ul>
+
+<p>
+    <a href="{% url 'user_logout' %}">Logout</a>
+</p>
+
+</body>
+</html>

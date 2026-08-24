@@ -42,4 +42,14 @@ path(
     views.student_registration_success,
     name='student_registration_success'
 ),
+path(
+    'student/login/',
+    views.student_login,
+    name='student_login'
+),path(
+    'student/dashboard/',
+    views.student_dashboard,
+    name='student_dashboard'
+),
+
 ]
