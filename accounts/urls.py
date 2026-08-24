@@ -31,4 +31,15 @@ urlpatterns = [
         views.user_logout,
         name='user_logout'
     ),
+path(
+    'student/register/',
+    views.student_register,
+    name='student_register'
+),
+
+path(
+    'student/register/success/',
+    views.student_registration_success,
+    name='student_registration_success'
+),
 ]

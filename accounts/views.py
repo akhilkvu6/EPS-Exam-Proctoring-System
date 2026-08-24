@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 
-from .forms import TeacherRegistrationForm, LoginForm
+from .forms import TeacherRegistrationForm, StudentRegistrationForm, LoginForm
 
 
 def teacher_register(request):
@@ -104,3 +104,26 @@ def teacher_dashboard(request):
 
 def home(request):
     return render(request, 'home.html')
+
+def student_register(request):
+
+    if request.method == 'POST':
+        form = StudentRegistrationForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return redirect('student_registration_success')
+
+    else:
+        form = StudentRegistrationForm()
+
+    return render(
+        request,
+        'accounts/student_register.html',
+        {'form': form}
+    )
+def student_registration_success(request):
+    return render(
+        request,
+        'accounts/student_registration_success.html'
+    )

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+</head>
+<body>
+
+<h1>Student Registration</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div>
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    <p>
+        {{ form.username.label_tag }}
+        {{ form.username }}
+
+        {% if form.username.errors %}
+            <ul>
+                {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.email.label_tag }}
+        {{ form.email }}
+
+        {% if form.email.errors %}
+            <ul>
+                {% for error in form.email.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.password1.label_tag }}
+        {{ form.password1 }}
+
+        {% if form.password1.errors %}
+            <ul>
+                {% for error in form.password1.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.password2.label_tag }}
+        {{ form.password2 }}
+
+        {% if form.password2.errors %}
+            <ul>
+                {% for error in form.password2.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.roll_number.label_tag }}
+        {{ form.roll_number }}
+
+        {% if form.roll_number.errors %}
+            <ul>
+                {% for error in form.roll_number.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.department.label_tag }}
+        {{ form.department }}
+
+        {% if form.department.errors %}
+            <ul>
+                {% for error in form.department.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <p>
+        {{ form.semester.label_tag }}
+        {{ form.semester }}
+
+        {% if form.semester.errors %}
+            <ul>
+                {% for error in form.semester.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </p>
+
+    <button type="submit">Register</button>
+</form>
+
+<p>
+    Already have an account?
+    <a href="#">Login here</a>
+</p>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import User, TeacherProfile
+from .models import User, TeacherProfile, StudentProfile
 
 
 class TeacherRegistrationForm(UserCreationForm):
@@ -47,3 +47,41 @@ class LoginForm(forms.Form):
     password = forms.CharField(
         widget=forms.PasswordInput
     )
+
+
+class StudentRegistrationForm(UserCreationForm):
+
+    email = forms.EmailField(required=True)
+    roll_number = forms.CharField(max_length=50)
+    department = forms.CharField(max_length=100)
+    semester = forms.CharField(max_length=20)
+
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'email',
+            'password1',
+            'password2',
+            'roll_number',
+            'department',
+            'semester',
+        ]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+
+        user.email = self.cleaned_data['email']
+        user.role = 'student'
+
+        if commit:
+            user.save()
+
+            StudentProfile.objects.create(
+                user=user,
+                roll_number=self.cleaned_data['roll_number'],
+                department=self.cleaned_data['department'],
+                semester=self.cleaned_data['semester']
+            )
+
+        return user
