@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Submitted — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 620px; margin: 3rem auto; padding: 0 1rem;">
+    
+    <div class="bento-card bento-card--elevated" style="padding: 2.5rem; text-align: center; background: var(--eps-surface, #FFFFFF); border: 1px solid var(--eps-border-subtle, #E2EAE0); border-radius: var(--eps-radius-xl, 18px);">
+        
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(209, 237, 211, 0.6); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.25rem auto;">
+            ✓
+        </div>
+
+        <span class="bento-badge bento-badge--warning" style="margin-bottom: 0.75rem; font-weight: 700; text-transform: uppercase;">
+            Status: Pending Approval
+        </span>
+
+        <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--eps-text-primary, #1A2419); margin-bottom: 0.75rem;">
+            Application Successfully Submitted
+        </h1>
+
+        <p style="font-size: 0.95rem; color: var(--eps-text-secondary, #556854); line-height: 1.6; margin-bottom: 1.5rem;">
+            Your account has been registered and placed in the institutional verification queue. Once approved by your department faculty or administrator, your account will be activated immediately.
+        </p>
+
+        <!-- In-App Notification Notice (Strictly Zero-Email) -->
+        <div class="bento-card bento-card--mint-subtle" style="padding: 1rem; margin-bottom: 2rem; border-radius: var(--eps-radius-md, 8px); text-align: left; display: flex; gap: 0.75rem; align-items: flex-start;">
+            <div style="font-size: 1.25rem;">🔔</div>
+            <div style="font-size: 0.85rem; color: var(--eps-text-primary, #1A2419); line-height: 1.5;">
+                <strong>Zero-Email Institutional Architecture:</strong>
+                All application reviews and status notifications occur directly within EPS. No verification links or automated emails are sent. You may check your account status anytime by signing in.
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'common_login' %}" class="bento-btn bento-btn--primary bento-btn--lg">
+                Proceed to Login &rarr;
+            </a>
+            <a href="{% url 'home' %}" class="bento-btn bento-btn--outline bento-btn--lg">
+                Return to Homepage
+            </a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Question - EPS Question Bank{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+    <div class="bento-page-header">
+        <div>
+            <h1 class="bento-page-title">Add Question to Repository</h1>
+            <p class="bento-page-subtitle">Author reusable assessment items with automatic evaluation keys or rubrics.</p>
+        </div>
+        <div class="bento-page-actions">
+            <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Back to Question Bank</a>
+        </div>
+    </div>
+
+    <div class="bento-card" style="padding: 2.25rem;">
+        {% if form.non_field_errors %}
+            <div class="bento-alert bento-alert--danger" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--eps-radius-md); background: #fef2f2; border: 1px solid #fecaca; color: var(--eps-status-danger);">
+                {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="bento-grid bento-grid--3" style="margin-bottom: 1rem;">
+                <div class="bento-form-group" style="grid-column: span 2;">
+                    <label class="bento-label" for="id_subject">Academic Subject *</label>
+                    {{ form.subject }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_question_type">Question Format *</label>
+                    {{ form.question_type }}
+                </div>
+            </div>
+
+            <div class="bento-grid bento-grid--2" style="margin-bottom: 1rem;">
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_difficulty">Difficulty Level *</label>
+                    {{ form.difficulty }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_topic">Topic / Unit / Module</label>
+                    {{ form.topic }}
+                </div>
+            </div>
+
+            <div class="bento-form-group" style="margin-bottom: 1rem;">
+                <label class="bento-label" for="id_question_text">Question Prompt *</label>
+                {{ form.question_text }}
+            </div>
+
+            <div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem;">
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_marks">Marks Awarded *</label>
+                    {{ form.marks }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_negative_marks">Negative Deduction (Optional)</label>
+                    {{ form.negative_marks }}
+                </div>
+            </div>
+
+            <!-- Dynamic MCQ Options Section -->
+            <div id="mcq-options-container" class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.2rem;">Multiple Choice Option Set</h3>
+                        <p style="font-size: 0.8rem; color: var(--eps-text-muted); margin: 0;">Select the radio button next to the correct answer choice</p>
+                    </div>
+                    <span class="bento-badge bento-badge--sage" style="font-size: 0.75rem;">Single Choice Key</span>
+                </div>
+
+                <div id="options-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                        <input type="radio" name="correct_option" value="0" checked style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
+                        <input type="text" name="option_text[]" class="bento-input" placeholder="Option A text (Correct by default)" required>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                        <input type="radio" name="correct_option" value="1" style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
+                        <input type="text" name="option_text[]" class="bento-input" placeholder="Option B text" required>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                        <input type="radio" name="correct_option" value="2" style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
+                        <input type="text" name="option_text[]" class="bento-input" placeholder="Option C text (Optional)">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                        <input type="radio" name="correct_option" value="3" style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
+                        <input type="text" name="option_text[]" class="bento-input" placeholder="Option D text (Optional)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- True/False Section -->
+            <div id="tf-options-container" class="bento-card bento-card--mint" style="display: none; margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+                <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.75rem;">Select Correct Value</h3>
+                <div style="display: flex; gap: 2rem;">
+                    <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                        <input type="radio" name="tf_correct" value="True" checked style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> True
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                        <input type="radio" name="tf_correct" value="False" style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> False
+                    </label>
+                </div>
+            </div>
+
+            <!-- Reference Answer Key -->
+            <div id="text-key-container" style="margin-bottom: 1rem;">
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_correct_text_answer">Reference Answer Key / Grading Guide</label>
+                    {{ form.correct_text_answer }}
+                </div>
+            </div>
+
+            <div class="bento-form-group" style="margin-bottom: 2rem;">
+                <label class="bento-label" for="id_explanation">Solution Explanation / Rubric (Optional)</label>
+                {{ form.explanation }}
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--ghost">Cancel</a>
+                <button type="submit" class="bento-btn bento-btn--primary" style="padding: 0.75rem 2rem;">
+                    Save Question to Repository &rarr;
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const typeSelect = document.getElementById('id_question_type');
+    const mcqBox = document.getElementById('mcq-options-container');
+    const tfBox = document.getElementById('tf-options-container');
+    const keyBox = document.getElementById('text-key-container');
+
+    function toggleTypeSections() {
+        if (!typeSelect) return;
+        const val = typeSelect.value;
+        if (val === 'mcq') {
+            mcqBox.style.display = 'block';
+            tfBox.style.display = 'none';
+            keyBox.style.display = 'none';
+        } else if (val === 'true_false') {
+            mcqBox.style.display = 'none';
+            tfBox.style.display = 'block';
+            keyBox.style.display = 'none';
+        } else {
+            mcqBox.style.display = 'none';
+            tfBox.style.display = 'none';
+            keyBox.style.display = 'block';
+        }
+    }
+
+    if (typeSelect) {
+        typeSelect.addEventListener('change', toggleTypeSections);
+        toggleTypeSections();
+    }
+});
+</script>
+{% endblock %}

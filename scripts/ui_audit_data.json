@@ -1,0 +1,2253 @@
+[
+  {
+    "template": "accounts/account_status.html",
+    "lines": 100,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/status/"
+    ],
+    "views": [
+      "accounts.views.account_status"
+    ]
+  },
+  {
+    "template": "accounts/admin_analytics.html",
+    "lines": 203,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/analytics/"
+    ],
+    "views": [
+      "accounts.views.admin_analytics"
+    ]
+  },
+  {
+    "template": "accounts/admin_approval_history.html",
+    "lines": 120,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/approval-history/"
+    ],
+    "views": [
+      "accounts.views.admin_approval_history"
+    ]
+  },
+  {
+    "template": "accounts/admin_audit_logs.html",
+    "lines": 114,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/audit-logs/"
+    ],
+    "views": [
+      "accounts.views.admin_audit_logs"
+    ]
+  },
+  {
+    "template": "accounts/admin_backup.html",
+    "lines": 108,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/backup/"
+    ],
+    "views": [
+      "accounts.views.admin_backup"
+    ]
+  },
+  {
+    "template": "accounts/admin_classes.html",
+    "lines": 99,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/classes/"
+    ],
+    "views": [
+      "accounts.views.admin_classes"
+    ]
+  },
+  {
+    "template": "accounts/admin_dashboard.html",
+    "lines": 319,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/dashboard/"
+    ],
+    "views": [
+      "accounts.views.admin_dashboard"
+    ]
+  },
+  {
+    "template": "accounts/admin_departments.html",
+    "lines": 109,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/departments/"
+    ],
+    "views": [
+      "accounts.views.admin_departments"
+    ]
+  },
+  {
+    "template": "accounts/admin_edit_class.html",
+    "lines": 40,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/classes/<int:class_id>/edit/"
+    ],
+    "views": [
+      "accounts.views.admin_edit_class"
+    ]
+  },
+  {
+    "template": "accounts/admin_edit_department.html",
+    "lines": 40,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/departments/<int:dept_id>/edit/"
+    ],
+    "views": [
+      "accounts.views.admin_edit_department"
+    ]
+  },
+  {
+    "template": "accounts/admin_policies.html",
+    "lines": 463,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/policies/"
+    ],
+    "views": [
+      "accounts.views.admin_policies"
+    ]
+  },
+  {
+    "template": "accounts/admin_security.html",
+    "lines": 92,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/security/"
+    ],
+    "views": [
+      "accounts.views.admin_security"
+    ]
+  },
+  {
+    "template": "accounts/admin_student_approvals.html",
+    "lines": 154,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/student-approvals/"
+    ],
+    "views": [
+      "accounts.views.admin_student_approvals"
+    ]
+  },
+  {
+    "template": "accounts/admin_student_detail.html",
+    "lines": 280,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/student/<int:student_id>/"
+    ],
+    "views": [
+      "accounts.views.admin_student_detail"
+    ]
+  },
+  {
+    "template": "accounts/admin_students.html",
+    "lines": 215,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/students/"
+    ],
+    "views": [
+      "accounts.views.admin_students"
+    ]
+  },
+  {
+    "template": "accounts/admin_suspended.html",
+    "lines": 123,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/suspended/"
+    ],
+    "views": [
+      "accounts.views.admin_suspended_accounts"
+    ]
+  },
+  {
+    "template": "accounts/admin_teacher_approvals.html",
+    "lines": 156,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/teacher-approvals/"
+    ],
+    "views": [
+      "accounts.views.admin_teacher_approvals"
+    ]
+  },
+  {
+    "template": "accounts/admin_teacher_detail.html",
+    "lines": 215,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/teacher/<int:teacher_id>/"
+    ],
+    "views": [
+      "accounts.views.admin_teacher_detail"
+    ]
+  },
+  {
+    "template": "accounts/admin_teachers.html",
+    "lines": 170,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/admin/teachers/"
+    ],
+    "views": [
+      "accounts.views.admin_teachers"
+    ]
+  },
+  {
+    "template": "accounts/change_password.html",
+    "lines": 115,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/change-password/"
+    ],
+    "views": [
+      "accounts.views.change_password"
+    ]
+  },
+  {
+    "template": "accounts/import_students.html",
+    "lines": 248,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/students/import/",
+      "/accounts/students/import/",
+      "/accounts/students/import/",
+      "/accounts/students/import/",
+      "/accounts/students/import/"
+    ],
+    "views": [
+      "accounts.views.import_students",
+      "accounts.views.import_students",
+      "accounts.views.import_students",
+      "accounts.views.import_students",
+      "accounts.views.import_students"
+    ]
+  },
+  {
+    "template": "accounts/login.html",
+    "lines": 178,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": false,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/login/",
+      "/accounts/login/",
+      "/accounts/login/"
+    ],
+    "views": [
+      "accounts.views.common_login",
+      "accounts.views.common_login",
+      "accounts.views.common_login"
+    ]
+  },
+  {
+    "template": "accounts/notifications.html",
+    "lines": 78,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/notifications/"
+    ],
+    "views": [
+      "accounts.views.notifications_list"
+    ]
+  },
+  {
+    "template": "accounts/profile.html",
+    "lines": 207,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/profile/"
+    ],
+    "views": [
+      "accounts.views.user_profile"
+    ]
+  },
+  {
+    "template": "accounts/register.html",
+    "lines": 323,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/register/",
+      "/accounts/register/central/"
+    ],
+    "views": [
+      "accounts.views.central_register"
+    ]
+  },
+  {
+    "template": "accounts/registration_success.html",
+    "lines": 47,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/register/success/"
+    ],
+    "views": [
+      "accounts.views.registration_success"
+    ]
+  },
+  {
+    "template": "accounts/student_approvals.html",
+    "lines": 151,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/teacher/student-approvals/"
+    ],
+    "views": [
+      "accounts.views.teacher_student_approvals"
+    ]
+  },
+  {
+    "template": "accounts/student_dashboard.html",
+    "lines": 454,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/student/dashboard/"
+    ],
+    "views": [
+      "accounts.views.student_dashboard"
+    ]
+  },
+  {
+    "template": "accounts/student_login.html",
+    "lines": 115,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [],
+    "views": []
+  },
+  {
+    "template": "accounts/student_register.html",
+    "lines": 201,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/student/register/"
+    ],
+    "views": [
+      "accounts.views.student_register"
+    ]
+  },
+  {
+    "template": "accounts/student_registration_success.html",
+    "lines": 41,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/student/register/success/"
+    ],
+    "views": [
+      "accounts.views.student_registration_success"
+    ]
+  },
+  {
+    "template": "accounts/teacher_dashboard.html",
+    "lines": 308,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/teacher/dashboard/"
+    ],
+    "views": [
+      "accounts.views.teacher_dashboard"
+    ]
+  },
+  {
+    "template": "accounts/teacher_login.html",
+    "lines": 115,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [],
+    "views": []
+  },
+  {
+    "template": "accounts/teacher_register.html",
+    "lines": 168,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/teacher/register/"
+    ],
+    "views": [
+      "accounts.views.teacher_register"
+    ]
+  },
+  {
+    "template": "accounts/teacher_registration_success.html",
+    "lines": 41,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/teacher/register/success/"
+    ],
+    "views": [
+      "accounts.views.teacher_registration_success"
+    ]
+  },
+  {
+    "template": "accounts/teacher_students.html",
+    "lines": 183,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/accounts/teacher/students/"
+    ],
+    "views": [
+      "accounts.views.teacher_students"
+    ]
+  },
+  {
+    "template": "base.html",
+    "lines": 330,
+    "extends": null,
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": false,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": true,
+    "has_custom_header": true,
+    "compliance": "BASELINE",
+    "issues": [],
+    "routes": [],
+    "views": []
+  },
+  {
+    "template": "exams/admin_all_exams.html",
+    "lines": 147,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/admin/all/"
+    ],
+    "views": [
+      "exams.views.admin_all_exams"
+    ]
+  },
+  {
+    "template": "exams/admin_attempts.html",
+    "lines": 140,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/admin/attempts/"
+    ],
+    "views": [
+      "exams.views.admin_exam_attempts"
+    ]
+  },
+  {
+    "template": "exams/admin_incidents.html",
+    "lines": 150,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/admin/incidents/"
+    ],
+    "views": [
+      "exams.views.admin_proctoring_incidents"
+    ]
+  },
+  {
+    "template": "exams/admin_proctoring.html",
+    "lines": 202,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/admin/proctoring/"
+    ],
+    "views": [
+      "exams.views.admin_proctoring_overview"
+    ]
+  },
+  {
+    "template": "exams/create_exam.html",
+    "lines": 207,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/create/"
+    ],
+    "views": [
+      "exams.views.create_exam"
+    ]
+  },
+  {
+    "template": "exams/create_question.html",
+    "lines": 164,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/questions/create/"
+    ],
+    "views": [
+      "exams.views.create_question"
+    ]
+  },
+  {
+    "template": "exams/edit_exam.html",
+    "lines": 196,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/<int:exam_id>/edit/"
+    ],
+    "views": [
+      "exams.views.edit_exam"
+    ]
+  },
+  {
+    "template": "exams/edit_question.html",
+    "lines": 154,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/questions/<int:question_id>/edit/"
+    ],
+    "views": [
+      "exams.views.edit_question"
+    ]
+  },
+  {
+    "template": "exams/exam_detail.html",
+    "lines": 274,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/<int:exam_id>/"
+    ],
+    "views": [
+      "exams.views.exam_detail"
+    ]
+  },
+  {
+    "template": "exams/exam_preview.html",
+    "lines": 83,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/<int:exam_id>/preview/"
+    ],
+    "views": [
+      "exams.views.exam_preview"
+    ]
+  },
+  {
+    "template": "exams/exam_readiness.html",
+    "lines": 448,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 35,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": true,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/<int:exam_id>/readiness/"
+    ],
+    "views": [
+      "exams.views.exam_readiness"
+    ]
+  },
+  {
+    "template": "exams/exam_room.html",
+    "lines": 367,
+    "extends": null,
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 100,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": true,
+    "has_custom_header": true,
+    "compliance": "COMPLIANT_SPECIALIZED",
+    "issues": [],
+    "routes": [
+      "/exams/attempt/<int:attempt_id>/room/"
+    ],
+    "views": [
+      "exams.views.exam_room"
+    ]
+  },
+  {
+    "template": "exams/exam_submitted.html",
+    "lines": 62,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/attempt/<int:attempt_id>/submitted/"
+    ],
+    "views": [
+      "exams.views.exam_submitted"
+    ]
+  },
+  {
+    "template": "exams/import_questions.html",
+    "lines": 140,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/questions/import/",
+      "/exams/questions/import/",
+      "/exams/questions/import/",
+      "/exams/questions/import/",
+      "/exams/questions/import/",
+      "/exams/questions/import/"
+    ],
+    "views": [
+      "exams.views.import_questions",
+      "exams.views.import_questions",
+      "exams.views.import_questions",
+      "exams.views.import_questions",
+      "exams.views.import_questions",
+      "exams.views.import_questions"
+    ]
+  },
+  {
+    "template": "exams/live_invigilation.html",
+    "lines": 171,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/<int:exam_id>/invigilate/"
+    ],
+    "views": [
+      "exams.views.live_invigilation"
+    ]
+  },
+  {
+    "template": "exams/manage_exams.html",
+    "lines": 163,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/manage/"
+    ],
+    "views": [
+      "exams.views.manage_exams"
+    ]
+  },
+  {
+    "template": "exams/manage_subjects.html",
+    "lines": 98,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/subjects/"
+    ],
+    "views": [
+      "exams.views.manage_subjects"
+    ]
+  },
+  {
+    "template": "exams/question_bank.html",
+    "lines": 168,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/questions/"
+    ],
+    "views": [
+      "exams.views.question_bank"
+    ]
+  },
+  {
+    "template": "exams/review_incident.html",
+    "lines": 152,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/incidents/<int:incident_id>/review/"
+    ],
+    "views": [
+      "exams.views.review_incident"
+    ]
+  },
+  {
+    "template": "exams/student_exam_list.html",
+    "lines": 226,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/exams/my-exams/"
+    ],
+    "views": [
+      "exams.views.student_exam_list"
+    ]
+  },
+  {
+    "template": "home.html",
+    "lines": 278,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/"
+    ],
+    "views": [
+      "accounts.views.home"
+    ]
+  },
+  {
+    "template": "results/admin_export.html",
+    "lines": 103,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/admin/export/"
+    ],
+    "views": [
+      "results.views.admin_results_export"
+    ]
+  },
+  {
+    "template": "results/admin_overview.html",
+    "lines": 120,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/admin/overview/"
+    ],
+    "views": [
+      "results.views.admin_results_overview"
+    ]
+  },
+  {
+    "template": "results/grade_attempt.html",
+    "lines": 120,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": true,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/attempt/<int:attempt_id>/grade/"
+    ],
+    "views": [
+      "results.views.grade_attempt"
+    ]
+  },
+  {
+    "template": "results/student_result_detail.html",
+    "lines": 127,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": false,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": false
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/my-results/<int:result_id>/"
+    ],
+    "views": [
+      "results.views.student_result_detail"
+    ]
+  },
+  {
+    "template": "results/student_results.html",
+    "lines": 83,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": false,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": false,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/my-results/"
+    ],
+    "views": [
+      "results.views.student_results"
+    ]
+  },
+  {
+    "template": "results/teacher_exam_results.html",
+    "lines": 170,
+    "extends": "base.html",
+    "uses_tailwind": false,
+    "uses_google_fonts": false,
+    "style_lines": 0,
+    "blue_colors": [],
+    "bento_components": {
+      "bento_grid": true,
+      "bento_card": true,
+      "bento_btn": true,
+      "bento_badge": true,
+      "bento_table": true,
+      "bento_input": false,
+      "bento_stat": true,
+      "bento_alert": false,
+      "bento_empty": true
+    },
+    "legacy_components": {
+      "card": false,
+      "btn": false,
+      "table": false
+    },
+    "has_custom_sidebar": false,
+    "has_custom_header": false,
+    "compliance": "COMPLIANT",
+    "issues": [],
+    "routes": [
+      "/results/exam/<int:exam_id>/"
+    ],
+    "views": [
+      "results.views.teacher_exam_results"
+    ]
+  }
+]

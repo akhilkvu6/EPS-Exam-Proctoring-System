@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Examinations Master Directory - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">EXAMINATION GOVERNANCE</span>
+            <span class="bento-badge bento-badge--sage">Total Configured: {{ total_exams }}</span>
+        </div>
+        <h1 class="bento-page-title">Institutional Examinations Master Catalog</h1>
+        <p class="bento-page-subtitle">Oversight for all examination papers, schedules, authoring faculty, and candidate attempt volumes.</p>
+    </div>
+    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'admin_exam_attempts' %}" class="bento-btn bento-btn--outline bento-btn--sm">Candidate Attempts &rarr;</a>
+        <a href="{% url 'admin_proctoring_overview' %}" class="bento-btn bento-btn--warning bento-btn--sm">Live Proctoring Fleet</a>
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; align-items: end;">
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Search Exam Title / Faculty</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="Title, subject code, or teacher..." class="bento-input" style="font-size: 0.85rem;">
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Subject Filter</label>
+            <select name="subject" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Subjects</option>
+                {% for sub in subjects %}
+                    <option value="{{ sub.id }}" {% if subject_id == sub.id|stringformat:"s" %}selected{% endif %}>
+                        {{ sub.code }} - {{ sub.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Lifecycle Status</label>
+            <select name="status" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Statuses</option>
+                <option value="published" {% if status == 'published' %}selected{% endif %}>Published / Active</option>
+                <option value="draft" {% if status == 'draft' %}selected{% endif %}>Draft</option>
+                <option value="closed" {% if status == 'closed' %}selected{% endif %}>Closed</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="flex: 1;">Filter</button>
+            <a href="{% url 'admin_all_exams' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Examinations Table -->
+<div class="bento-card">
+    <div class="bento-card__header">
+        <div>
+            <h2 class="bento-card__title">Examination Papers</h2>
+            <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_exams }} total tests.</p>
+        </div>
+    </div>
+
+    {% if page_obj %}
+        <div class="bento-table-wrapper">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Examination Title</th>
+                        <th>Subject</th>
+                        <th>Faculty Author</th>
+                        <th>Duration</th>
+                        <th>Total Marks</th>
+                        <th>Attempts Recorded</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in page_obj %}
+                        <tr>
+                            <td>
+                                <strong style="color: var(--eps-text-primary);">{{ exam.title }}</strong>
+                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">
+                                    Scheduled: {{ exam.start_time|date:"M d, Y H:i" }} &ndash; {{ exam.end_time|date:"H:i" }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="bento-badge bento-badge--sage" style="font-weight: 700;">{{ exam.subject.code }}</span>
+                                <div style="font-size: 0.75rem; color: var(--eps-text-secondary);">{{ exam.subject.name }}</div>
+                            </td>
+                            <td>
+                                <span style="color: var(--eps-text-primary);">Prof. {{ exam.created_by.first_name|default:exam.created_by.username }}</span>
+                            </td>
+                            <td>{{ exam.duration_minutes }} mins</td>
+                            <td><strong>{{ exam.total_marks }}</strong></td>
+                            <td>
+                                <span class="bento-badge bento-badge--mint" style="font-weight: 700;">
+                                    {{ exam.attempts.count }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if exam.status == 'published' %}
+                                    <span class="bento-badge bento-badge--success">Published</span>
+                                {% elif exam.status == 'draft' %}
+                                    <span class="bento-badge bento-badge--neutral">Draft</span>
+                                {% else %}
+                                    <span class="bento-badge bento-badge--warning">{{ exam.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; gap: 0.35rem;">
+                                    <a href="{% url 'exam_preview' exam.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.2rem 0.5rem;" target="_blank">
+                                        Preview &rarr;
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border);">
+                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <div style="display: flex; gap: 0.35rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No examinations found matching your filter parameters.</p>
+    {% endif %}
+</div>
+{% endblock %}

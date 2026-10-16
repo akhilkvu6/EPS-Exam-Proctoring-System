@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Academic Subjects - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <h1 class="bento-page-title">Academic Courses & Subjects</h1>
+        <p class="bento-page-subtitle">Configure institutional courses for exam creation and question bank taxonomy.</p>
+    </div>
+    <div class="bento-page-actions">
+        <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Question Bank</a>
+    </div>
+</div>
+
+<div class="bento-grid bento-grid--3" style="align-items: start;">
+    <!-- Add Subject Form Bento Card -->
+    <div class="bento-card bento-card--mint">
+        <div class="bento-card__header" style="margin-bottom: 1rem;">
+            <div>
+                <h3 class="bento-card__title" style="font-size: 1.05rem;">+ Add Course / Subject</h3>
+                <p class="bento-card__subtitle" style="font-size: 0.8rem;">Define a new curriculum course code</p>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="bento-form-group" style="margin-bottom: 0.85rem;">
+                <label class="bento-label" for="id_name">Subject Name *</label>
+                {{ form.name }}
+            </div>
+            <div class="bento-form-group" style="margin-bottom: 0.85rem;">
+                <label class="bento-label" for="id_code">Course Code *</label>
+                {{ form.code }}
+            </div>
+            <div class="bento-form-group" style="margin-bottom: 1.25rem;">
+                <label class="bento-label" for="id_department">Academic Department *</label>
+                {{ form.department }}
+            </div>
+            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%;">
+                + Save Subject
+            </button>
+        </form>
+    </div>
+
+    <!-- Subjects List Bento Card (Span 2) -->
+    <div style="grid-column: span 2;" class="bento-card">
+        <div class="bento-card__header">
+            <div>
+                <h2 class="bento-card__title" style="margin-bottom: 0.25rem;">Existing Courses ({{ subjects.count }})</h2>
+                <p class="bento-card__subtitle">All active courses registered in the institutional repository.</p>
+            </div>
+        </div>
+
+        {% if subjects %}
+            <div class="bento-table-wrapper">
+                <table class="bento-table">
+                    <thead>
+                        <tr>
+                            <th>Subject Name</th>
+                            <th>Code</th>
+                            <th>Department</th>
+                            <th style="text-align: right;">Questions Banked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in subjects %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--eps-text-primary); font-size: 0.95rem;">{{ s.name }}</strong>
+                                </td>
+                                <td>
+                                    <span class="bento-badge bento-badge--sage" style="font-family: monospace; font-weight: 700;">{{ s.code }}</span>
+                                </td>
+                                <td>
+                                    <span style="color: var(--eps-text-secondary); font-size: 0.9rem;">{{ s.department.name }}</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <span class="bento-badge bento-badge--mint" style="font-weight: 700; font-size: 0.85rem;">
+                                        {{ s.questions.count }} items
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="bento-empty-state" style="padding: 2.5rem 1rem; text-align: center; border: 1.5px dashed var(--eps-border); border-radius: var(--eps-radius-md); background: var(--eps-canvas);">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                <p style="font-size: 0.9rem; color: var(--eps-text-muted);">
+                    No academic subjects configured yet. Use the form on the left to add your first subject.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

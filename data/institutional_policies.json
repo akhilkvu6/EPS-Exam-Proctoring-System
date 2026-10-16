@@ -1,0 +1,19 @@
+{
+  "attempt_allowance": "dual",
+  "audio_monitor": "threshold",
+  "audit_retention_years": "7y",
+  "clipboard_neutralization_enabled": true,
+  "distractor_shuffling_enabled": true,
+  "early_entry_enabled": false,
+  "focus_trap_enabled": true,
+  "item_randomization_enabled": true,
+  "late_entry_enabled": true,
+  "late_entry_mins": 15,
+  "negative_marking_scheme": "mild",
+  "os_lockdown_enabled": true,
+  "score_embargo_enabled": true,
+  "server_submission_enabled": true,
+  "telemetry_retention_days": "90",
+  "timing_accommodation": "1.0",
+  "video_ingestion": "dual"
+}

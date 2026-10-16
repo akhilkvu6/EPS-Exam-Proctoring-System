@@ -1,77 +1,278 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Online Examination System</title>
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
-<body>
+{% block title %}EPS — Institutional Online Examination & Proctoring Platform{% endblock %}
 
-    <h1>Online Examination System</h1>
+{% block content %}
+<div style="max-width: 1240px; margin: 1rem auto 4rem auto;">
 
-    <p>Development Navigation</p>
+    <!-- =========================================================================
+         1. HERO SECTION (Asymmetric Bento Hero)
+         ========================================================================= -->
+    <div class="bento-card bento-card--primary" style="padding: 3.5rem 2.5rem; margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <div style="max-width: 760px; position: relative; z-index: 2;">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); padding: 0.35rem 0.85rem; border-radius: var(--eps-radius-full); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.5rem;">
+                <span>🌿</span> Academic Integrity System &bull; EPS
+            </div>
 
-    <hr>
+            <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.25rem; color: #FFFFFF; letter-spacing: -0.025em;">
+                Institutional Online Examination &amp; Proctoring Platform
+            </h1>
 
-    <h2>Available Pages</h2>
+            <p style="font-size: 1.1rem; line-height: 1.65; opacity: 0.95; color: #FFFFFF; margin-bottom: 2.25rem;">
+                An institutional evaluation environment delivering tamper-resistant assessments, client-side sensory telemetry, and streamlined academic workflows—strictly built with zero external email dependencies.
+            </p>
 
-    <h3>Admin</h3>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="{% url 'common_login' %}" class="bento-btn bento-btn--mint bento-btn--lg" style="box-shadow: 0 4px 16px rgba(0,0,0,0.15);">
+                    <span>Login to Portal</span>
+                    <span>→</span>
+                </a>
+                <a href="{% url 'register' %}" class="bento-btn bento-btn--outline bento-btn--lg" style="background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); color: white;">
+                    <span>Create Account</span>
+                </a>
+            </div>
+        </div>
 
-    <ul>
-        <li>
-            <a href="/admin/">
-                Django Admin
+        <div style="position: absolute; right: -40px; bottom: -40px; font-size: 14rem; opacity: 0.08; pointer-events: none; user-select: none;">
+            🌿
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         2. CORE CAPABILITIES (Bento Grid 4-Column Layout)
+         ========================================================================= -->
+    <div style="margin-bottom: 2.5rem;">
+        <div style="margin-bottom: 1.25rem;">
+            <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--eps-text-primary);">
+                Platform Architecture &amp; Capabilities
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--eps-text-secondary); margin: 0;">
+                Engineered for college examination boards, departmental faculty, and candidate assessment.
+            </p>
+        </div>
+
+        <div class="bento-grid">
+            
+            <!-- Feature 1: Real-Time Telemetry (Wide) -->
+            <div class="bento-card bento-card--wide" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--sage" style="margin-bottom: 1rem;">
+                        Sensory Telemetry
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Client-Side Proctoring Suite
+                    </h3>
+                    <p style="font-size: 0.9rem; color: var(--eps-text-secondary); line-height: 1.55; margin-bottom: 1rem;">
+                        WebRTC webcam stream presence, Web Audio API amplitude variance detection, HTML5 Fullscreen API locking, and Page Visibility API tab-switch logging.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="bento-badge bento-badge--mint">WebRTC Video</span>
+                    <span class="bento-badge bento-badge--mint">Web Audio VU</span>
+                    <span class="bento-badge bento-badge--mint">Fullscreen Lock</span>
+                    <span class="bento-badge bento-badge--mint">Focus Tracking</span>
+                </div>
+            </div>
+
+            <!-- Feature 2: Zero-Email Policy -->
+            <div class="bento-card" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--warning" style="margin-bottom: 1rem;">
+                        Strict Zero-Email
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        100% In-App Notifications
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                        Zero SMTP configurations or third-party email providers. Approvals, alerts, and scorecard announcements are delivered directly in-app.
+                    </p>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--eps-sage-primary);">
+                    Self-Contained Deployment
+                </div>
+            </div>
+
+            <!-- Feature 3: Academic Structure -->
+            <div class="bento-card" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--success" style="margin-bottom: 1rem;">
+                        Institutional Hierarchy
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Departments &amp; Classes
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                        Organized academic hierarchy with departmental student assignment, teacher oversight, and class cohort scoping.
+                    </p>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--eps-sage-primary);">
+                    Role-Based Isolation
+                </div>
+            </div>
+
+            <!-- Feature 4: Question Banking -->
+            <div class="bento-card" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--sage" style="margin-bottom: 1rem;">
+                        Assessment Engine
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Question Repository
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                        Multi-format question authoring with OpenPyXL Excel and CSV bulk import, question recycling, and negative marking penalty deductions.
+                    </p>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--eps-sage-primary);">
+                    Excel &bull; CSV &bull; Manual
+                </div>
+            </div>
+
+            <!-- Feature 5: Evaluation & Gradebook (Wide) -->
+            <div class="bento-card bento-card--wide" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--mint" style="margin-bottom: 1rem;">
+                        Grading &amp; Analytics
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Dual-Mode Grading &amp; Scorecards
+                    </h3>
+                    <p style="font-size: 0.9rem; color: var(--eps-text-secondary); line-height: 1.55; margin-bottom: 1rem;">
+                        Instant objective auto-grading combined with a dedicated faculty descriptive grading console. Candidate scorecards render sectional performance and review notes.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="bento-badge bento-badge--sage">Automated Scoring</span>
+                    <span class="bento-badge bento-badge--sage">Descriptive Review</span>
+                    <span class="bento-badge bento-badge--sage">Institutional CSV Export</span>
+                </div>
+            </div>
+
+            <!-- Feature 6: Security & Auditing -->
+            <div class="bento-card" style="justify-content: space-between;">
+                <div>
+                    <div class="bento-badge bento-badge--danger" style="margin-bottom: 1rem;">
+                        Platform Security
+                    </div>
+                    <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Immutable Audit Trail
+                    </h3>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                        Comprehensive logging of authentications, policy adjustments, question modifications, and proctoring telemetry violations.
+                    </p>
+                </div>
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--eps-danger);">
+                    Forensically Hardened
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         3. WORKFLOW PROGRESSION (Student vs Teacher)
+         ========================================================================= -->
+    <div class="bento-grid bento-grid--2col" style="gap: 1.75rem; margin-bottom: 2.5rem;">
+        
+        <!-- Student Journey Card -->
+        <div class="bento-card" style="padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
+                <span style="font-size: 1.75rem;">🎓</span>
+                <div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">Student Candidate Journey</h3>
+                    <span style="font-size: 0.8rem; color: var(--eps-text-muted);">Assessment Workflow</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--sage" style="align-self: flex-start;">1</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Central Registration:</strong> Submit candidate profile with roll number and department; awaits teacher verification.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--sage" style="align-self: flex-start;">2</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Pre-Flight Hardware Check:</strong> Test camera, microphone, and agree to institutional honor code declaration.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--sage" style="align-self: flex-start;">3</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Proctored Exam Room:</strong> Distraction-free workspace with AJAX answer autosave, timer countdown, and telemetry monitoring.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--sage" style="align-self: flex-start;">4</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Published Scorecards:</strong> Inspect verified scores, pass/fail status, and teacher remarks.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Journey Card -->
+        <div class="bento-card" style="padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.25rem;">
+                <span style="font-size: 1.75rem;">👩‍🏫</span>
+                <div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">Faculty Invigilator Journey</h3>
+                    <span style="font-size: 0.8rem; color: var(--eps-text-muted);">Evaluation &amp; Governance</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--mint" style="align-self: flex-start;">1</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Student Approvals &amp; Rosters:</strong> Verify departmental candidates, assign class cohorts, and manage rosters.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--mint" style="align-self: flex-start;">2</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Exam Authoring:</strong> Build questions, import spreadsheets, configure passing criteria and time multipliers.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--mint" style="align-self: flex-start;">3</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Live Invigilation:</strong> Track candidate heartbeats in real-time and review flagged proctoring incidents.
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <span class="bento-badge bento-badge--mint" style="align-self: flex-start;">4</span>
+                    <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                        <strong style="color: var(--eps-text-primary);">Descriptive Grading:</strong> Evaluate essay responses with rubric rubrics and publish finalized grades.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =========================================================================
+         4. INSTITUTIONAL CALLOUT
+         ========================================================================= -->
+    <div class="bento-card bento-card--mint-subtle" style="padding: 2.25rem; text-align: center;">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+            Ready to Begin Academic Examination Session?
+        </h3>
+        <p style="font-size: 0.95rem; color: var(--eps-text-secondary); max-width: 600px; margin: 0 auto 1.5rem auto;">
+            Authenticate with your institutional credentials or register a verified student or faculty profile to get started.
+        </p>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+            <a href="{% url 'common_login' %}" class="bento-btn bento-btn--primary bento-btn--lg">
+                <span>Access EPS Portal</span>
+                <span>→</span>
             </a>
-        </li>
-    </ul>
-
-    <h3>Teacher</h3>
-
-    <ul>
-        <li>
-            <a href="{% url 'teacher_register' %}">
-                Teacher Registration
+            <a href="{% url 'register' %}" class="bento-btn bento-btn--outline bento-btn--lg">
+                <span>Register Account</span>
             </a>
-        </li>
+        </div>
+    </div>
 
-        <li>
-            <a href="{% url 'teacher_registration_success' %}">
-                Registration Success Page
-            </a>
-        </li>
-
-        <li>
-            <a href="{% url 'teacher_login' %}">
-                Teacher Login
-            </a>
-        </li>
-
-        <li>
-            <a href="{% url 'teacher_dashboard' %}">
-                Teacher Dashboard
-            </a>
-        </li>
-
-        <li>
-            <a href="{% url 'user_logout' %}">
-                Logout
-            </a>
-        </li>
-    </ul>
-
-    <hr>
-
-    <h2>Project Status</h2>
-
-    <p>✅ Django Project</p>
-    <p>✅ Admin</p>
-    <p>✅ Teacher Registration</p>
-    <p>✅ Teacher Verification</p>
-    <p>✅ Teacher Login</p>
-    <p>✅ Teacher Dashboard</p>
-
-    <p>🚧 Student Module — Coming Next</p>
-    <p>🚧 Exam Module — Coming Next</p>
-    <p>🚧 Results Module — Coming Next</p>
-
-</body>
-</html>
+</div>
+{% endblock %}

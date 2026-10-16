@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Preview: {{ exam.title }} - EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 920px; margin: 0 auto;">
+    <div class="bento-page-header">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <span class="bento-badge bento-badge--mint" style="font-weight: 700; letter-spacing: 0.04em;">
+                    👁️ STUDENT EXAMINATION PREVIEW
+                </span>
+            </div>
+            <h1 class="bento-page-title" style="margin-bottom: 0.25rem;">{{ exam.title }}</h1>
+            <p class="bento-page-subtitle">
+                Subject: <strong>{{ exam.subject.name }} ({{ exam.subject.code }})</strong> &bull; Total Marks: <strong>{{ exam.total_marks }}</strong> &bull; Time Allowed: <strong>{{ exam.duration_minutes }} minutes</strong>
+            </p>
+        </div>
+        <div class="bento-page-actions">
+            <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Management</a>
+        </div>
+    </div>
+
+    <!-- Instructions Banner Bento Card -->
+    <div class="bento-card bento-card--mint" style="margin-bottom: 2rem;">
+        <div class="bento-card__header" style="margin-bottom: 0.5rem;">
+            <h3 class="bento-card__title" style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📋</span> Candidate Examination Instructions
+            </h3>
+        </div>
+        <div style="font-size: 0.92rem; color: var(--eps-text-secondary); line-height: 1.6; white-space: pre-line;">
+            {{ exam.instructions|default:"No specific candidate instructions provided for this examination." }}
+        </div>
+    </div>
+
+    <!-- Questions Preview List -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        {% for eq in exam_questions %}
+            <div class="bento-card" style="padding: 1.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--eps-border); padding-bottom: 0.85rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="bento-badge bento-badge--primary" style="font-weight: 700;">Question {{ eq.order }}</span>
+                        <span class="bento-badge bento-badge--neutral" style="font-size: 0.75rem;">{{ eq.question.get_question_type_display }}</span>
+                    </div>
+                    <div class="bento-badge bento-badge--mint" style="font-size: 0.82rem; font-weight: 600;">
+                        {{ eq.effective_marks }} Marks {% if eq.effective_negative_marks %}<span style="color: var(--eps-status-danger); font-size: 0.75rem; margin-left: 0.2rem;">(-{{ eq.effective_negative_marks }})</span>{% endif %}
+                    </div>
+                </div>
+
+                <div style="font-size: 1.02rem; color: var(--eps-text-primary); margin-bottom: 1.25rem; line-height: 1.6; font-weight: 500;">
+                    {{ eq.question.question_text|linebreaks }}
+                </div>
+
+                {% if eq.question.question_type == 'mcq' or eq.question.question_type == 'true_false' %}
+                    <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                        {% for opt in eq.question.options.all %}
+                            <label style="display: flex; align-items: center; gap: 0.85rem; padding: 0.75rem 1.15rem; border: 1.5px solid var(--eps-border); border-radius: var(--eps-radius-md); background: var(--eps-surface); cursor: default; transition: all var(--eps-transition-fast);">
+                                <input type="radio" name="preview_q_{{ eq.id }}" disabled style="width: 18px; height: 18px; accent-color: var(--eps-primary-sage);">
+                                <span style="font-size: 0.95rem; color: var(--eps-text-primary);">{{ opt.option_text }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% elif eq.question.question_type == 'short_answer' %}
+                    <div class="bento-form-group" style="margin-bottom: 0;">
+                        <input type="text" class="bento-input" placeholder="Examinee enters concise single-line answer..." disabled style="background: var(--eps-surface-alt);">
+                    </div>
+                {% elif eq.question.question_type == 'descriptive' %}
+                    <div class="bento-form-group" style="margin-bottom: 0;">
+                        <textarea class="bento-input" rows="4" placeholder="Examinee drafts detailed descriptive response here..." disabled style="background: var(--eps-surface-alt); resize: none;"></textarea>
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="bento-card" style="text-align: center; padding: 3rem 1.5rem; color: var(--eps-text-muted);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❓</div>
+                <h3 style="font-size: 1.1rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No questions configured</h3>
+                <p style="font-size: 0.88rem; margin-bottom: 1.25rem;">Return to the exam manager to attach questions from the repository.</p>
+                <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn--primary bento-btn--sm">&larr; Return to Exam Manager</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

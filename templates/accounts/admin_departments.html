@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Academic Departments - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">ACADEMIC ARCHITECTURE</span>
+            <span class="bento-badge bento-badge--sage">{{ departments.count }} Departments Configured</span>
+        </div>
+        <h1 class="bento-page-title">Academic Departments Management</h1>
+        <p class="bento-page-subtitle">Configure faculties, academic codes, subject syllabi mappings, and departmental class cohorts.</p>
+    </div>
+    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'admin_classes' %}" class="bento-btn bento-btn--outline bento-btn--sm">Class Cohorts &rarr;</a>
+        <a href="{% url 'manage_subjects' %}" class="bento-btn bento-btn--outline bento-btn--sm">Course Subjects &rarr;</a>
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<div class="bento-grid bento-grid--3" style="margin-bottom: 1.5rem; align-items: start;">
+    <!-- Add Department Form Bento Card -->
+    <div class="bento-card bento-card--mint" style="grid-column: span 1;">
+        <div class="bento-card__header">
+            <h3 class="bento-card__title">+ Create Department</h3>
+            <p class="bento-card__subtitle">Register an institutional faculty unit.</p>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="bento-form-group" style="margin-bottom: 0.75rem;">
+                <label class="bento-label">Department Name</label>
+                {{ form.name }}
+            </div>
+            <div class="bento-form-group" style="margin-bottom: 0.75rem;">
+                <label class="bento-label">Department Code</label>
+                {{ form.code }}
+            </div>
+            <div class="bento-form-group" style="margin-bottom: 1.25rem;">
+                <label class="bento-label">Description (Optional)</label>
+                {{ form.description }}
+            </div>
+            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%;">
+                Save Department
+            </button>
+        </form>
+    </div>
+
+    <!-- Departments Directory Bento Card -->
+    <div class="bento-card" style="grid-column: span 2;">
+        <div class="bento-card__header">
+            <h2 class="bento-card__title">Configured Academic Faculties</h2>
+            <p class="bento-card__subtitle">Departments currently active in the EPS institutional platform.</p>
+        </div>
+
+        {% if departments %}
+            <div class="bento-table-wrapper">
+                <table class="bento-table">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Code</th>
+                            <th>Associated Cohorts</th>
+                            <th>Created</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dept in departments %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--eps-text-primary);">{{ dept.name }}</strong>
+                                    {% if dept.description %}
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-muted);">{{ dept.description|truncatewords:8 }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="bento-badge bento-badge--sage" style="font-family: monospace; font-weight: 700;">{{ dept.code }}</span>
+                                </td>
+                                <td>
+                                    {% if dept.classes.all %}
+                                        <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                                            {% for cls in dept.classes.all %}
+                                                <span class="bento-badge bento-badge--mint" style="font-size: 0.72rem;">{{ cls.name }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span style="color: var(--eps-text-muted); font-size: 0.8rem;">No classes yet</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.82rem; color: var(--eps-text-secondary);">{{ dept.created_at|date:"M d, Y" }}</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'admin_edit_department' dept.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.2rem 0.5rem;">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No academic departments configured yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

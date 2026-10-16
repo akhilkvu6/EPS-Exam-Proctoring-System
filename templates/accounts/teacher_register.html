@@ -1,32 +1,168 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Teacher Registration</title>
-</head>
+{% extends 'base.html' %}
+{% load static %}
 
-<body>
+{% block title %}Faculty Registration & Credential Verification — EPS{% endblock %}
 
-    <h1>Teacher Registration</h1>
+{% block content %}
+<div style="max-width: 860px; margin: 1.5rem auto 3.5rem auto;">
 
-    {% if form.errors %}
-        <div style="color: red; margin-bottom: 20px;">
-            <h3>Please correct the following errors:</h3>
+    <!-- Breadcrumb / Back Link -->
+    <div style="margin-bottom: 1rem;">
+        <a href="{% url 'register' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+            ← Back to Role Selection
+        </a>
+    </div>
 
-            {{ form.errors }}
+    <div class="bento-card" style="padding: 2.25rem;">
+        
+        <!-- Header -->
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="bento-badge bento-badge--mint">Faculty Access</span>
+                <span style="font-size: 0.8rem; color: var(--eps-text-muted);">&bull; Tier-2 Reviewer Role</span>
+            </div>
+            <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
+                Faculty Registration &amp; Credential Verification
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--eps-text-secondary); margin: 0;">
+                Provide your institutional affiliation details. Faculty profiles require administrative approval before examination delivery permissions are granted.
+            </p>
         </div>
-    {% endif %}
 
-    <form method="POST">
+        <!-- Errors -->
+        {% if form.errors %}
+            <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <span>⚠️</span>
+                    <div>
+                        <strong style="display: block; margin-bottom: 0.25rem;">Please correct the following errors:</strong>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                            {% for field, errors in form.errors.items %}
+                                {% for err in errors %}
+                                    <li><strong>{{ field|title }}:</strong> {{ err }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
-        {% csrf_token %}
+        <form method="POST" action="{% url 'teacher_register' %}">
+            {% csrf_token %}
 
-        {{ form.as_p }}
+            <!-- SECTION 1: Personal Credentials & Security -->
+            <div style="margin-bottom: 1.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--eps-border-subtle);">
+                    <span style="background-color: var(--eps-sage-primary); color: white; width: 22px; height: 22px; border-radius: var(--eps-radius-full); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">1</span>
+                    <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">Personal Credentials &amp; Security</h2>
+                </div>
 
-        <button type="submit">
-            Register
-        </button>
+                <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="full_name">
+                            Full Name <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="text" id="full_name" name="full_name" class="bento-input" placeholder="e.g. Dr. Eleanor Vance" value="{{ form.full_name.value|default:'' }}" required>
+                    </div>
 
-    </form>
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="username">
+                            Login Username <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="text" id="username" name="username" class="bento-input" placeholder="e.g. prof_vance" value="{{ form.username.value|default:'' }}" required autocomplete="username">
+                    </div>
+                </div>
 
-</body>
-</html>
+                <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="employee_id">
+                            Staff / Employee ID <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="text" id="employee_id" name="employee_id" class="bento-input" placeholder="e.g. FAC-4409" value="{{ form.employee_id.value|default:'' }}" required>
+                    </div>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="email">
+                            Institutional Email (Optional)
+                        </label>
+                        <input type="email" id="email" name="email" class="bento-input" placeholder="faculty@institution.edu" value="{{ form.email.value|default:'' }}">
+                        <span class="bento-form-hint">Record reference only; zero automated emails sent.</span>
+                    </div>
+                </div>
+
+                <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="password1_field">
+                            Password <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="password" id="password1_field" name="password1" class="bento-input" placeholder="••••••••••••" required autocomplete="new-password">
+                    </div>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="password2_field">
+                            Confirm Password <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="password" id="password2_field" name="password2" class="bento-input" placeholder="••••••••••••" required autocomplete="new-password">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Professional Affiliation & Teaching Areas -->
+            <div style="margin-bottom: 1.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--eps-border-subtle);">
+                    <span style="background-color: var(--eps-sage-secondary); color: white; width: 22px; height: 22px; border-radius: var(--eps-radius-full); display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700;">2</span>
+                    <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">Professional Affiliation &amp; Teaching Areas</h2>
+                </div>
+
+                <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="department">
+                            Department / Faculty <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="text" id="department" name="department" class="bento-input" placeholder="e.g. Computer Science & Engineering" value="{{ form.department.value|default:'' }}" required>
+                    </div>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="qualification">
+                            Highest Qualification <span style="color: var(--eps-danger);">*</span>
+                        </label>
+                        <input type="text" id="qualification" name="qualification" class="bento-input" placeholder="e.g. Ph.D. / M.Tech / M.C.A." value="{{ form.qualification.value|default:'' }}" required>
+                    </div>
+                </div>
+
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="specialization">
+                        Specialization / Teaching Area
+                    </label>
+                    <input type="text" id="specialization" name="specialization" class="bento-input" placeholder="e.g. Distributed Systems, Network Security, Machine Learning" value="{{ form.specialization.value|default:'' }}">
+                </div>
+            </div>
+
+            <!-- Verification Notice Box -->
+            <div style="background-color: var(--eps-mint-subtle); border: 1px solid var(--eps-mint); border-radius: var(--eps-radius-control); padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                <span style="font-size: 1.2rem;">🛡️</span>
+                <div style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                    <strong style="color: var(--eps-sage-primary);">Administrator Approval Step:</strong>
+                    Your account will be provisioned in a <strong>Pending</strong> state. An institutional administrator will review your faculty credentials before test creation and invigilation permissions are unlocked.
+                </div>
+            </div>
+
+            <!-- Submit Button & Links -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <a href="{% url 'common_login' %}" style="font-size: 0.9rem; color: var(--eps-text-secondary);">
+                    Already registered? <strong style="color: var(--eps-sage-primary);">Sign In →</strong>
+                </a>
+
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
+                    <span>Submit Faculty Registration</span>
+                    <span>→</span>
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}

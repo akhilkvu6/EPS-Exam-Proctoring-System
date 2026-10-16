@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Candidate Directory - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">ACCOUNTS MANAGEMENT</span>
+            <span class="bento-badge bento-badge--sage">Total Records: {{ total_count }}</span>
+        </div>
+        <h1 class="bento-page-title">Candidate Directory & Oversight</h1>
+        <p class="bento-page-subtitle">Search, inspect, filter, and govern student accounts across all academic departments.</p>
+    </div>
+    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'import_students' %}" class="bento-btn bento-btn--primary bento-btn--sm">📊 Bulk Student Import</a>
+        <a href="{% url 'admin_student_approvals' %}" class="bento-btn bento-btn--warning bento-btn--sm">Verification Queue</a>
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<!-- Search, Filter & Bulk Controls Card -->
+<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Search Query</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="Name, Roll No, Username..." class="bento-input" style="font-size: 0.85rem;">
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Department</label>
+            <select name="department" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Departments</option>
+                {% for dept in departments_list %}
+                    <option value="{{ dept }}" {% if department == dept %}selected{% endif %}>{{ dept }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Semester</label>
+            <select name="semester" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Semesters</option>
+                {% for sem in semesters_list %}
+                    <option value="{{ sem }}" {% if semester == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Account Status</label>
+            <select name="status" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Statuses</option>
+                <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved / Active</option>
+                <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending Verification</option>
+                <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
+                <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Sort Order</label>
+            <select name="sort" class="bento-select" style="font-size: 0.85rem;">
+                <option value="-date" {% if sort == '-date' %}selected{% endif %}>Newest First</option>
+                <option value="date" {% if sort == 'date' %}selected{% endif %}>Oldest First</option>
+                <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                <option value="roll" {% if sort == 'roll' %}selected{% endif %}>Roll Number</option>
+                <option value="dept" {% if sort == 'dept' %}selected{% endif %}>Department</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="flex: 1;">Filter</button>
+            <a href="{% url 'admin_students' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Bulk Actions & Table Card -->
+<form method="POST">
+    {% csrf_token %}
+    <div class="bento-card">
+        <div class="bento-card__header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+                <h2 class="bento-card__title">Candidate Roster</h2>
+                <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_count }} student records.</p>
+            </div>
+
+            <!-- Bulk Operations Toolbar -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.82rem; color: var(--eps-text-muted);">Bulk Action:</span>
+                <select name="bulk_action" class="bento-select" style="font-size: 0.82rem; padding: 0.3rem 0.6rem; width: auto;">
+                    <option value="activate">Reactivate Selected</option>
+                    <option value="suspend">Suspend Selected</option>
+                    <option value="export_csv">Export Selected to CSV</option>
+                </select>
+                <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" onclick="return confirm('Apply selected bulk action?');">Apply</button>
+            </div>
+        </div>
+
+        {% if page_obj %}
+            <div class="bento-table-wrapper">
+                <table class="bento-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="selectAllCheckbox" onclick="toggleSelectAll(this)">
+                            </th>
+                            <th>Roll Number</th>
+                            <th>Student Name</th>
+                            <th>Username</th>
+                            <th>Department & Class</th>
+                            <th>Semester</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in page_obj %}
+                            <tr>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" name="selected_students" value="{{ student.id }}" class="student-select-cb">
+                                </td>
+                                <td>
+                                    <span class="bento-badge bento-badge--sage" style="font-family: monospace; font-weight: 700;">{{ student.roll_number }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'admin_student_detail' student.id %}" style="color: var(--eps-text-primary); font-weight: 600; text-decoration: none;">
+                                        {{ student.full_name|default:student.user.get_full_name|default:student.user.username }}
+                                    </a>
+                                    <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ student.user.email }}</div>
+                                </td>
+                                <td><code>{{ student.user.username }}</code></td>
+                                <td>
+                                    <div>{{ student.department }}</div>
+                                    {% if student.class_group %}
+                                        <span class="bento-badge bento-badge--mint" style="font-size: 0.72rem;">{{ student.class_group.name }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>Semester {{ student.semester }}</td>
+                                <td>
+                                    {% if student.verification_status == 'approved' %}
+                                        <span class="bento-badge bento-badge--success">Approved</span>
+                                    {% elif student.verification_status == 'pending' %}
+                                        <span class="bento-badge bento-badge--warning">Pending</span>
+                                    {% elif student.verification_status == 'suspended' %}
+                                        <span class="bento-badge bento-badge--danger">Suspended</span>
+                                    {% else %}
+                                        <span class="bento-badge bento-badge--neutral">{{ student.verification_status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span style="font-size: 0.82rem; color: var(--eps-text-secondary);">{{ student.user.date_joined|date:"M d, Y" }}</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: inline-flex; gap: 0.35rem;">
+                                        <a href="{% url 'admin_student_detail' student.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.2rem 0.5rem;">
+                                            Inspect &rarr;
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bento Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border); flex-wrap: wrap; gap: 0.75rem;">
+                    <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+                    <div style="display: flex; gap: 0.35rem;">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
+                        {% endif %}
+
+                        {% for p in page_obj.paginator.page_range %}
+                            {% if p == page_obj.number %}
+                                <span class="bento-btn bento-btn--primary bento-btn--sm">{{ p }}</span>
+                            {% elif p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
+                                <a href="?page={{ p }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">{{ p }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="bento-empty-state" style="padding: 3rem 1.5rem; text-align: center;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+                <h3 style="font-size: 1.15rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No Candidate Records Found</h3>
+                <p style="font-size: 0.9rem; color: var(--eps-text-muted); max-width: 440px; margin: 0 auto 1.25rem;">
+                    No candidates match the provided search or filter parameters. Try resetting your filters.
+                </p>
+                <a href="{% url 'admin_students' %}" class="bento-btn bento-btn--outline bento-btn--sm">Reset Filters</a>
+            </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('.student-select-cb');
+    checkboxes.forEach(cb => cb.checked = source.checked);
+}
+</script>
+{% endblock %}

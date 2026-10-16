@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Database Integrity & Backup Ledger - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">SYSTEM RESILIENCE</span>
+            {% if integrity_result == 'ok' or integrity_result == 'OK' %}
+                <span class="bento-badge bento-badge--success">PRAGMA Integrity: Valid</span>
+            {% else %}
+                <span class="bento-badge bento-badge--danger">Integrity Notice</span>
+            {% endif %}
+        </div>
+        <h1 class="bento-page-title">Database Integrity & Backup Management</h1>
+        <p class="bento-page-subtitle">Inspect primary SQLite database health, storage footprint, and immutable institutional backup snapshots.</p>
+    </div>
+    <div class="bento-page-actions">
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<div class="bento-grid bento-grid--3" style="margin-bottom: 1.5rem; align-items: start;">
+    <!-- Primary DB Health Card -->
+    <div class="bento-card bento-stat">
+        <div class="bento-stat__icon" style="background: rgba(92, 112, 87, 0.12); color: var(--eps-primary-sage);">💾</div>
+        <div>
+            <div class="bento-stat__value" style="color: var(--eps-primary-sage);">{{ db_size_kb }} KB</div>
+            <div class="bento-stat__label">Primary SQLite Database Size</div>
+            <div class="bento-stat__sub" style="color: var(--eps-status-success); font-weight: 600;">PRAGMA Check: {{ integrity_result }}</div>
+        </div>
+    </div>
+
+    <!-- Active Backups Count -->
+    <div class="bento-card bento-stat">
+        <div class="bento-card__icon" style="background: rgba(137, 164, 130, 0.15); color: var(--eps-secondary-sage);">🛡️</div>
+        <div>
+            <div class="bento-stat__value" style="color: var(--eps-secondary-sage);">{{ backups|length }} Snapshots</div>
+            <div class="bento-stat__label">Institutional Backups On Disk</div>
+            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Immutable recovery baselines</div>
+        </div>
+    </div>
+
+    <!-- Storage Engine -->
+    <div class="bento-card bento-stat">
+        <div class="bento-card__icon" style="background: rgba(209, 237, 211, 0.6); color: var(--eps-primary-sage);">⚙️</div>
+        <div>
+            <div class="bento-stat__value" style="color: var(--eps-primary-sage); font-size: 1.4rem;">SQLite 3 Engine</div>
+            <div class="bento-stat__label">Zero-Administration Engine</div>
+            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Atomic transactions & write-ahead</div>
+        </div>
+    </div>
+</div>
+
+<!-- Backups Table Bento Card -->
+<div class="bento-card" style="margin-bottom: 1.5rem;">
+    <div class="bento-card__header">
+        <div>
+            <h2 class="bento-card__title">Verified Snapshot Ledger</h2>
+            <p class="bento-card__subtitle">Immutable database snapshots preserved in the project directory.</p>
+        </div>
+    </div>
+
+    <div class="bento-table-wrapper">
+        <table class="bento-table">
+            <thead>
+                <tr>
+                    <th>Snapshot Filename</th>
+                    <th>Snapshot Type</th>
+                    <th>Created Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in backups %}
+                    <tr>
+                        <td>
+                            <code style="font-size: 0.88rem; font-weight: 600; color: var(--eps-primary-sage);">{{ b.name }}</code>
+                        </td>
+                        <td>{{ b.type }}</td>
+                        <td>{{ b.date }}</td>
+                        <td><span class="bento-badge bento-badge--success">Verified & Intact</span></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Backup & Recovery Protocol Bento Card -->
+<div class="bento-card bento-card--mint">
+    <div class="bento-card__header">
+        <h3 class="bento-card__title">Institutional Disaster Recovery Procedure</h3>
+    </div>
+    <div style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.6;">
+        <p style="margin-bottom: 0.75rem;">
+            To restore the examination platform to a verified baseline in the event of hardware or storage failure:
+        </p>
+        <ol style="margin-left: 1.25rem;">
+            <li>Stop the running Django application server.</li>
+            <li>Copy the desired snapshot (e.g., <code>db.sqlite3.backup_change_request</code>) to <code>db.sqlite3</code>.</li>
+            <li>Run <code>python manage.py check</code> to ensure relational integrity is satisfied.</li>
+            <li>Restart the application server. All user accounts, examination papers, and proctoring telemetry will resume immediately.</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}

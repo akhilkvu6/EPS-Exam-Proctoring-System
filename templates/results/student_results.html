@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}My Examination Results — EPS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">My Published Results & Transcripts</h1>
+        <p class="page-subtitle">Department of <strong>{{ request.user.student_profile.department }}</strong> &bull; Roll Number: <strong>{{ request.user.student_profile.roll_number }}</strong></p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a href="{% url 'student_dashboard' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Dashboard</a>
+        <a href="{% url 'student_exam_list' %}" class="bento-btn bento-btn--mint bento-btn--sm">View Active Exams</a>
+    </div>
+</div>
+
+<div class="bento-card bento-card--full">
+    <div class="bento-card__header">
+        <div>
+            <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Academic Gradebook</span>
+            <h2 class="bento-card__title">Official Published Examination Records</h2>
+            <p class="bento-card__subtitle">Scores are officially published only after faculty evaluation is finalized.</p>
+        </div>
+        <span class="bento-badge bento-badge--sage">{{ results|length }} Record(s)</span>
+    </div>
+
+    {% if results %}
+        <div class="bento-table-container">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Examination Title</th>
+                        <th>Subject</th>
+                        <th>Date Published</th>
+                        <th>Marks Obtained</th>
+                        <th>Percentage</th>
+                        <th>Result Status</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                        <tr>
+                            <td><strong>{{ r.exam.title }}</strong></td>
+                            <td>{{ r.exam.subject.name }} (<code>{{ r.exam.subject.code }}</code>)</td>
+                            <td>{{ r.published_at|date:"M d, Y" }}</td>
+                            <td>
+                                <strong style="color: var(--eps-sage-primary); font-size: 1.05rem;">{{ r.total_marks_obtained }}</strong> / {{ r.maximum_marks }}
+                            </td>
+                            <td>
+                                <strong style="color: {% if r.is_passed %}var(--eps-success){% else %}var(--eps-danger){% endif %}; font-size: 1.05rem;">
+                                    {{ r.percentage }}%
+                                </strong>
+                            </td>
+                            <td>
+                                <span class="bento-badge {% if r.is_passed %}bento-badge--success{% else %}bento-badge--danger{% endif %}">
+                                    {% if r.is_passed %}✓ PASSED{% else %}✕ FAILED{% endif %}
+                                </span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a href="{% url 'student_result_detail' r.id %}" class="bento-btn bento-btn--primary bento-btn--sm">
+                                    View Scorecard &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="bento-empty-state" style="padding: 3rem 1.5rem;">
+            <div class="bento-empty-state__icon">📊</div>
+            <div class="bento-empty-state__title">No Published Results Available</div>
+            <p class="bento-empty-state__text">
+                Your examination scores will appear here once your instructors finalize evaluation and publish the results.
+            </p>
+            <a href="{% url 'student_exam_list' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+                Browse Scheduled Examinations &rarr;
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

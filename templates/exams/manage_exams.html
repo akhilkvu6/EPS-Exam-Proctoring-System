@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Examination Management — EPS{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Examination Authoring & Administration</h1>
+        <p class="page-subtitle">Configure proctoring policies, assemble question sets, and publish academic tests.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary bento-btn--sm">➕ Create Examination</a>
+        <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">📚 Question Bank</a>
+    </div>
+</div>
+
+<!-- Bento Stats Overview -->
+<div class="bento-grid">
+    <div class="bento-card bento-card--compact">
+        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
+            <span class="bento-badge bento-badge--warning">Authoring</span>
+            <span style="font-size: 1.3rem;">📝</span>
+        </div>
+        <div class="bento-stat__value" style="color: var(--eps-warning);">
+            {{ draft_count }}
+        </div>
+        <div class="bento-stat__label">Draft Papers</div>
+    </div>
+
+    <div class="bento-card bento-card--compact bento-card--mint-subtle">
+        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
+            <span class="bento-badge bento-badge--mint">Scheduled</span>
+            <span style="font-size: 1.3rem;">📅</span>
+        </div>
+        <div class="bento-stat__value" style="color: var(--eps-sage-primary);">
+            {{ published_count }}
+        </div>
+        <div class="bento-stat__label">Published / Queued</div>
+    </div>
+
+    <div class="bento-card bento-card--compact">
+        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
+            <span class="bento-badge bento-badge--success">Live Active</span>
+            <span style="font-size: 1.3rem;">⚡</span>
+        </div>
+        <div class="bento-stat__value" style="color: var(--eps-success);">
+            {{ active_count }}
+        </div>
+        <div class="bento-stat__label">Active Right Now</div>
+    </div>
+
+    <div class="bento-card bento-card--compact">
+        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
+            <span class="bento-badge bento-badge--sage">Archived</span>
+            <span style="font-size: 1.3rem;">📁</span>
+        </div>
+        <div class="bento-stat__value" style="color: var(--eps-text-muted);">
+            {{ closed_count }}
+        </div>
+        <div class="bento-stat__label">Closed Tests</div>
+    </div>
+</div>
+
+<!-- Examinations Roster Bento Card -->
+<div class="bento-card bento-card--full">
+    <div class="bento-card__header">
+        <div>
+            <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Roster</span>
+            <h2 class="bento-card__title">All Configured Examinations</h2>
+            <p class="bento-card__subtitle">Comprehensive list of drafts, published tests, and concluded sessions.</p>
+        </div>
+        <span class="bento-badge bento-badge--sage">{{ exams|length }} Total Exams</span>
+    </div>
+
+    {% if exams %}
+        <div class="bento-table-container">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Title & Subject</th>
+                        <th>Schedule Window</th>
+                        <th>Duration</th>
+                        <th>Marks</th>
+                        <th>Proctoring Policy</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in exams %}
+                        <tr>
+                            <td>
+                                <strong><a href="{% url 'exam_detail' exam.id %}" style="color: var(--eps-sage-primary); font-size: 1rem;">{{ exam.title }}</a></strong>
+                                <div style="font-size: 0.8rem; color: var(--eps-text-secondary); margin-top: 0.15rem;">
+                                    {{ exam.subject.name }} (<code>{{ exam.subject.code }}</code>) &bull; Author: {{ exam.created_by.username }}
+                                </div>
+                            </td>
+                            <td style="font-size: 0.84rem;">
+                                <div><strong style="color: var(--eps-text-primary);">Start:</strong> {{ exam.start_time|date:"M d, Y H:i" }}</div>
+                                <div><strong style="color: var(--eps-text-secondary);">End:</strong> {{ exam.end_time|date:"M d, Y H:i" }}</div>
+                            </td>
+                            <td>{{ exam.duration_minutes }} mins</td>
+                            <td>
+                                <strong style="color: var(--eps-text-primary);">{{ exam.total_marks }}</strong> pts
+                                <span style="font-size: 0.75rem; color: var(--eps-text-muted); display: block;">Pass: {{ exam.passing_marks }}</span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                    {% if exam.camera_required != 'disabled' %}
+                                        <span class="bento-badge bento-badge--mint" style="font-size: 0.72rem;">📹 Camera</span>
+                                    {% endif %}
+                                    {% if exam.fullscreen_required %}
+                                        <span class="bento-badge bento-badge--sage" style="font-size: 0.72rem;">⛶ Fullscreen</span>
+                                    {% endif %}
+                                    {% if exam.block_tab_switch %}
+                                        <span class="bento-badge bento-badge--warning" style="font-size: 0.72rem;">🚫 Tab Lock</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                {% with live=exam.get_live_status %}
+                                    {% if live == 'draft' %}
+                                        <span class="bento-badge bento-badge--warning">Draft</span>
+                                    {% elif live == 'active' %}
+                                        <span class="bento-badge bento-badge--success">● Live Now</span>
+                                    {% elif live == 'scheduled' %}
+                                        <span class="bento-badge bento-badge--mint">Scheduled</span>
+                                    {% else %}
+                                        <span class="bento-badge bento-badge--sage">Closed</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap;">
+                                    <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn--primary bento-btn--sm">Manage</a>
+                                    {% if exam.status == 'published' or exam.status == 'closed' %}
+                                        <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn--mint bento-btn--sm">Results</a>
+                                    {% endif %}
+                                    {% if exam.can_modify %}
+                                        <a href="{% url 'edit_exam' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">Edit</a>
+                                    {% endif %}
+                                    <a href="{% url 'exam_preview' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">Preview</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="bento-empty-state" style="padding: 3rem 1.5rem;">
+            <div class="bento-empty-state__icon">📋</div>
+            <div class="bento-empty-state__title">No Examinations Created Yet</div>
+            <p class="bento-empty-state__text">
+                Start by authoring your first online examination with customizable proctoring policies and question sets.
+            </p>
+            <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary bento-btn--sm">
+                ➕ Create Examination &rarr;
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

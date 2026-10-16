@@ -1,119 +1,201 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Registration</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-<h1>Student Registration</h1>
+{% block title %}Student Candidate Registration — EPS{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+{% block content %}
+<div style="max-width: 820px; margin: 1.5rem auto 3.5rem auto;">
 
-    {% if form.non_field_errors %}
-        <div>
-            {{ form.non_field_errors }}
+    <!-- Breadcrumb / Back Link -->
+    <div style="margin-bottom: 1rem;">
+        <a href="{% url 'register' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+            ← Back to Role Selection
+        </a>
+    </div>
+
+    <div class="bento-card" style="padding: 2.25rem;">
+        
+        <!-- Header -->
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span class="bento-badge bento-badge--success">Student Candidate</span>
+                <span style="font-size: 0.8rem; color: var(--eps-text-muted);">&bull; Official Roster Enrollment</span>
+            </div>
+            <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
+                Student Account Registration
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--eps-text-secondary); margin: 0;">
+                Enter your academic details. Your profile will be verified by department faculty before examination room access is unlocked.
+            </p>
         </div>
-    {% endif %}
 
-    <p>
-        {{ form.username.label_tag }}
-        {{ form.username }}
-
-        {% if form.username.errors %}
-            <ul>
-                {% for error in form.username.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
+        <!-- Errors -->
+        {% if form.errors %}
+            <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                    <span>⚠️</span>
+                    <div>
+                        <strong style="display: block; margin-bottom: 0.25rem;">Please correct the following errors:</strong>
+                        <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                            {% for field, errors in form.errors.items %}
+                                {% for err in errors %}
+                                    <li><strong>{{ field|title }}:</strong> {{ err }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
         {% endif %}
-    </p>
 
-    <p>
-        {{ form.email.label_tag }}
-        {{ form.email }}
+        <form method="POST" action="{% url 'student_register' %}">
+            {% csrf_token %}
 
-        {% if form.email.errors %}
-            <ul>
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+            <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                <!-- Full Name -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="full_name">
+                        Full Name <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           id="full_name" 
+                           name="full_name" 
+                           class="bento-input" 
+                           placeholder="e.g. Alex Johnson" 
+                           value="{{ form.full_name.value|default:'' }}" 
+                           required>
+                </div>
 
-    <p>
-        {{ form.password1.label_tag }}
-        {{ form.password1 }}
+                <!-- Roll Number -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="roll_number">
+                        Register / Roll Number <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           id="roll_number" 
+                           name="roll_number" 
+                           class="bento-input" 
+                           placeholder="e.g. STU-88241" 
+                           value="{{ form.roll_number.value|default:'' }}" 
+                           required>
+                </div>
+            </div>
 
-        {% if form.password1.errors %}
-            <ul>
-                {% for error in form.password1.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+            <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                <!-- Username -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="username">
+                        Login Username <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           id="username" 
+                           name="username" 
+                           class="bento-input" 
+                           placeholder="e.g. alex_j" 
+                           value="{{ form.username.value|default:'' }}" 
+                           required 
+                           autocomplete="username">
+                </div>
 
-    <p>
-        {{ form.password2.label_tag }}
-        {{ form.password2 }}
+                <!-- Institutional Email -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="email">
+                        Institutional Email (Optional)
+                    </label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           class="bento-input" 
+                           placeholder="alex@institution.edu" 
+                           value="{{ form.email.value|default:'' }}">
+                    <span class="bento-form-hint">Record reference only; zero automated emails sent.</span>
+                </div>
+            </div>
 
-        {% if form.password2.errors %}
-            <ul>
-                {% for error in form.password2.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+            <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 0;">
+                <!-- Department -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="department">
+                        Academic Department <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           id="department" 
+                           name="department" 
+                           class="bento-input" 
+                           placeholder="e.g. Computer Science" 
+                           value="{{ form.department.value|default:'' }}" 
+                           required>
+                </div>
 
-    <p>
-        {{ form.roll_number.label_tag }}
-        {{ form.roll_number }}
+                <!-- Semester -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="semester">
+                        Semester (1 to 8) <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           id="semester" 
+                           name="semester" 
+                           class="bento-input" 
+                           placeholder="e.g. 6" 
+                           value="{{ form.semester.value|default:'' }}" 
+                           required>
+                </div>
+            </div>
 
-        {% if form.roll_number.errors %}
-            <ul>
-                {% for error in form.roll_number.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+            <div class="bento-grid bento-grid--2col" style="gap: 1.25rem; margin-bottom: 1.25rem;">
+                <!-- Password 1 -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="password1_field">
+                        Password <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="password" 
+                           id="password1_field" 
+                           name="password1" 
+                           class="bento-input" 
+                           placeholder="••••••••••••" 
+                           required 
+                           autocomplete="new-password">
+                </div>
 
-    <p>
-        {{ form.department.label_tag }}
-        {{ form.department }}
+                <!-- Password 2 -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="password2_field">
+                        Confirm Password <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="password" 
+                           id="password2_field" 
+                           name="password2" 
+                           class="bento-input" 
+                           placeholder="••••••••••••" 
+                           required 
+                           autocomplete="new-password">
+                </div>
+            </div>
 
-        {% if form.department.errors %}
-            <ul>
-                {% for error in form.department.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+            <!-- Verification Notice Box -->
+            <div style="background-color: var(--eps-mint-subtle); border: 1px solid var(--eps-mint); border-radius: var(--eps-radius-control); padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                <span style="font-size: 1.2rem;">🎓</span>
+                <div style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                    <strong style="color: var(--eps-sage-primary);">Faculty Verification Step:</strong>
+                    Your registration will be queued to department faculty. Once approved, you can log in and immediately launch assigned examinations.
+                </div>
+            </div>
 
-    <p>
-        {{ form.semester.label_tag }}
-        {{ form.semester }}
+            <!-- Submit Button & Links -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <a href="{% url 'common_login' %}" style="font-size: 0.9rem; color: var(--eps-text-secondary);">
+                    Already registered? <strong style="color: var(--eps-sage-primary);">Sign In →</strong>
+                </a>
 
-        {% if form.semester.errors %}
-            <ul>
-                {% for error in form.semester.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </p>
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
+                    <span>Submit Student Registration</span>
+                    <span>→</span>
+                </button>
+            </div>
 
-    <button type="submit">Register</button>
-</form>
+        </form>
 
-<p>
-    Already have an account?
-    <a href="#">Login here</a>
-</p>
+    </div>
 
-</body>
-</html>
+</div>
+{% endblock %}

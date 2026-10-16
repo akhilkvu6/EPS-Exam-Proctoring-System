@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Institutional Authentication — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 2rem auto 3.5rem auto;">
+    
+    <div class="bento-grid bento-grid--2col" style="gap: 1.75rem; align-items: stretch;">
+        
+        <!-- Left Feature Bento Card: Institutional Trust & Security -->
+        <div class="bento-card bento-card--primary" style="padding: 2.5rem; justify-content: space-between;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); padding: 0.35rem 0.85rem; border-radius: var(--eps-radius-full); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.5rem;">
+                    <span>🌿</span> Official Institutional Portal
+                </div>
+                
+                <h1 style="font-size: 1.85rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; color: #FFFFFF;">
+                    Institutional Single Sign-On
+                </h1>
+                
+                <p style="font-size: 0.95rem; line-height: 1.6; opacity: 0.95; color: #FFFFFF; margin-bottom: 2rem;">
+                    Unified credential access for Students, Faculty, and Institutional Administrators. Enter your verified institutional credentials to continue.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
+                        <div style="font-size: 0.88rem; opacity: 0.95;">
+                            <strong>Role-Based Routing:</strong> Automatic redirection to student, faculty, or executive administrative consoles.
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
+                        <div style="font-size: 0.88rem; opacity: 0.95;">
+                            <strong>Zero-Email Architecture:</strong> All notifications, credential verifications, and approvals are managed 100% in-app.
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
+                        <div style="font-size: 0.88rem; opacity: 0.95;">
+                            <strong>Session Integrity:</strong> Encrypted sessions with HTTP-only cookies and cryptographic CSRF protection.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding-top: 1.75rem; margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.82rem; opacity: 0.85;">
+                Protected by Institutional Security &bull; BCA Final-Year Project
+            </div>
+        </div>
+
+        <!-- Right Bento Card: Login Form -->
+        <div class="bento-card" style="padding: 2.25rem; display: flex; flex-direction: column; justify-content: center;">
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.45rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
+                    Sign In
+                </h2>
+                <p style="font-size: 0.88rem; color: var(--eps-text-secondary);">
+                    Enter your username or roll number and password
+                </p>
+            </div>
+
+            <!-- Form Non-Field Errors -->
+            {% if form.non_field_errors %}
+                <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span>⚠️</span>
+                        <div>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'common_login' %}">
+                {% csrf_token %}
+
+                <!-- Username Field -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="id_username">
+                        Username or Institutional ID <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <input type="text" 
+                           name="username" 
+                           id="id_username" 
+                           class="bento-input" 
+                           placeholder="e.g. s_vance, prof_anita, or STU-88241" 
+                           value="{{ form.username.value|default:'' }}" 
+                           required 
+                           autofocus 
+                           autocomplete="username">
+                    {% if form.username.errors %}
+                        <div style="color: var(--eps-danger); font-size: 0.82rem; margin-top: 0.3rem;">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="id_password">
+                        Password <span style="color: var(--eps-danger);">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <input type="password" 
+                               name="password" 
+                               id="id_password" 
+                               class="bento-input" 
+                               placeholder="••••••••••••" 
+                               required 
+                               autocomplete="current-password"
+                               style="padding-right: 2.75rem;">
+                        <button type="button" 
+                                id="toggle_password_btn" 
+                                title="Toggle password visibility" 
+                                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--eps-text-muted);">
+                            👁️
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <div style="color: var(--eps-danger); font-size: 0.82rem; margin-top: 0.3rem;">
+                            {{ form.password.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember Device Option -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--eps-text-secondary); cursor: pointer;">
+                        <input type="checkbox" name="remember_device" id="remember_device" style="accent-color: var(--eps-sage-primary); width: 16px; height: 16px;">
+                        <span>Remember my session on this device</span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="width: 100%;">
+                    <span>Sign In to Portal</span>
+                    <span>→</span>
+                </button>
+            </form>
+
+            <!-- Bottom Registration Link -->
+            <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle); text-align: center; font-size: 0.88rem; color: var(--eps-text-secondary);">
+                <span>Don't have an institutional account?</span>
+                <a href="{% url 'register' %}" style="font-weight: 700; color: var(--eps-sage-primary); margin-left: 0.35rem;">
+                    Register here →
+                </a>
+            </div>
+
+            <!-- In-App Support Notice -->
+            <div style="margin-top: 1rem; text-align: center; font-size: 0.78rem; color: var(--eps-text-muted);">
+                🔒 Strictly In-App Authentication &bull; If locked out, contact your department administrator.
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleBtn = document.getElementById('toggle_password_btn');
+        var passInput = document.getElementById('id_password');
+        if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', function() {
+                var isPassword = passInput.getAttribute('type') === 'password';
+                passInput.setAttribute('type', isPassword ? 'text' : 'password');
+                toggleBtn.textContent = isPassword ? '🔒' : '👁️';
+            });
+        }
+    });
+</script>
+{% endblock %}

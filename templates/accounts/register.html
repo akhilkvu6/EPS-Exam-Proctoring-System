@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Account — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 760px; margin: 1.5rem auto 3.5rem auto; padding: 0 1rem;">
+
+    <!-- Central Header -->
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <span class="bento-badge bento-badge--primary" style="margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.78rem;">
+            Institutional Onboarding
+        </span>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--eps-text-primary, #1A2419); margin-bottom: 0.5rem;">
+            Create Your EPS Account
+        </h1>
+        <p style="font-size: 0.95rem; color: var(--eps-text-secondary, #556854); max-width: 520px; margin: 0 auto;">
+            Please select the account type required for your institutional academic activities.
+        </p>
+    </div>
+
+    <!-- Role Selection Card Area -->
+    <div class="bento-card" style="padding: 1.75rem; margin-bottom: 1.5rem; background: var(--eps-surface, #FFFFFF); border: 1px solid var(--eps-border-subtle, #E2EAE0); border-radius: var(--eps-radius-lg, 14px);">
+        
+        <label id="role-selector-label" style="display: block; font-size: 1.05rem; font-weight: 700; color: var(--eps-text-primary, #1A2419); margin-bottom: 1rem; text-align: center;">
+            Which type of account do you need?
+        </label>
+
+        <!-- Two Selectable Role Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;" role="radiogroup" aria-labelledby="role-selector-label">
+            
+            <!-- Student Option Card -->
+            <div id="card-role-student" 
+                 class="role-selection-card {% if active_role == 'student' %}is-selected{% endif %}"
+                 tabindex="0"
+                 role="radio"
+                 aria-checked="{% if active_role == 'student' %}true{% else %}false{% endif %}"
+                 onclick="selectRole('student')"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){selectRole('student'); event.preventDefault();}"
+                 style="cursor: pointer; padding: 1.25rem; border-radius: var(--eps-radius-md, 8px); border: 2px solid {% if active_role == 'student' %}var(--eps-primary-sage, #5C7057){% else %}var(--eps-border-subtle, #E2EAE0){% endif %}; background: {% if active_role == 'student' %}rgba(209, 237, 211, 0.25){% else %}var(--eps-surface, #FFFFFF){% endif %}; transition: all 0.2s ease;">
+                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
+                    <div style="font-size: 2rem; line-height: 1;">🎓</div>
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <strong style="font-size: 1.1rem; color: var(--eps-text-primary, #1A2419);">Student</strong>
+                            <span class="role-check-indicator" style="display: {% if active_role == 'student' %}inline-block{% else %}none{% endif %}; color: var(--eps-primary-sage, #5C7057); font-weight: bold;">✓</span>
+                        </div>
+                        <p style="font-size: 0.84rem; color: var(--eps-text-secondary, #556854); margin: 0.4rem 0 0 0; line-height: 1.45;">
+                            Register to access assigned examinations and view published results.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Option Card -->
+            <div id="card-role-teacher" 
+                 class="role-selection-card {% if active_role == 'teacher' %}is-selected{% endif %}"
+                 tabindex="0"
+                 role="radio"
+                 aria-checked="{% if active_role == 'teacher' %}true{% else %}false{% endif %}"
+                 onclick="selectRole('teacher')"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){selectRole('teacher'); event.preventDefault();}"
+                 style="cursor: pointer; padding: 1.25rem; border-radius: var(--eps-radius-md, 8px); border: 2px solid {% if active_role == 'teacher' %}var(--eps-primary-sage, #5C7057){% else %}var(--eps-border-subtle, #E2EAE0){% endif %}; background: {% if active_role == 'teacher' %}rgba(209, 237, 211, 0.25){% else %}var(--eps-surface, #FFFFFF){% endif %}; transition: all 0.2s ease;">
+                <div style="display: flex; align-items: flex-start; gap: 0.85rem;">
+                    <div style="font-size: 2rem; line-height: 1;">👨‍🏫</div>
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <strong style="font-size: 1.1rem; color: var(--eps-text-primary, #1A2419);">Teacher</strong>
+                            <span class="role-check-indicator" style="display: {% if active_role == 'teacher' %}inline-block{% else %}none{% endif %}; color: var(--eps-primary-sage, #5C7057); font-weight: bold;">✓</span>
+                        </div>
+                        <p style="font-size: 0.84rem; color: var(--eps-text-secondary, #556854); margin: 0.4rem 0 0 0; line-height: 1.45;">
+                            Apply for access to manage examinations and students, subject to administrator approval.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Student Registration Form Container -->
+    <div id="form-container-student" style="display: {% if active_role == 'student' %}block{% else %}none{% endif %};">
+        <div class="bento-card" style="padding: 2rem; background: var(--eps-surface, #FFFFFF); border: 1px solid var(--eps-border-subtle, #E2EAE0); border-radius: var(--eps-radius-lg, 14px);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle, #E2EAE0); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary, #1A2419); margin: 0;">
+                        Student Registration Form
+                    </h2>
+                    <p style="font-size: 0.82rem; color: var(--eps-text-secondary, #556854); margin: 0.2rem 0 0 0;">
+                        All accounts are reviewed and approved by faculty before exam access is granted.
+                    </p>
+                </div>
+                <span class="bento-badge bento-badge--mint">Student Role</span>
+            </div>
+
+            <form method="post" action="{% url 'register' %}" id="student-reg-form">
+                {% csrf_token %}
+                <input type="hidden" name="role" value="student">
+
+                {% if student_form.non_field_errors %}
+                    <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
+                        {{ student_form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_student_full_name">Full Name *</label>
+                        {{ student_form.full_name }}
+                        {% if student_form.full_name.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.full_name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_student_roll_number">Register / Roll Number *</label>
+                        {{ student_form.roll_number }}
+                        {% if student_form.roll_number.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.roll_number.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_student_username">Username *</label>
+                        {{ student_form.username }}
+                        {% if student_form.username.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.username.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_student_email">Institutional Email (Optional)</label>
+                        {{ student_form.email }}
+                        <small style="display: block; font-size: 0.75rem; color: var(--eps-text-muted, #556854); margin-top: 0.25rem;">Record reference only; no automated emails are sent.</small>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_student_department">Department / Course *</label>
+                        {{ student_form.department }}
+                        {% if student_form.department.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.department.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_student_semester">Semester (1 to 8) *</label>
+                        {{ student_form.semester }}
+                        {% if student_form.semester.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.semester.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label" for="id_student_password1">Password *</label>
+                        {{ student_form.password1 }}
+                        {% if student_form.password1.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.password1.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_student_password2">Confirm Password *</label>
+                        {{ student_form.password2 }}
+                        {% if student_form.password2.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ student_form.password2.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap; pt: 0.5rem;">
+                    <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="flex: 1 1 200px;">
+                        Complete Student Registration &rarr;
+                    </button>
+                    <a href="{% url 'common_login' %}" style="color: var(--eps-primary-sage, #5C7057); text-decoration: underline; font-size: 0.88rem;">
+                        Already registered? Sign in
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Teacher Registration Form Container -->
+    <div id="form-container-teacher" style="display: {% if active_role == 'teacher' %}block{% else %}none{% endif %};">
+        <div class="bento-card" style="padding: 2rem; background: var(--eps-surface, #FFFFFF); border: 1px solid var(--eps-border-subtle, #E2EAE0); border-radius: var(--eps-radius-lg, 14px);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle, #E2EAE0); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary, #1A2419); margin: 0;">
+                        Faculty Application Form
+                    </h2>
+                    <p style="font-size: 0.82rem; color: var(--eps-text-secondary, #556854); margin: 0.2rem 0 0 0;">
+                        Faculty profiles require administrative review before authoring rights are granted.
+                    </p>
+                </div>
+                <span class="bento-badge bento-badge--warning">Teacher Role</span>
+            </div>
+
+            <form method="post" action="{% url 'register' %}" id="teacher-reg-form">
+                {% csrf_token %}
+                <input type="hidden" name="role" value="teacher">
+
+                {% if teacher_form.non_field_errors %}
+                    <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
+                        {{ teacher_form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_teacher_full_name">Full Name *</label>
+                        {{ teacher_form.full_name }}
+                        {% if teacher_form.full_name.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.full_name.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_teacher_employee_id">Employee ID / Staff Code *</label>
+                        {{ teacher_form.employee_id }}
+                        {% if teacher_form.employee_id.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.employee_id.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_teacher_username">Username *</label>
+                        {{ teacher_form.username }}
+                        {% if teacher_form.username.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.username.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_teacher_email">Institutional Email (Optional)</label>
+                        {{ teacher_form.email }}
+                        <small style="display: block; font-size: 0.75rem; color: var(--eps-text-muted, #556854); margin-top: 0.25rem;">Record reference only; no automated emails are sent.</small>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label class="form-label" for="id_teacher_department">Department *</label>
+                        {{ teacher_form.department }}
+                        {% if teacher_form.department.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.department.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_teacher_qualification">Highest Qualification *</label>
+                        {{ teacher_form.qualification }}
+                        {% if teacher_form.qualification.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.qualification.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label class="form-label" for="id_teacher_institution">College / Institution Name</label>
+                    {{ teacher_form.institution }}
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label" for="id_teacher_password1">Password *</label>
+                        {{ teacher_form.password1 }}
+                        {% if teacher_form.password1.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.password1.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label" for="id_teacher_password2">Confirm Password *</label>
+                        {{ teacher_form.password2 }}
+                        {% if teacher_form.password2.errors %}<div class="form-error" style="color: var(--eps-danger, #C84C4C); font-size: 0.8rem; margin-top: 0.25rem;">{{ teacher_form.password2.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="flex: 1 1 200px;">
+                        Submit Faculty Application &rarr;
+                    </button>
+                    <a href="{% url 'common_login' %}" style="color: var(--eps-primary-sage, #5C7057); text-decoration: underline; font-size: 0.88rem;">
+                        Already registered? Sign in
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function selectRole(role) {
+    const studentCard = document.getElementById('card-role-student');
+    const teacherCard = document.getElementById('card-role-teacher');
+    const studentForm = document.getElementById('form-container-student');
+    const teacherForm = document.getElementById('form-container-teacher');
+
+    if (role === 'student') {
+        studentCard.style.borderColor = 'var(--eps-primary-sage, #5C7057)';
+        studentCard.style.background = 'rgba(209, 237, 211, 0.25)';
+        studentCard.setAttribute('aria-checked', 'true');
+        studentCard.querySelector('.role-check-indicator').style.display = 'inline-block';
+
+        teacherCard.style.borderColor = 'var(--eps-border-subtle, #E2EAE0)';
+        teacherCard.style.background = 'var(--eps-surface, #FFFFFF)';
+        teacherCard.setAttribute('aria-checked', 'false');
+        teacherCard.querySelector('.role-check-indicator').style.display = 'none';
+
+        studentForm.style.display = 'block';
+        teacherForm.style.display = 'none';
+
+        // Transfer common fields if user typed in teacher form before switching
+        try {
+            const tFull = document.querySelector('#teacher-reg-form input[name="full_name"]')?.value;
+            const tUser = document.querySelector('#teacher-reg-form input[name="username"]')?.value;
+            const sFull = document.querySelector('#student-reg-form input[name="full_name"]');
+            const sUser = document.querySelector('#student-reg-form input[name="username"]');
+            if (tFull && sFull && !sFull.value) sFull.value = tFull;
+            if (tUser && sUser && !sUser.value) sUser.value = tUser;
+        } catch(e) {}
+
+    } else {
+        teacherCard.style.borderColor = 'var(--eps-primary-sage, #5C7057)';
+        teacherCard.style.background = 'rgba(209, 237, 211, 0.25)';
+        teacherCard.setAttribute('aria-checked', 'true');
+        teacherCard.querySelector('.role-check-indicator').style.display = 'inline-block';
+
+        studentCard.style.borderColor = 'var(--eps-border-subtle, #E2EAE0)';
+        studentCard.style.background = 'var(--eps-surface, #FFFFFF)';
+        studentCard.setAttribute('aria-checked', 'false');
+        studentCard.querySelector('.role-check-indicator').style.display = 'none';
+
+        teacherForm.style.display = 'block';
+        studentForm.style.display = 'none';
+
+        // Transfer common fields if user typed in student form before switching
+        try {
+            const sFull = document.querySelector('#student-reg-form input[name="full_name"]')?.value;
+            const sUser = document.querySelector('#student-reg-form input[name="username"]')?.value;
+            const tFull = document.querySelector('#teacher-reg-form input[name="full_name"]');
+            const tUser = document.querySelector('#teacher-reg-form input[name="username"]');
+            if (sFull && tFull && !tFull.value) tFull.value = sFull;
+            if (sUser && tUser && !tUser.value) tUser.value = sUser;
+        } catch(e) {}
+    }
+}
+</script>
+{% endblock %}

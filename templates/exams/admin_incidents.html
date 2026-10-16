@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Flagged Proctoring Incidents Ledger - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--danger" style="font-weight: 700;">PROCTORING EVIDENCE</span>
+            <span class="bento-badge bento-badge--neutral">Total Incidents: {{ total_incidents }}</span>
+        </div>
+        <h1 class="bento-page-title">Flagged Proctoring Incidents Ledger</h1>
+        <p class="bento-page-subtitle">Comprehensive forensic audit trail of all recorded test integrity violations, browser switches, and facial anomalies.</p>
+    </div>
+    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'admin_results_export' %}?report=incidents" class="bento-btn bento-btn--primary bento-btn--sm">📥 Export Incidents (CSV)</a>
+        <a href="{% url 'admin_proctoring_overview' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Live Fleet &rarr;</a>
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; align-items: end;">
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Search Candidate / Exam</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="Candidate username, exam title..." class="bento-input" style="font-size: 0.85rem;">
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Incident Category</label>
+            <select name="event_type" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Categories</option>
+                {% for code, label in event_types %}
+                    <option value="{{ code }}" {% if event_type == code %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="bento-label" style="font-size: 0.75rem;">Severity Level</label>
+            <select name="severity" class="bento-select" style="font-size: 0.85rem;">
+                <option value="">All Severities</option>
+                <option value="high" {% if severity == 'high' %}selected{% endif %}>High Severity</option>
+                <option value="medium" {% if severity == 'medium' %}selected{% endif %}>Medium Severity</option>
+                <option value="low" {% if severity == 'low' %}selected{% endif %}>Low Severity</option>
+            </select>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="flex: 1;">Filter</button>
+            <a href="{% url 'admin_proctoring_incidents' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Reset</a>
+        </div>
+    </form>
+</div>
+
+<!-- Incidents Table -->
+<div class="bento-card">
+    <div class="bento-card__header">
+        <div>
+            <h2 class="bento-card__title">Incident Evidence Ledger</h2>
+            <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_incidents }} events.</p>
+        </div>
+    </div>
+
+    {% if page_obj %}
+        <div class="bento-table-wrapper">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Candidate</th>
+                        <th>Examination</th>
+                        <th>Incident Category</th>
+                        <th>Severity</th>
+                        <th>Forensic Details</th>
+                        <th style="text-align: right;">Review Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inc in page_obj %}
+                        <tr>
+                            <td style="font-family: monospace; font-size: 0.82rem; white-space: nowrap; color: var(--eps-text-secondary);">
+                                {{ inc.timestamp|date:"Y-m-d H:i:s" }}
+                            </td>
+                            <td>
+                                <strong>{{ inc.attempt.student.username }}</strong>
+                                {% if inc.attempt.student.student_profile %}
+                                    <div style="font-size: 0.75rem; color: var(--eps-text-muted);">
+                                        Roll: {{ inc.attempt.student.student_profile.roll_number }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ inc.attempt.exam.title }}</strong>
+                            </td>
+                            <td>
+                                <span class="bento-badge bento-badge--sage">{{ inc.get_event_type_display }}</span>
+                            </td>
+                            <td>
+                                {% if inc.severity == 'high' %}
+                                    <span class="bento-badge bento-badge--danger">HIGH</span>
+                                {% elif inc.severity == 'medium' %}
+                                    <span class="bento-badge bento-badge--warning">MEDIUM</span>
+                                {% else %}
+                                    <span class="bento-badge bento-badge--neutral">LOW</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.4;">
+                                {{ inc.details }}
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                <a href="{% url 'review_incident' inc.id %}?next={{ request.get_full_path|urlencode }}" class="bento-btn bento-btn--outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; text-decoration: none;">
+                                    {% if inc.review_status == 'reviewed' %}
+                                        <span style="color: var(--eps-success);">✓ Cleared</span>
+                                    {% elif inc.review_status == 'action_required' %}
+                                        <span style="color: var(--eps-danger); font-weight: 700;">⚠️ Action Req.</span>
+                                    {% elif inc.review_status == 'inconclusive' %}
+                                        <span style="color: #b45309;">Inconclusive</span>
+                                    {% else %}
+                                        Review ↗
+                                    {% endif %}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border);">
+                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <div style="display: flex; gap: 0.35rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No proctoring violations recorded matching your search.</p>
+    {% endif %}
+</div>
+{% endblock %}

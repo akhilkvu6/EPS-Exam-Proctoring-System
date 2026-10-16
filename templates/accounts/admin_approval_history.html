@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Approval Decision Ledger - Institutional Administration - EPS{% endblock %}
+
+{% block content %}
+<div class="bento-page-header">
+    <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">GOVERNANCE LEDGER</span>
+        </div>
+        <h1 class="bento-page-title">Approval Decision History</h1>
+        <p class="bento-page-subtitle">Immutable chronological audit trail of all student and faculty registration decisions made by teachers and administrators.</p>
+    </div>
+    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'admin_student_approvals' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Student Queue</a>
+        <a href="{% url 'admin_teacher_approvals' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Faculty Queue</a>
+        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <form method="GET" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <select name="role" class="bento-select" style="width: auto; min-width: 160px; font-size: 0.88rem;">
+            <option value="">All Roles</option>
+            <option value="student" {% if role == 'student' %}selected{% endif %}>Student Applicants</option>
+            <option value="teacher" {% if role == 'teacher' %}selected{% endif %}>Faculty Applicants</option>
+        </select>
+        <select name="decision" class="bento-select" style="width: auto; min-width: 160px; font-size: 0.88rem;">
+            <option value="">All Decisions</option>
+            <option value="approved" {% if decision == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if decision == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+        <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm">Filter</button>
+        {% if role or decision %}
+            <a href="{% url 'admin_approval_history' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Approval History Ledger Table -->
+<div class="bento-card">
+    <div class="bento-card__header">
+        <h2 class="bento-card__title">Verification Log Entries</h2>
+        <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of recorded decisions.</p>
+    </div>
+
+    {% if page_obj %}
+        <div class="bento-table-wrapper">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Applicant</th>
+                        <th>Role</th>
+                        <th>Reviewer</th>
+                        <th>Decision</th>
+                        <th>Official Institutional Memo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in page_obj %}
+                        <tr>
+                            <td style="font-family: monospace; font-size: 0.82rem; white-space: nowrap; color: var(--eps-text-secondary);">
+                                {{ rec.created_at|date:"Y-m-d H:i:s" }}
+                            </td>
+                            <td>
+                                <strong style="color: var(--eps-text-primary);">{{ rec.applicant.get_full_name|default:rec.applicant.username }}</strong>
+                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ rec.applicant.email }}</div>
+                            </td>
+                            <td>
+                                {% if rec.role == 'teacher' %}
+                                    <span class="bento-badge bento-badge--sage">Faculty</span>
+                                {% else %}
+                                    <span class="bento-badge bento-badge--mint">Student</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if rec.reviewed_by %}
+                                    <strong>{{ rec.reviewed_by.username }}</strong>
+                                {% else %}
+                                    <span style="color: var(--eps-text-muted);">System</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if rec.decision == 'approved' %}
+                                    <span class="bento-badge bento-badge--success">✓ Approved</span>
+                                {% else %}
+                                    <span class="bento-badge bento-badge--danger">✕ Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--eps-text-secondary);">
+                                {{ rec.reason|default:"—" }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border);">
+                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+                <div style="display: flex; gap: 0.35rem;">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No decision records logged.</p>
+    {% endif %}
+</div>
+{% endblock %}

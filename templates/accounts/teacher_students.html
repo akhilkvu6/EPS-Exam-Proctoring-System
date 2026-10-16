@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}My Students Roster — EPS Platform{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Department Students Roster</h1>
+        <p class="page-subtitle">View approved candidates enrolled in {{ teacher_department }}, verify academic records, and assign class groups.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a href="{% url 'import_students' %}" class="bento-btn bento-btn--outline">
+            <span>📑</span> Bulk Excel Import
+        </a>
+        <a href="{% url 'teacher_student_approvals' %}" class="bento-btn bento-btn--primary">
+            <span>👥</span> Pending Approvals
+        </a>
+    </div>
+</div>
+
+<!-- Metrics summary strip -->
+<div class="bento-grid bento-grid--4col" style="margin-bottom: 1.5rem;">
+    <div class="bento-card bento-card--mint-subtle">
+        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--eps-text-muted); letter-spacing: 0.05em;">Total Enrolled</div>
+        <div style="font-size: 1.85rem; font-weight: 800; color: var(--eps-text-primary); margin-top: 0.25rem;">{{ total_count }}</div>
+        <div style="font-size: 0.75rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Approved candidates in department</div>
+    </div>
+    <div class="bento-card">
+        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--eps-text-muted); letter-spacing: 0.05em;">Active Department</div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--eps-primary); margin-top: 0.25rem;">{{ teacher_department }}</div>
+        <div style="font-size: 0.75rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Faculty departmental boundary</div>
+    </div>
+    <div class="bento-card">
+        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--eps-text-muted); letter-spacing: 0.05em;">Class Groups</div>
+        <div style="font-size: 1.85rem; font-weight: 800; color: var(--eps-text-primary); margin-top: 0.25rem;">{{ available_classes.count }}</div>
+        <div style="font-size: 0.75rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Configured cohort divisions</div>
+    </div>
+    <div class="bento-card">
+        <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--eps-text-muted); letter-spacing: 0.05em;">Pagination</div>
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--eps-text-primary); margin-top: 0.25rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages|default:1 }}</div>
+        <div style="font-size: 0.75rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">15 records per page</div>
+    </div>
+</div>
+
+<!-- Search and Filtering Toolbar -->
+<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;">
+        <div style="flex: 2 1 240px;">
+            <label class="bento-form-label" style="margin-bottom: 0.3rem;">Search Candidate</label>
+            <input type="text" name="q" value="{{ q }}" class="bento-input" placeholder="Search by name, roll no, or username...">
+        </div>
+        <div style="flex: 1 1 180px;">
+            <label class="bento-form-label" style="margin-bottom: 0.3rem;">Filter by Class</label>
+            <select name="class_filter" class="bento-input">
+                <option value="">All Classes</option>
+                {% for cg in available_classes %}
+                    <option value="{{ cg.id }}" {% if class_filter == cg.id|stringformat:"s" %}selected{% endif %}>{{ cg.name }} (Sem {{ cg.semester }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1 1 140px;">
+            <label class="bento-form-label" style="margin-bottom: 0.3rem;">Semester</label>
+            <select name="semester" class="bento-input">
+                <option value="">All Semesters</option>
+                {% for sem in semesters %}
+                    <option value="{{ sem }}" {% if semester_filter == sem %}selected{% endif %}>Sem {{ sem }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="bento-btn bento-btn--primary">
+                🔍 Filter
+            </button>
+            {% if q or class_filter or semester_filter %}
+                <a href="{% url 'teacher_students' %}" class="bento-btn bento-btn--outline" title="Clear all filters">
+                    ✕ Reset
+                </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Student Roster Table Card -->
+<div class="bento-card" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 class="bento-card__title" style="font-size: 1.1rem; margin-bottom: 0.2rem;">Enrolled Students</h2>
+            <p class="bento-card__subtitle" style="font-size: 0.8rem;">Assigned candidates eligible for examination access within {{ teacher_department }}</p>
+        </div>
+        <span class="bento-badge bento-badge--mint">{{ total_count }} Approved</span>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="bento-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--eps-card-bg-subtle, #f7f9f7); border-bottom: 1px solid var(--eps-border-subtle); text-align: left; font-size: 0.8rem; color: var(--eps-text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">
+                    <th style="padding: 0.85rem 1.25rem;">Candidate / Roll No</th>
+                    <th style="padding: 0.85rem 1rem;">Department</th>
+                    <th style="padding: 0.85rem 1rem;">Semester</th>
+                    <th style="padding: 0.85rem 1rem;">Class Assignment</th>
+                    <th style="padding: 0.85rem 1rem;">Status</th>
+                    <th style="padding: 0.85rem 1.25rem; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr style="border-bottom: 1px solid var(--eps-border-subtle); font-size: 0.9rem;">
+                        <td style="padding: 0.95rem 1.25rem;">
+                            <div style="font-weight: 700; color: var(--eps-text-primary);">{{ student.full_name|default:student.user.username }}</div>
+                            <div style="font-size: 0.8rem; color: var(--eps-text-muted); font-family: var(--font-mono, monospace);">
+                                {{ student.roll_number }} &bull; {{ student.user.username }}
+                            </div>
+                        </td>
+                        <td style="padding: 0.95rem 1rem; color: var(--eps-text-secondary);">
+                            {{ student.department }}
+                        </td>
+                        <td style="padding: 0.95rem 1rem;">
+                            <span class="bento-badge" style="background: rgba(0,0,0,0.05); color: var(--eps-text-primary);">
+                                Sem {{ student.semester }}
+                            </span>
+                        </td>
+                        <td style="padding: 0.95rem 1rem;">
+                            <form method="POST" style="display: flex; align-items: center; gap: 0.4rem;">
+                                {% csrf_token %}
+                                <input type="hidden" name="assign_class" value="1">
+                                <input type="hidden" name="student_id" value="{{ student.id }}">
+                                <select name="class_id" class="bento-input" style="padding: 0.3rem 0.5rem; font-size: 0.82rem; min-width: 150px;" onchange="this.form.submit()">
+                                    <option value="">-- No Class --</option>
+                                    {% for cg in available_classes %}
+                                        <option value="{{ cg.id }}" {% if student.class_group_id == cg.id %}selected{% endif %}>{{ cg.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td style="padding: 0.95rem 1rem;">
+                            <span class="bento-badge bento-badge--mint">
+                                Approved
+                            </span>
+                        </td>
+                        <td style="padding: 0.95rem 1.25rem; text-align: right;">
+                            <a href="{% url 'admin_student_detail' student.id %}" class="bento-btn bento-btn--outline" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;" title="View Student Profile">
+                                Details ↗
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding: 3rem 1rem; text-align: center; color: var(--eps-text-muted);">
+                            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                            <div style="font-weight: 600; font-size: 1rem; color: var(--eps-text-secondary);">No enrolled students match your criteria.</div>
+                            <p style="font-size: 0.85rem; margin-top: 0.25rem;">Try modifying your search or filter parameters.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if page_obj.has_other_pages %}
+        <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--eps-border-subtle); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+            <div style="color: var(--eps-text-muted);">
+                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ total_count }} students
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if semester_filter %}&semester={{ semester_filter }}{% endif %}" class="bento-btn bento-btn--outline" style="padding: 0.35rem 0.75rem;">
+                        ← Previous
+                    </a>
+                {% endif %}
+                <span style="display: flex; align-items: center; padding: 0 0.5rem; font-weight: 600;">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if class_filter %}&class_filter={{ class_filter }}{% endif %}{% if semester_filter %}&semester={{ semester_filter }}{% endif %}" class="bento-btn bento-btn--outline" style="padding: 0.35rem 0.75rem;">
+                        Next →
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Question #{{ question.id }} — EPS Question Bank{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+    <div class="bento-page-header">
+        <div>
+            <h1 class="bento-page-title">Edit Question #{{ question.id }}</h1>
+            <p class="bento-page-subtitle">Modify repository question properties, options, evaluation criteria, and explanations.</p>
+        </div>
+        <div class="bento-page-actions">
+            <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Back to Question Bank</a>
+        </div>
+    </div>
+
+    {% if has_student_answers %}
+        <div class="bento-alert bento-alert--warning" style="margin-bottom: 1.5rem;">
+            <div>
+                <strong>🔒 Student Submissions Recorded:</strong> This question is referenced by existing student attempt answer records. To maintain academic grading integrity, the format and key structure cannot be deleted, but you may refine prompt phrasing, options wording, and explanation notes.
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="bento-card" style="padding: 2.25rem;">
+        {% if form.non_field_errors %}
+            <div class="bento-alert bento-alert--danger" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--eps-radius-md); background: #fef2f2; border: 1px solid #fecaca; color: var(--eps-status-danger);">
+                {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="bento-grid bento-grid--3" style="margin-bottom: 1rem;">
+                <div class="bento-form-group" style="grid-column: span 2;">
+                    <label class="bento-label" for="id_subject">Academic Subject *</label>
+                    {{ form.subject }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_question_type">Question Format *</label>
+                    {% if has_student_answers %}
+                        <input type="text" class="bento-input" value="{{ question.get_question_type_display }}" readonly style="background: var(--eps-card-bg-subtle, #eee); cursor: not-allowed;">
+                        <input type="hidden" name="question_type" value="{{ question.question_type }}">
+                    {% else %}
+                        {{ form.question_type }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="bento-grid bento-grid--2" style="margin-bottom: 1rem;">
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_difficulty">Difficulty Level *</label>
+                    {{ form.difficulty }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_topic">Topic / Unit / Module</label>
+                    {{ form.topic }}
+                </div>
+            </div>
+
+            <div class="bento-form-group" style="margin-bottom: 1rem;">
+                <label class="bento-label" for="id_question_text">Question Prompt *</label>
+                {{ form.question_text }}
+            </div>
+
+            <div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem;">
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_marks">Marks Awarded *</label>
+                    {{ form.marks }}
+                </div>
+                <div class="bento-form-group">
+                    <label class="bento-label" for="id_negative_marks">Negative Deduction (Optional)</label>
+                    {{ form.negative_marks }}
+                </div>
+            </div>
+
+            <!-- Existing Options Section -->
+            {% if question.question_type == 'mcq' %}
+                <div id="mcq-options-container" class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.2rem;">Multiple Choice Option Set</h3>
+                            <p style="font-size: 0.8rem; color: var(--eps-text-muted); margin: 0;">Update option texts or correct answer flag</p>
+                        </div>
+                        <span class="bento-badge bento-badge--sage" style="font-size: 0.75rem;">MCQ Keys</span>
+                    </div>
+
+                    {% if has_student_answers %}
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            {% for opt in options %}
+                                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                    <span class="bento-badge {% if opt.is_correct %}bento-badge--mint{% else %}bento-badge--outline{% endif %}" style="min-width: 80px; justify-content: center;">
+                                        {% if opt.is_correct %}✓ Correct{% else %}Distractor{% endif %}
+                                    </span>
+                                    <input type="hidden" name="existing_option_id[]" value="{{ opt.id }}">
+                                    <input type="text" name="existing_option_text[]" value="{{ opt.option_text }}" class="bento-input" required>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div id="options-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            {% for opt in options %}
+                                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                    <input type="radio" name="correct_option" value="{{ forloop.counter0 }}" {% if opt.is_correct %}checked{% endif %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
+                                    <input type="text" name="option_text[]" value="{{ opt.option_text }}" class="bento-input" required>
+                                </div>
+                            {% empty %}
+                                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                    <input type="radio" name="correct_option" value="0" checked style="width: 20px; height: 20px;">
+                                    <input type="text" name="option_text[]" class="bento-input" placeholder="Option A text" required>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                    <input type="radio" name="correct_option" value="1" style="width: 20px; height: 20px;">
+                                    <input type="text" name="option_text[]" class="bento-input" placeholder="Option B text" required>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% elif question.question_type == 'true_false' %}
+                <div id="tf-options-container" class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.75rem;">Select Correct Value</h3>
+                    <div style="display: flex; gap: 2rem;">
+                        <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                            <input type="radio" name="tf_correct" value="True" {% for opt in options %}{% if opt.option_text == 'True' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> True
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
+                            <input type="radio" name="tf_correct" value="False" {% for opt in options %}{% if opt.option_text == 'False' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> False
+                        </label>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="bento-form-group" style="margin-bottom: 1rem;">
+                <label class="bento-label" for="id_correct_text_answer">Expected Answer Reference / Keywords</label>
+                {{ form.correct_text_answer }}
+            </div>
+
+            <div class="bento-form-group" style="margin-bottom: 1.75rem;">
+                <label class="bento-label" for="id_explanation">Solution Explanation</label>
+                {{ form.explanation }}
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--eps-border-subtle);">
+                <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--lg">Cancel</a>
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
+                    💾 Save Question Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

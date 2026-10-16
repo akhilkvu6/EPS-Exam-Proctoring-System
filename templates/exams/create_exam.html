@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Examination — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 960px; margin: 1rem auto 3rem auto;">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Author New Examination</h1>
+            <p class="page-subtitle">Configure test schedule, scoring parameters, and browser proctoring security rules.</p>
+        </div>
+        <a href="{% url 'manage_exams' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Exam Roster</a>
+    </div>
+
+    {% if form.non_field_errors %}
+        <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
+            <div>{% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}</div>
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Section 1: General Details Bento Card -->
+            <div class="bento-card" style="padding: 2.25rem;">
+                <div class="bento-card__header">
+                    <div>
+                        <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Step 1 of 5</span>
+                        <h2 class="bento-card__title">General Examination Information</h2>
+                    </div>
+                    <span style="font-size: 1.5rem;">📝</span>
+                </div>
+
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="id_title">Examination Title *</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<ul class="form-errors">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="id_subject">Academic Subject / Course *</label>
+                        {{ form.subject }}
+                        {% if form.subject.errors %}<ul class="form-errors">{% for e in form.subject.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="id_duration_minutes">Duration (Minutes) *</label>
+                        {{ form.duration_minutes }}
+                        {% if form.duration_minutes.errors %}<ul class="form-errors">{% for e in form.duration_minutes.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+                </div>
+
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="id_description">Brief Description (Optional)</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="bento-form-group" style="margin-bottom: 0;">
+                    <label class="bento-form-label" for="id_instructions">Examination Guidelines & Rules</label>
+                    {{ form.instructions }}
+                    <span class="bento-form-hint">Displayed to examinees before starting the examination.</span>
+                </div>
+            </div>
+
+            <!-- Section 2: Scheduling Bento Card -->
+            <div class="bento-card" style="padding: 2.25rem;">
+                <div class="bento-card__header">
+                    <div>
+                        <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Step 2 of 5</span>
+                        <h2 class="bento-card__title">Examination Schedule Window</h2>
+                    </div>
+                    <span style="font-size: 1.5rem;">📅</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="bento-form-group" style="margin-bottom: 0;">
+                        <label class="bento-form-label" for="id_start_time">Available From (Start Date & Time) *</label>
+                        {{ form.start_time }}
+                        {% if form.start_time.errors %}<ul class="form-errors">{% for e in form.start_time.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+
+                    <div class="bento-form-group" style="margin-bottom: 0;">
+                        <label class="bento-form-label" for="id_end_time">Deadline (End Date & Time) *</label>
+                        {{ form.end_time }}
+                        {% if form.end_time.errors %}<ul class="form-errors">{% for e in form.end_time.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Scoring & Shuffling Bento Card -->
+            <div class="bento-card" style="padding: 2.25rem;">
+                <div class="bento-card__header">
+                    <div>
+                        <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Step 3 of 5</span>
+                        <h2 class="bento-card__title">Scoring & Question Order</h2>
+                    </div>
+                    <span style="font-size: 1.5rem;">⚖️</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="id_total_marks">Target Total Marks *</label>
+                        {{ form.total_marks }}
+                    </div>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="id_passing_marks">Passing Marks *</label>
+                        {{ form.passing_marks }}
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; align-items: center; background: var(--eps-surface-muted); padding: 1rem 1.25rem; border-radius: var(--eps-radius-control);">
+                    <div style="display: flex; align-items: center; gap: 0.65rem;">
+                        {{ form.negative_marking }}
+                        <label for="id_negative_marking" style="font-size: 0.92rem; font-weight: 600; color: var(--eps-text-primary);">Enable Negative Marking</label>
+                    </div>
+                    <div>
+                        <label class="bento-form-label" for="id_default_negative_mark" style="font-size: 0.84rem;">Default Penalty per Wrong Answer</label>
+                        {{ form.default_negative_mark }}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; font-weight: 500; cursor: pointer;">
+                        {{ form.shuffle_questions }} Shuffle Question Sequence
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.92rem; font-weight: 500; cursor: pointer;">
+                        {{ form.shuffle_options }} Shuffle MCQ Answer Choices
+                    </label>
+                </div>
+            </div>
+
+            <!-- Section 4: Browser Proctoring Security Policy -->
+            <div class="bento-card bento-card--mint-subtle" style="padding: 2.25rem;">
+                <div class="bento-card__header">
+                    <div>
+                        <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Step 4 of 5</span>
+                        <h2 class="bento-card__title" style="color: var(--eps-sage-primary);">Browser Proctoring Policy Settings</h2>
+                    </div>
+                    <span style="font-size: 1.5rem;">🛡️</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div class="bento-form-group">
+                        <label class="bento-form-label">Webcam Monitoring</label>
+                        {{ form.camera_required }}
+                    </div>
+                    <div class="bento-form-group">
+                        <label class="bento-form-label">Audio Decibel Monitor</label>
+                        {{ form.microphone_required }}
+                    </div>
+                    <div class="bento-form-group">
+                        <label class="bento-form-label">Screen Share Check</label>
+                        {{ form.screen_sharing_required }}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; background: white; padding: 1rem 1.25rem; border-radius: var(--eps-radius-control); border: 1px solid var(--eps-border);">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+                        {{ form.fullscreen_required }} Force Fullscreen Mode
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+                        {{ form.block_tab_switch }} Log Tab Switching
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; cursor: pointer;">
+                        {{ form.block_copy_paste }} Intercept Copy / Paste
+                    </label>
+                </div>
+
+                <div class="bento-form-group" style="margin-bottom: 0;">
+                    <label class="bento-form-label" for="id_max_warning_count">Maximum Warning Incidents Allowed</label>
+                    {{ form.max_warning_count }}
+                    <span class="bento-form-hint">Threshold before the attempt is highlighted for urgent faculty invigilator review.</span>
+                </div>
+            </div>
+
+            <!-- Section 5: Student Class Assignments -->
+            <div class="bento-card" style="padding: 2.25rem;">
+                <div class="bento-card__header">
+                    <div>
+                        <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Step 5 of 5</span>
+                        <h2 class="bento-card__title">Class & Cohort Assignments</h2>
+                    </div>
+                    <span style="font-size: 1.5rem;">👥</span>
+                </div>
+
+                <div class="bento-form-group" style="margin-bottom: 0;">
+                    <label class="bento-form-label">Select Assigned Classes (Hold Ctrl to select multiple)</label>
+                    {{ form.assigned_classes }}
+                    <span class="bento-form-hint">Enrolled students in these classes will automatically receive in-app alerts and test room access.</span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1rem;">
+                <a href="{% url 'manage_exams' %}" class="bento-btn bento-btn--outline bento-btn--lg">Cancel</a>
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="padding-left: 2rem; padding-right: 2rem;">
+                    Save Draft & Assemble Questions &rarr;
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Examination and Proctoring Policies — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto 3.5rem auto;">
+
+    <!-- =========================================================================
+         1. PAGE HEADER & ACTIONS
+         ========================================================================= -->
+    <div class="bento-page-header">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <span class="bento-badge bento-badge--sage">Institutional Governance</span>
+                <span class="bento-badge bento-badge--mint">Global Enforcement</span>
+                <span style="font-size: 0.8rem; color: var(--eps-text-muted);">&bull; Protocol Version {{ metadata.protocol_version|default:"3.4.1" }}</span>
+            </div>
+            <h1 class="bento-page-title">
+                Examination and Proctoring Policies
+            </h1>
+            <p class="bento-page-subtitle">
+                Configure institution-wide assessment parameters, sensory telemetry sensitivities, and integrity thresholds.
+            </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{% url 'admin_policies_export' %}" class="bento-btn bento-btn--outline">
+                <span>📥</span>
+                <span>Export Signed JSON</span>
+            </a>
+            <button type="submit" form="policies-form" class="bento-btn bento-btn--primary">
+                <span>✓ Save Changes</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Errors -->
+    {% if form.errors %}
+        <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                <span>⚠️</span>
+                <div>
+                    <strong style="display: block; margin-bottom: 0.25rem;">Please review policy errors:</strong>
+                    <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem;">
+                        {% for field, errors in form.errors.items %}
+                            {% for err in errors %}
+                                <li><strong>{{ field|title }}:</strong> {{ err }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'admin_policies' %}" id="policies-form">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--eps-grid-gap); align-items: start;">
+            
+            <!-- Left Column: Policy Cards -->
+            <div style="display: flex; flex-direction: column; gap: var(--eps-grid-gap);">
+
+                <!-- SECTION 1: Session Governance & Timing -->
+                <div class="bento-card">
+                    <div class="bento-card__header">
+                        <div>
+                            <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                                1. Assessment Session Governance &amp; Timing
+                            </h2>
+                            <p class="bento-card__subtitle">Candidate admission windows, duration enforcement, and attempt limits</p>
+                        </div>
+                        <span class="bento-badge bento-badge--sage">Session Rules</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <!-- Late Entry Cutoff -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Late-Entry Admission Cutoff
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Prevents candidates from initiating an assessment after the configured grace window has elapsed.
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <input type="number" 
+                                       name="late_entry_mins" 
+                                       id="late_entry_mins" 
+                                       class="bento-input" 
+                                       style="width: 80px; text-align: center;" 
+                                       min="0" 
+                                       max="120" 
+                                       value="{{ policies.late_entry_mins|default:'15' }}">
+                                <span style="font-size: 0.85rem; color: var(--eps-text-secondary); font-weight: 600;">mins</span>
+                                <label class="bento-switch" title="Toggle Late Entry Cutoff">
+                                    <input type="checkbox" name="late_entry_enabled" id="late_entry_enabled" {% if policies.late_entry_enabled %}checked{% endif %}>
+                                    <span class="bento-switch__slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Attempt Allowance Ceiling -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Candidate Attempt Allowance Ceiling
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Governs how many times a candidate may start or retake an assigned examination.
+                                </div>
+                            </div>
+                            <select name="attempt_allowance" id="attempt_allowance" class="bento-select" style="width: 200px;">
+                                <option value="single" {% if policies.attempt_allowance == 'single' or not policies.attempt_allowance %}selected{% endif %}>Single Attempt (1x)</option>
+                                <option value="dual" {% if policies.attempt_allowance == 'dual' %}selected{% endif %}>Dual Attempt (2x)</option>
+                                <option value="practice" {% if policies.attempt_allowance == 'practice' %}selected{% endif %}>Unlimited Practice</option>
+                            </select>
+                        </div>
+
+                        <!-- Timing Accommodation Baseline -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Default Timing Accommodation Baseline
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Academic accommodation multiplier applied automatically to candidates with authorized extra time.
+                                </div>
+                            </div>
+                            <select name="timing_accommodation" id="timing_accommodation" class="bento-select" style="width: 190px;">
+                                <option value="1.0" {% if policies.timing_accommodation == '1.0' %}selected{% endif %}>Standard 1.0x (Default)</option>
+                                <option value="1.25" {% if policies.timing_accommodation == '1.25' %}selected{% endif %}>Extended 1.25x (+25%)</option>
+                                <option value="1.5" {% if policies.timing_accommodation == '1.5' %}selected{% endif %}>Accommodated 1.5x (Senate)</option>
+                                <option value="2.0" {% if policies.timing_accommodation == '2.0' %}selected{% endif %}>Double Time 2.0x (Special)</option>
+                            </select>
+                        </div>
+
+                        <!-- Automatic Server Submission -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Authoritative Server Auto-Submission
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    When duration reaches zero, active attempts are automatically finalized on the server, even if the candidate loses connectivity.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle Server Auto Submission">
+                                <input type="checkbox" name="server_submission_enabled" id="server_submission_enabled" {% if policies.server_submission_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Sensory Telemetry & Video/Audio Ingestion -->
+                <div class="bento-card">
+                    <div class="bento-card__header">
+                        <div>
+                            <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                                2. Sensory Telemetry &amp; Hardware Requirements
+                            </h2>
+                            <p class="bento-card__subtitle">Webcam presence checks and ambient microphone monitoring</p>
+                        </div>
+                        <span class="bento-badge bento-badge--mint">Sensory Telemetry</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <!-- Video Stream Ingestion -->
+                        <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle);">
+                            <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
+                                Video Stream Ingestion Mode
+                            </div>
+                            <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin-bottom: 0.75rem;">
+                                Client-side WebRTC video feeds are processed locally for face presence and stream heartbeats. No video is ever stored externally.
+                            </p>
+                            <div class="bento-grid bento-grid--3col" style="gap: 0.75rem; margin-bottom: 0;">
+                                <label class="bento-radio-card {% if policies.video_ingestion == 'single' %}is-selected{% endif %}">
+                                    <input type="radio" name="video_ingestion" value="single" {% if policies.video_ingestion == 'single' or not policies.video_ingestion %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Webcam Required</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Single front-facing candidate camera</div>
+                                    </div>
+                                </label>
+                                <label class="bento-radio-card {% if policies.video_ingestion == 'dual' %}is-selected{% endif %}">
+                                    <input type="radio" name="video_ingestion" value="dual" {% if policies.video_ingestion == 'dual' %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Dual-Feed Alert</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Multi-camera telemetry check</div>
+                                    </div>
+                                </label>
+                                <label class="bento-radio-card {% if policies.video_ingestion == 'disabled' %}is-selected{% endif %}">
+                                    <input type="radio" name="video_ingestion" value="disabled" {% if policies.video_ingestion == 'disabled' %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Disabled</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">In-person hall proctoring mode</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Audio Telemetry Monitor -->
+                        <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle);">
+                            <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
+                                Ambient Audio Variance Monitoring
+                            </div>
+                            <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin-bottom: 0.75rem;">
+                                Uses Web Audio API to detect noise spikes above baseline without archiving raw acoustic recordings.
+                            </p>
+                            <div class="bento-grid bento-grid--3col" style="gap: 0.75rem; margin-bottom: 0;">
+                                <label class="bento-radio-card {% if policies.audio_monitor == 'threshold' %}is-selected{% endif %}">
+                                    <input type="radio" name="audio_monitor" value="threshold" {% if policies.audio_monitor == 'threshold' or not policies.audio_monitor %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Decibel Spike Log</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Amplitude spike threshold logging</div>
+                                    </div>
+                                </label>
+                                <label class="bento-radio-card {% if policies.audio_monitor == 'continuous' %}is-selected{% endif %}">
+                                    <input type="radio" name="audio_monitor" value="continuous" {% if policies.audio_monitor == 'continuous' %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Strict Level</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">Continuous variance monitoring</div>
+                                    </div>
+                                </label>
+                                <label class="bento-radio-card {% if policies.audio_monitor == 'disabled' %}is-selected{% endif %}">
+                                    <input type="radio" name="audio_monitor" value="disabled" {% if policies.audio_monitor == 'disabled' %}checked{% endif %} style="accent-color: var(--eps-sage-primary); margin-top: 3px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 0.88rem; color: var(--eps-text-primary);">Disabled</div>
+                                        <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">No microphone permissions requested</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Honest Privacy Standard -->
+                        <div style="background-color: var(--eps-mint-subtle); border: 1px solid var(--eps-mint); border-radius: var(--eps-radius-control); padding: 1rem; display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <span style="font-size: 1.25rem;">🔒</span>
+                            <div style="font-size: 0.84rem; color: var(--eps-text-secondary); line-height: 1.5;">
+                                <strong style="color: var(--eps-sage-primary);">Privacy &amp; Data Ethics Disclosure:</strong>
+                                Biometric face scanning, emotional classification, and external gaze AI models are strictly disabled under institutional policy. Telemetry signals remain strictly within client-side WebRTC presence checks.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Client Environment & Focus Monitoring -->
+                <div class="bento-card">
+                    <div class="bento-card__header">
+                        <div>
+                            <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                                3. Client Environment &amp; Focus Containment
+                            </h2>
+                            <p class="bento-card__subtitle">Fullscreen locking, window blur detection, and clipboard neutralization</p>
+                        </div>
+                        <span class="bento-badge bento-badge--danger">Anti-Cheating</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <!-- Focus Trap / Tab Switch -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Page Visibility &amp; Tab-Switch Interception
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Logs an incident event whenever candidate switches browser tabs or minimizes the examination window.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle Tab Switch Tracking">
+                                <input type="checkbox" name="focus_trap_enabled" id="focus_trap_enabled" {% if policies.focus_trap_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Clipboard Neutralization -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Clipboard Copy/Paste Neutralization
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Disables right-click context menus, text selection, and keyboard paste shortcuts inside question panes.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle Clipboard Neutralization">
+                                <input type="checkbox" name="clipboard_neutralization_enabled" id="clipboard_neutralization_enabled" {% if policies.clipboard_neutralization_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- OS Lockdown Mode -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Fullscreen API Enforcement
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Forces HTML5 Fullscreen mode upon examination launch. Exiting fullscreen prompts a warning and increments violation counts.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle OS Lockdown / Fullscreen">
+                                <input type="checkbox" name="os_lockdown_enabled" id="os_lockdown_enabled" {% if policies.os_lockdown_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Grading & Question Shuffling -->
+                <div class="bento-card">
+                    <div class="bento-card__header">
+                        <div>
+                            <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                                4. Examination Randomization &amp; Evaluation Policies
+                            </h2>
+                            <p class="bento-card__subtitle">Question order shuffling, distractor randomization, and negative marks</p>
+                        </div>
+                        <span class="bento-badge bento-badge--success">Evaluation</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                        <!-- Question Shuffling -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Item Order Randomization
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Generates a unique deterministic question permutation for each candidate attempt to prevent neighbor copy.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle Question Randomization">
+                                <input type="checkbox" name="item_randomization_enabled" id="item_randomization_enabled" {% if policies.item_randomization_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Distractor Shuffling -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--eps-border-subtle); flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Multiple-Choice Distractor Shuffling
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Permutes A/B/C/D option ordering independently per candidate attempt.
+                                </div>
+                            </div>
+                            <label class="bento-switch" title="Toggle Distractor Shuffling">
+                                <input type="checkbox" name="distractor_shuffling_enabled" id="distractor_shuffling_enabled" {% if policies.distractor_shuffling_enabled %}checked{% endif %}>
+                                <span class="bento-switch__slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Negative Marking Scheme -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                            <div style="max-width: 520px;">
+                                <div style="font-weight: 600; color: var(--eps-text-primary); margin-bottom: 0.2rem;">
+                                    Default Negative Marking Penalty Scheme
+                                </div>
+                                <div style="font-size: 0.84rem; color: var(--eps-text-secondary);">
+                                    Penalty deducted for incorrect objective selections unless overridden by individual question settings.
+                                </div>
+                            </div>
+                            <select name="negative_marking_scheme" id="negative_marking_scheme" class="bento-select" style="width: 220px;">
+                                <option value="none" {% if policies.negative_marking_scheme == 'none' %}selected{% endif %}>None [0.0]</option>
+                                <option value="mild" {% if policies.negative_marking_scheme == 'mild' or not policies.negative_marking_scheme %}selected{% endif %}>Mild [-0.25]</option>
+                                <option value="strict" {% if policies.negative_marking_scheme == 'strict' %}selected{% endif %}>Strict [-0.50]</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Institutional Stats & Meta -->
+            <div style="display: flex; flex-direction: column; gap: var(--eps-grid-gap);">
+
+                <!-- Governance Summary Bento Card -->
+                <div class="bento-card bento-card--mint">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Governance Manifest
+                    </h3>
+                    <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin-bottom: 1.25rem;">
+                        Active configuration is cryptographically signed and stored with SHA-256 integrity checksums.
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--eps-text-secondary);">Active Policy Hash:</span>
+                            <span class="bento-badge bento-badge--sage" style="font-family: var(--eps-font-mono); font-size: 0.72rem;">{{ metadata.short_hash|default:metadata.hash|default:"0xe3b0..1c14" }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--eps-text-secondary);">Last Updated:</span>
+                            <strong style="color: var(--eps-text-primary);">{{ metadata.last_modified_formatted|default:"Active Baseline" }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--eps-text-secondary);">Authority Signer:</span>
+                            <strong style="color: var(--eps-text-primary);">{{ request.user.username }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--eps-text-secondary);">Active Exams Governed:</span>
+                            <span class="bento-badge bento-badge--success">{{ active_exams_count }} Active</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--eps-text-secondary);">Approved Students:</span>
+                            <span class="bento-badge bento-badge--sage">{{ total_students }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--eps-text-secondary);">Approved Faculty:</span>
+                            <span class="bento-badge bento-badge--mint">{{ total_teachers }}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.08);">
+                        <button type="submit" class="bento-btn bento-btn--primary" style="width: 100%;">
+                            Save All Policies →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Retention Card -->
+                <div class="bento-card">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Retention Periods
+                    </h3>
+                    <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin-bottom: 1.25rem;">
+                        Institutional ledger data retention mandates.
+                    </p>
+
+                    <div class="bento-form-group">
+                        <label class="bento-form-label" for="telemetry_retention_days">
+                            Proctoring Telemetry Retention
+                        </label>
+                        <select name="telemetry_retention_days" id="telemetry_retention_days" class="bento-select">
+                            <option value="30" {% if policies.telemetry_retention_days == '30' %}selected{% endif %}>30 Days</option>
+                            <option value="90" {% if policies.telemetry_retention_days == '90' or not policies.telemetry_retention_days %}selected{% endif %}>90 Days Post-Term</option>
+                            <option value="180" {% if policies.telemetry_retention_days == '180' %}selected{% endif %}>180 Days</option>
+                        </select>
+                    </div>
+
+                    <div class="bento-form-group" style="margin-bottom: 0;">
+                        <label class="bento-form-label" for="audit_retention_years">
+                            Security Audit Log Retention
+                        </label>
+                        <select name="audit_retention_years" id="audit_retention_years" class="bento-select">
+                            <option value="5y" {% if policies.audit_retention_years == '5y' %}selected{% endif %}>5 Years</option>
+                            <option value="7y" {% if policies.audit_retention_years == '7y' or not policies.audit_retention_years %}selected{% endif %}>7 Years Institutional Archive</option>
+                            <option value="10y" {% if policies.audit_retention_years == '10y' %}selected{% endif %}>10 Years Statutory Archive</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

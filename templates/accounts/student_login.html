@@ -1,26 +1,115 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Login</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>Student Login</h1>
+{% block title %}Student Sign In — EPS Portal{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
+{% block content %}
+<div style="max-width: 960px; margin: 2rem auto;">
+    <div class="bento-grid bento-grid--2col" style="gap: 1.5rem; align-items: stretch;">
+        
+        <!-- Left Bento Card: Student Context -->
+        <div class="bento-card bento-card--primary" style="padding: 2.5rem; justify-content: space-between;">
+            <div>
+                <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); padding: 0.35rem 0.85rem; border-radius: var(--eps-radius-full); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.5rem;">
+                    <span>🎓</span> Candidate Portal
+                </div>
+                <h2 style="font-size: 1.85rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; color: #FFFFFF;">
+                    Student Sign In
+                </h2>
+                <p style="font-size: 0.95rem; line-height: 1.6; opacity: 0.95; color: #FFFFFF; margin-bottom: 1.5rem;">
+                    Access scheduled examinations, take real-time proctored assessments, and review official performance scorecards.
+                </p>
 
-    {{ form.as_p }}
+                <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 2rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 1.15rem;">✓</span>
+                        <div style="font-size: 0.85rem; opacity: 0.95;">
+                            <strong>Hardware Check:</strong> Verify webcam, mic, and browser before exam initiation.
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                        <span style="font-size: 1.15rem;">✓</span>
+                        <div style="font-size: 0.85rem; opacity: 0.95;">
+                            <strong>In-App Alerts:</strong> Receive notifications when exams are published or results released.
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit">Login</button>
-</form>
+            <div style="padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem; opacity: 0.85;">
+                Protected by Institutional Security &bull; BCA Final-Year Project
+            </div>
+        </div>
 
-<p>
-    Don't have a student account?
-    <a href="{% url 'student_register' %}">
-        Register here
-    </a>
-</p>
+        <!-- Right Bento Card: Login Form -->
+        <div class="bento-card" style="padding: 2.5rem; justify-content: center;">
+            <div style="margin-bottom: 1.5rem;">
+                <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.5rem;">Student Authentication</span>
+                <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--eps-text-primary); margin-top: 0.25rem;">
+                    Welcome Student
+                </h1>
+                <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin-top: 0.25rem;">
+                    Sign in with your approved student username.
+                </p>
+            </div>
 
-</body>
-</html>
+            {% if form.non_field_errors %}
+                <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
+                    <div>
+                        {% for err in form.non_field_errors %}
+                            <div>{{ err }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="bento-form-group">
+                    <label class="bento-form-label" for="id_username">Student Username *</label>
+                    <input type="text" name="username" id="id_username" class="bento-input" placeholder="e.g. student_rahul" required autofocus value="{{ form.username.value|default:'' }}">
+                    {% if form.username.errors %}
+                        <ul class="form-errors">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <div class="bento-form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+                        <label class="bento-form-label" for="id_password" style="margin-bottom: 0;">Password *</label>
+                        <a href="{% url 'account_status' %}" style="font-size: 0.8rem; color: var(--eps-primary-sage); font-weight: 600;">Check Approval Status?</a>
+                    </div>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="id_password" class="bento-input" placeholder="Enter your password" required style="padding-right: 2.75rem;">
+                        <button type="button" onclick="togglePasswordVisibility('id_password', this)" title="Toggle password visibility" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--eps-text-muted); padding: 4px;">
+                            👁️
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                        <ul class="form-errors">
+                            {% for error in form.password.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="width: 100%; margin-top: 0.75rem;">
+                    Sign In as Student &rarr;
+                </button>
+            </form>
+
+            <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--eps-border); text-align: center; font-size: 0.88rem; color: var(--eps-text-secondary);">
+                <p style="margin-bottom: 0.5rem;">Don't have a student account?</p>
+                <a href="{% url 'student_register' %}" class="bento-badge bento-badge--sage" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+                    Register as Student &rarr;
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

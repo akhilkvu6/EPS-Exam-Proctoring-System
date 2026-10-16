@@ -1,19 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registration Successful</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>Registration Successful</h1>
+{% block title %}Registration Submitted — EPS{% endblock %}
 
-<p>
-    Your student account has been created successfully.
-</p>
+{% block content %}
+<div style="max-width: 620px; margin: 3rem auto;">
+    <div class="bento-card bento-card--mint-subtle" style="padding: 2.75rem 2.25rem; text-align: center;">
+        <div style="width: 64px; height: 64px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-mint); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--eps-sage-primary); box-shadow: 0 4px 16px rgb(92 112 87 / 15%);">
+            ✓
+        </div>
 
-<a href="{% url 'student_register' %}">
-    Register another student
-</a>
+        <span class="bento-badge bento-badge--warning" style="margin-bottom: 0.75rem;">Status: Pending Approval</span>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+            Registration Submitted Successfully
+        </h1>
+        <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto;">
+            Your student account has been created and assigned to your academic department's faculty review queue.
+        </p>
 
-</body>
-</html>
+        <div class="bento-card" style="background: white; border: 1px solid var(--eps-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 2rem;">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                📌 What Happens Next?
+            </div>
+            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.65;">
+                <li>Your department faculty will review your register number and semester eligibility.</li>
+                <li>You can log in to view your real-time approval status at any time.</li>
+                <li>Upon faculty approval, your examination room access and schedule will be unlocked immediately.</li>
+            </ul>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
+            <a href="{% url 'common_login' %}" class="bento-btn bento-btn--primary bento-btn--lg">
+                Go to Sign In &rarr;
+            </a>
+            <a href="{% url 'home' %}" class="bento-btn bento-btn--outline bento-btn--lg">
+                Return to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

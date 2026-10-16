@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Institutional Administration Cockpit — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+
+    <!-- =========================================================================
+         1. EXECUTIVE SYSTEM INTEGRITY BANNER
+         ========================================================================= -->
+    <div class="bento-card bento-card--mint-subtle" style="padding: 1.5rem 2rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span class="brand-leaf-icon" style="width: 44px; height: 44px; font-size: 1.35rem;">
+                    🛡️
+                </span>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="bento-badge bento-badge--success">System Integrity: Optimal</span>
+                        <span style="font-size: 0.8rem; color: var(--eps-text-muted);">&bull; Real-Time Telemetry Active</span>
+                    </div>
+                    <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--eps-text-primary); margin: 0.2rem 0 0 0;">
+                        Institutional Administration Overview
+                    </h1>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <a href="{% url 'admin_results_export' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+                    <span>📥</span>
+                    <span>Export Audit Logs</span>
+                </a>
+                <a href="{% url 'import_students' %}" class="bento-btn bento-btn--mint bento-btn--sm">
+                    <span>📑</span>
+                    <span>Excel Import</span>
+                </a>
+                <a href="{% url 'admin_security' %}" class="bento-btn bento-btn--primary bento-btn--sm">
+                    <span>🔒</span>
+                    <span>Security Posture</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         2. FOUR BENTO METRIC STAT CARDS
+         ========================================================================= -->
+    <div class="bento-grid">
+        <!-- Card 1: Students -->
+        <div class="bento-card" style="justify-content: space-between;">
+            <div class="bento-stat">
+                <div>
+                    <div class="bento-stat__value">{{ total_students }}</div>
+                    <div class="bento-stat__label">Enrolled Students</div>
+                </div>
+                <div class="bento-stat__icon">
+                    🎓
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem;">
+                {% if students_pending > 0 %}
+                    <a href="{% url 'admin_student_approvals' %}" style="color: var(--eps-warning); font-weight: 700; text-decoration: none;">
+                        ⏳ {{ students_pending }} awaiting verification →
+                    </a>
+                {% else %}
+                    <span style="color: var(--eps-success); font-weight: 600;">✓ Roster all verified</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Card 2: Faculty -->
+        <div class="bento-card" style="justify-content: space-between;">
+            <div class="bento-stat">
+                <div>
+                    <div class="bento-stat__value">{{ total_teachers }}</div>
+                    <div class="bento-stat__label">Institutional Faculty</div>
+                </div>
+                <div class="bento-stat__icon">
+                    👩‍🏫
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem;">
+                {% if teachers_pending > 0 %}
+                    <a href="{% url 'admin_teacher_approvals' %}" style="color: var(--eps-danger); font-weight: 700; text-decoration: none;">
+                        ⚖️ {{ teachers_pending }} awaiting approval →
+                    </a>
+                {% else %}
+                    <span style="color: var(--eps-success); font-weight: 600;">✓ All faculty approved</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Card 3: Examinations & Attempts -->
+        <div class="bento-card" style="justify-content: space-between;">
+            <div class="bento-stat">
+                <div>
+                    <div class="bento-stat__value">{{ total_exams }}</div>
+                    <div class="bento-stat__label">Total Examinations</div>
+                </div>
+                <div class="bento-stat__icon">
+                    📋
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--eps-text-secondary);">
+                {{ active_exams }} Published &bull; {{ total_attempts }} Total Attempts
+            </div>
+        </div>
+
+        <!-- Card 4: Proctoring Integrity Rate -->
+        <div class="bento-card bento-card--mint" style="justify-content: space-between;">
+            <div class="bento-stat">
+                <div>
+                    <div class="bento-stat__value">{{ clean_pct }}%</div>
+                    <div class="bento-stat__label">Clean Session Rate</div>
+                </div>
+                <div class="bento-stat__icon">
+                    🛡️
+                </div>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--eps-sage-primary); font-weight: 600;">
+                {{ clean_attempts }} Clean &bull; {{ total_incidents }} Incidents Logged
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         3. PENDING APPROVALS SPLIT ROW (Faculty & Student Queues)
+         ========================================================================= -->
+    <div class="bento-grid bento-grid--2col" style="gap: var(--eps-grid-gap); margin-bottom: 2rem;">
+        
+        <!-- Teacher Approvals Queue -->
+        <div class="bento-card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border); display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                        Faculty Verification Queue
+                    </h2>
+                    <span style="font-size: 0.78rem; color: var(--eps-text-muted);">Tier-1 Administrator Sign-off</span>
+                </div>
+                <a href="{% url 'admin_teacher_approvals' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+                    All Teachers →
+                </a>
+            </div>
+
+            <div class="bento-table-wrapper" style="border: none; border-radius: 0;">
+                <table class="bento-table">
+                    <thead>
+                        <tr>
+                            <th>Faculty Name</th>
+                            <th>Department</th>
+                            <th>Staff ID</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if oldest_pending_teachers %}
+                            {% for tp in oldest_pending_teachers %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--eps-text-primary);">
+                                            {{ tp.full_name|default:tp.user.username }}
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--eps-text-muted);">@{{ tp.user.username }}</div>
+                                    </td>
+                                    <td style="font-size: 0.85rem;">{{ tp.department }}</td>
+                                    <td style="font-family: var(--eps-font-mono); font-size: 0.85rem;">{{ tp.employee_id }}</td>
+                                    <td>
+                                        <a href="{% url 'admin_teacher_detail' tp.id %}" class="bento-btn bento-btn--mint bento-btn--sm">
+                                            Review
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="bento-empty-state" style="padding: 1.5rem 1rem;">
+                                        <div class="bento-empty-state__icon" style="font-size: 1.75rem;">✓</div>
+                                        <div class="bento-empty-state__title" style="font-size: 1rem;">No Pending Teachers</div>
+                                        <p class="bento-empty-state__text" style="font-size: 0.82rem; margin-bottom: 0;">Faculty queue is completely verified.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Student Approvals Queue -->
+        <div class="bento-card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border); display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                        Candidate Verification Queue
+                    </h2>
+                    <span style="font-size: 0.78rem; color: var(--eps-text-muted);">Administrative Oversight</span>
+                </div>
+                <a href="{% url 'admin_student_approvals' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+                    All Students →
+                </a>
+            </div>
+
+            <div class="bento-table-wrapper" style="border: none; border-radius: 0;">
+                <table class="bento-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Roll Number</th>
+                            <th>Department</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if oldest_pending_students %}
+                            {% for sp in oldest_pending_students %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--eps-text-primary);">
+                                            {{ sp.full_name|default:sp.user.username }}
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: var(--eps-text-muted);">@{{ sp.user.username }}</div>
+                                    </td>
+                                    <td style="font-family: var(--eps-font-mono); font-size: 0.85rem;">{{ sp.roll_number }}</td>
+                                    <td style="font-size: 0.85rem;">{{ sp.department }}</td>
+                                    <td>
+                                        <a href="{% url 'admin_student_detail' sp.id %}" class="bento-btn bento-btn--sage bento-btn--sm">
+                                            Inspect
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="bento-empty-state" style="padding: 1.5rem 1rem;">
+                                        <div class="bento-empty-state__icon" style="font-size: 1.75rem;">✓</div>
+                                        <div class="bento-empty-state__title" style="font-size: 1rem;">No Pending Students</div>
+                                        <p class="bento-empty-state__text" style="font-size: 0.82rem; margin-bottom: 0;">All candidate applications are cleared.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =========================================================================
+         4. RECENT SYSTEM AUDIT ACTIVITY LEDGER
+         ========================================================================= -->
+    <div class="bento-card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
+                    Immutable System Audit Log Stream
+                </h2>
+                <span style="font-size: 0.8rem; color: var(--eps-text-secondary);">Real-time governance trail, security events, and administrative actions</span>
+            </div>
+            <a href="{% url 'admin_audit_logs' %}" class="bento-btn bento-btn--outline bento-btn--sm">
+                Full Audit Trail →
+            </a>
+        </div>
+
+        <div class="bento-table-wrapper" style="border: none; border-radius: 0;">
+            <table class="bento-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Action Type</th>
+                        <th>Actor</th>
+                        <th>Target User / Object</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_activity %}
+                        {% for log in recent_activity %}
+                            <tr>
+                                <td style="font-family: var(--eps-font-mono); font-size: 0.82rem; color: var(--eps-text-muted);">
+                                    {{ log.timestamp|date:"M d, H:i:s" }}
+                                </td>
+                                <td>
+                                    <span class="bento-badge {% if 'REJECT' in log.action or 'SUSPEND' in log.action %}bento-badge--danger{% elif 'APPROVE' in log.action or 'REGISTER' in log.action %}bento-badge--success{% else %}bento-badge--sage{% endif %}" style="font-size: 0.75rem;">
+                                        {{ log.action }}
+                                    </span>
+                                </td>
+                                <td style="font-weight: 600; font-size: 0.88rem;">
+                                    {{ log.actor.username|default:"System" }}
+                                </td>
+                                <td style="font-size: 0.85rem; color: var(--eps-text-secondary);">
+                                    {{ log.target_user.username|default:"—" }}
+                                </td>
+                                <td style="font-size: 0.85rem; color: var(--eps-text-primary);">
+                                    {{ log.details|truncatechars:65 }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="bento-empty-state" style="padding: 2rem 1rem;">
+                                    <div class="bento-empty-state__icon">📜</div>
+                                    <div class="bento-empty-state__title">Audit Trail Ready</div>
+                                    <p class="bento-empty-state__text">Activity events will automatically appear here as users interact with the system.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

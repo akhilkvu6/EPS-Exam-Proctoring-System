@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Status — EPS{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 2.5rem auto;">
+    <div class="bento-card" style="padding: 2.75rem 2.25rem; text-align: center;">
+
+        {% if status == 'pending' %}
+            <div style="width: 64px; height: 64px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-warning-bg); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--eps-warning); border: 1.5px solid var(--eps-warning-border);">
+                ⏳
+            </div>
+            <span class="bento-badge bento-badge--warning" style="margin-bottom: 0.75rem;">Status: Pending Review</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                Account Verification Pending
+            </h1>
+            <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.75rem;">
+                Hello <strong>{{ request.user.username }}</strong>, your registration has been submitted and is waiting for institutional review.
+            </p>
+
+            <div class="bento-card" style="background: var(--eps-surface-muted); border: 1px solid var(--eps-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 2rem;">
+                {% if role == 'student' %}
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                        🎓 Student Registration Details
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Roll / Register Number: <strong>{{ profile.roll_number }}</strong> &bull; Department: <strong>{{ profile.department }}</strong>
+                    </p>
+                    <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin: 0;">
+                        Your departmental faculty will verify your academic enrollment. Once approved, your student dashboard and scheduled examinations will be unlocked.
+                    </p>
+                {% elif role == 'teacher' %}
+                    <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
+                        👨‍🏫 Faculty Verification Details
+                    </div>
+                    <p style="font-size: 0.88rem; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                        Employee ID: <strong>{{ profile.employee_id }}</strong> &bull; Department: <strong>{{ profile.department }}</strong>
+                    </p>
+                    <p style="font-size: 0.84rem; color: var(--eps-text-secondary); margin: 0;">
+                        The institutional administrator will review your staff credentials before granting teacher privileges.
+                    </p>
+                {% endif %}
+            </div>
+
+        {% elif status == 'rejected' %}
+            <div style="width: 64px; height: 64px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-danger-bg); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--eps-danger); border: 1.5px solid var(--eps-danger-border);">
+                ✕
+            </div>
+            <span class="bento-badge bento-badge--danger" style="margin-bottom: 0.75rem;">Status: Rejected</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-danger); margin-bottom: 0.5rem;">
+                Application Not Approved
+            </h1>
+            <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.75rem;">
+                Your enrollment application was reviewed and could not be approved at this time.
+            </p>
+
+            <div class="bento-card" style="background: var(--eps-danger-bg); border: 1px solid var(--eps-danger-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 2rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-danger); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">
+                    Decision Reason Provided
+                </div>
+                <p style="font-size: 0.92rem; color: var(--eps-danger); font-style: italic; margin-bottom: 0.5rem;">
+                    "{{ rejection_reason|default:'No specific reason provided by reviewer.' }}"
+                </p>
+                {% if reviewed_at %}
+                    <p style="font-size: 0.78rem; color: var(--eps-danger); margin: 0;">
+                        Reviewed on {{ reviewed_at|date:"M d, Y H:i" }}
+                    </p>
+                {% endif %}
+            </div>
+
+        {% elif status == 'suspended' %}
+            <div style="width: 64px; height: 64px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-surface-muted); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--eps-text-muted); border: 1.5px solid var(--eps-border);">
+                🚫
+            </div>
+            <span class="bento-badge bento-badge--sage" style="margin-bottom: 0.75rem;">Status: Suspended</span>
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+                Account Suspended
+            </h1>
+            <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.75rem;">
+                This account has been placed on administrative hold by the institutional administration.
+            </p>
+
+            <div class="bento-card" style="background: var(--eps-surface-muted); border: 1px solid var(--eps-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 2rem;">
+                <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin: 0;">
+                    Please contact the examination administration department in person with your valid institutional ID card for account reactivation.
+                </p>
+            </div>
+        {% endif %}
+
+        <div style="display: flex; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
+            <a href="{% url 'user_logout' %}" class="bento-btn bento-btn--outline bento-btn--lg">
+                Log Out
+            </a>
+            <a href="{% url 'home' %}" class="bento-btn bento-btn--primary bento-btn--lg">
+                Return to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
