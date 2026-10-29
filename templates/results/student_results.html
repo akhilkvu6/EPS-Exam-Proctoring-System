@@ -1,83 +1,115 @@
 {% extends 'base.html' %}
 
-{% block title %}My Examination Results — EPS{% endblock %}
+{% block title %}My Examination Results — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">My Published Results & Transcripts</h1>
-        <p class="page-subtitle">Department of <strong>{{ request.user.student_profile.department }}</strong> &bull; Roll Number: <strong>{{ request.user.student_profile.roll_number }}</strong></p>
-    </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="{% url 'student_dashboard' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Dashboard</a>
-        <a href="{% url 'student_exam_list' %}" class="bento-btn bento-btn--mint bento-btn--sm">View Active Exams</a>
-    </div>
-</div>
+<div style="max-width: 1200px; margin: 0 auto var(--space-12) auto;">
 
-<div class="bento-card bento-card--full">
-    <div class="bento-card__header">
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Academic Gradebook</span>
-            <h2 class="bento-card__title">Official Published Examination Records</h2>
-            <p class="bento-card__subtitle">Scores are officially published only after faculty evaluation is finalized.</p>
-        </div>
-        <span class="bento-badge bento-badge--sage">{{ results|length }} Record(s)</span>
-    </div>
-
-    {% if results %}
-        <div class="bento-table-container">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Examination Title</th>
-                        <th>Subject</th>
-                        <th>Date Published</th>
-                        <th>Marks Obtained</th>
-                        <th>Percentage</th>
-                        <th>Result Status</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in results %}
-                        <tr>
-                            <td><strong>{{ r.exam.title }}</strong></td>
-                            <td>{{ r.exam.subject.name }} (<code>{{ r.exam.subject.code }}</code>)</td>
-                            <td>{{ r.published_at|date:"M d, Y" }}</td>
-                            <td>
-                                <strong style="color: var(--eps-sage-primary); font-size: 1.05rem;">{{ r.total_marks_obtained }}</strong> / {{ r.maximum_marks }}
-                            </td>
-                            <td>
-                                <strong style="color: {% if r.is_passed %}var(--eps-success){% else %}var(--eps-danger){% endif %}; font-size: 1.05rem;">
-                                    {{ r.percentage }}%
-                                </strong>
-                            </td>
-                            <td>
-                                <span class="bento-badge {% if r.is_passed %}bento-badge--success{% else %}bento-badge--danger{% endif %}">
-                                    {% if r.is_passed %}✓ PASSED{% else %}✕ FAILED{% endif %}
-                                </span>
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="{% url 'student_result_detail' r.id %}" class="bento-btn bento-btn--primary bento-btn--sm">
-                                    View Scorecard &rarr;
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="bento-empty-state" style="padding: 3rem 1.5rem;">
-            <div class="bento-empty-state__icon">📊</div>
-            <div class="bento-empty-state__title">No Published Results Available</div>
-            <p class="bento-empty-state__text">
-                Your examination scores will appear here once your instructors finalize evaluation and publish the results.
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'student_dashboard' %}" style="color: var(--text-muted); text-decoration: none;">Dashboard</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Academic Records</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+                <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                    My Published Results &amp; Transcripts
+                </h1>
+                <span class="badge badge-blue">Dept. {{ request.user.student_profile.department }}</span>
+            </div>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                Roll Number: <strong>{{ request.user.student_profile.roll_number }}</strong> &bull; Total Published Records: <strong>{{ results|length }}</strong>
             </p>
-            <a href="{% url 'student_exam_list' %}" class="bento-btn bento-btn--outline bento-btn--sm">
-                Browse Scheduled Examinations &rarr;
+        </div>
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Dashboard</span>
+            </a>
+            <a href="{% url 'student_exam_list' %}" class="btn btn-primary btn-sm">
+                <i data-lucide="file-text" class="lucide-icon icon-sm"></i>
+                <span>Available Exams</span>
             </a>
         </div>
-    {% endif %}
+    </div>
+
+    <!-- Results Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden; margin-bottom: var(--space-8);">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Official Published Gradebook</h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">
+                    Scores are officially released after teacher grading and marks moderation are complete
+                </p>
+            </div>
+            <span class="badge badge-mint">{{ results|length }} Published Scorecards</span>
+        </div>
+
+        {% if results %}
+            <div class="table-wrapper">
+                <table class="school-table" style="font-size: var(--font-size-xs);">
+                    <thead>
+                        <tr>
+                            <th>Examination Title</th>
+                            <th>Subject</th>
+                            <th>Date Published</th>
+                            <th>Marks Obtained</th>
+                            <th>Percentage</th>
+                            <th>Result Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--text-primary); font-size: var(--font-size-sm);">{{ r.exam.title }}</strong>
+                                </td>
+                                <td>
+                                    <span style="color: var(--text-secondary);">{{ r.exam.subject.name }}</span>
+                                    <span class="badge badge-lavender" style="margin-left: 4px; font-family: var(--font-mono);">{{ r.exam.subject.code }}</span>
+                                </td>
+                                <td style="color: var(--text-muted); white-space: nowrap;">
+                                    {{ r.published_at|date:"M d, Y" }}
+                                </td>
+                                <td>
+                                    <strong style="color: var(--text-primary); font-size: var(--font-size-sm);">{{ r.total_marks_obtained }}</strong> / {{ r.maximum_marks }} pts
+                                </td>
+                                <td>
+                                    <strong style="color: {% if r.is_passed %}var(--success){% else %}var(--danger){% endif %}; font-size: var(--font-size-sm);">
+                                        {{ r.percentage }}%
+                                    </strong>
+                                </td>
+                                <td>
+                                    <span class="badge {% if r.is_passed %}badge-approved{% else %}badge-rejected{% endif %}">
+                                        {% if r.is_passed %}PASSED{% else %}FAILED{% endif %}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'student_result_detail' r.id %}" class="btn btn-secondary btn-xs">
+                                        <span>View Scorecard</span>
+                                        <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="padding: var(--space-12) var(--space-4); text-align: center; color: var(--text-muted);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-2) auto;">
+                    <i data-lucide="award" class="lucide-icon icon-md"></i>
+                </div>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">No Scorecards Published Yet</div>
+                <p style="font-size: var(--font-size-xs); margin: var(--space-1) 0 0 0;">
+                    Your test scores will be published here once your instructors finalize evaluation.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

@@ -20,25 +20,88 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-56qjez$t)ekpux6ns8ca=w1%nbhq_j0a-(-(zz5#-nc&ho0tu8')
+from django.core.exceptions import ImproperlyConfigured
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+# ------------------------------------------------------------------------------
+# ENVIRONMENT & SECURITY CONFIGURATION
+# ------------------------------------------------------------------------------
+# Determine deployment mode:
+# Production is active when DJANGO_ENV is 'production'/'prod' or DJANGO_DEBUG is 'False'/'0'.
+# Default to local development mode only when DJANGO_ENV is not production.
+DJANGO_ENV = os.environ.get('DJANGO_ENV', 'development').lower().strip()
+IS_PRODUCTION = (
+    DJANGO_ENV in ('production', 'prod', 'staging') or
+    os.environ.get('DJANGO_DEBUG', '').lower().strip() in ('false', '0', 'no')
+)
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,[::1],*').split(',')
+if IS_PRODUCTION:
+    DEBUG = False
 
-if not DEBUG:
-    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'True') == 'True'
-    SESSION_COOKIE_SECURE = os.environ.get('DJANGO_SESSION_COOKIE_SECURE', 'True') == 'True'
-    CSRF_COOKIE_SECURE = os.environ.get('DJANGO_CSRF_COOKIE_SECURE', 'True') == 'True'
-    SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '31536000'))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # SEC-01: Production MUST have a strong, non-default SECRET_KEY provided via environment
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+    if not SECRET_KEY:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY environment variable must be set in production. "
+            "Never use a default or fallback secret key in production."
+        )
+    if SECRET_KEY.startswith('django-insecure-') or len(SECRET_KEY) < 50:
+        raise ImproperlyConfigured(
+            "Insecure or insufficient DJANGO_SECRET_KEY detected. Production requires an "
+            "unpredictable secret key of at least 50 characters."
+        )
 
+    # SEC-01: Production MUST have explicit ALLOWED_HOSTS and MUST NOT permit '*'
+    raw_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', '')
+    if not raw_hosts.strip():
+        raise ImproperlyConfigured(
+            "DJANGO_ALLOWED_HOSTS environment variable must be explicitly configured in production."
+        )
+    ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip()]
+    if '*' in ALLOWED_HOSTS:
+        raise ImproperlyConfigured(
+            "Wildcard '*' in DJANGO_ALLOWED_HOSTS is not permitted in production."
+        )
+
+    # SEC-14: Production transport & cookie security
+    SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'True').lower() in ('true', '1', 'yes')
+    SESSION_COOKIE_SECURE = os.environ.get('DJANGO_SESSION_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
+    CSRF_COOKIE_SECURE = os.environ.get('DJANGO_CSRF_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
+
+    # HSTS Configuration (Enabled for production)
+    hsts_seconds = os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '31536000')
+    try:
+        SECURE_HSTS_SECONDS = int(hsts_seconds)
+    except ValueError:
+        SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get('DJANGO_SECURE_HSTS_SUBDOMAINS', 'True').lower() in ('true', '1', 'yes')
+    SECURE_HSTS_PRELOAD = os.environ.get('DJANGO_SECURE_HSTS_PRELOAD', 'True').lower() in ('true', '1', 'yes')
+
+else:
+    # Local Development & Testing Environment
+    DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+
+    # Isolated development secret key (strictly for local development)
+    SECRET_KEY = os.environ.get(
+        'DJANGO_SECRET_KEY',
+        'django-insecure-eps-dev-local-only-never-use-in-production-389f4b72'
+    )
+
+    # Local development hosts: strictly loopback/test addresses (NO wildcard '*')
+    raw_hosts = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,[::1]')
+    ALLOWED_HOSTS = [h.strip() for h in raw_hosts.split(',') if h.strip() and h.strip() != '*']
+
+    # When testing with DEBUG=False in development, keep SSL redirect/HSTS disabled unless specified
+    if not DEBUG:
+        SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'False').lower() in ('true', '1', 'yes')
+        SESSION_COOKIE_SECURE = os.environ.get('DJANGO_SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1', 'yes')
+        CSRF_COOKIE_SECURE = os.environ.get('DJANGO_CSRF_COOKIE_SECURE', 'False').lower() in ('true', '1', 'yes')
+        SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
+
+# Baseline Security Headers (Active across all environments)
 SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'DENY' 
 
 
 

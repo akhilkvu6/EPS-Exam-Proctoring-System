@@ -1,117 +1,164 @@
 {% extends 'base.html' %}
 
-{% block title %}Manage: {{ exam.title }} - EPS{% endblock %}
+{% block title %}Manage: {{ exam.title }} — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
     <div>
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
-            <h1 class="bento-page-title" style="margin-bottom: 0;">{{ exam.title }}</h1>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <a href="{% url 'manage_exams' %}" style="color: var(--text-muted); text-decoration: none;">Exams</a>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Exam Details</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px; flex-wrap: wrap;">
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">{{ exam.title }}</h1>
             {% if exam.status == 'draft' %}
-                <span class="bento-badge bento-badge--warning">Draft Mode</span>
+                <span class="badge badge-yellow">Draft Mode</span>
             {% elif exam.status == 'published' %}
-                <span class="bento-badge bento-badge--success">● Published</span>
+                <span class="badge badge-approved">Published Live</span>
             {% else %}
-                <span class="bento-badge bento-badge--neutral">Concluded / Closed</span>
+                <span class="badge badge-secondary">Concluded</span>
             {% endif %}
         </div>
-        <p class="bento-page-subtitle">
-            <strong>{{ exam.subject.name }}</strong> ({{ exam.subject.code }}) &bull; Schedule: <strong>{{ exam.start_time|date:"M d, Y H:i" }} &ndash; {{ exam.end_time|date:"M d, Y H:i" }}</strong> &bull; Duration: <strong>{{ exam.duration_minutes }} mins</strong>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+            Subject: <strong>{{ exam.subject.name }}</strong> ({{ exam.subject.code }}) &bull; Window: <strong>{{ exam.start_time|date:"M d, H:i" }} &ndash; {{ exam.end_time|date:"M d, H:i" }}</strong> &bull; Duration: <strong>{{ exam.duration_minutes }}m</strong>
         </p>
     </div>
 
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-        <a href="{% url 'exam_preview' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">👁️ Student Preview</a>
+    <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+        <a href="{% url 'exam_preview' exam.id %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+            <span>Preview Paper</span>
+        </a>
         {% if exam.status == 'published' %}
-            <a href="{% url 'live_invigilation' exam.id %}" class="bento-btn bento-btn--primary bento-btn--sm">📡 Live Invigilation</a>
-            <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn--secondary bento-btn--sm">📊 View Results</a>
-            <form method="POST" action="{% url 'close_exam' exam.id %}" style="display: inline;" onsubmit="return confirm('Manually close this examination? Active in-progress attempts will be automatically finalized and submitted.');">
+            <a href="{% url 'live_invigilation' exam.id %}" class="btn btn-primary btn-sm">
+                <i data-lucide="radio" class="lucide-icon icon-sm"></i>
+                <span>Live Proctor HUD</span>
+            </a>
+            <a href="{% url 'teacher_exam_results' exam.id %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="bar-chart-2" class="lucide-icon icon-sm"></i>
+                <span>Results</span>
+            </a>
+            <form method="POST" action="{% url 'close_exam' exam.id %}" style="display: inline;" onsubmit="return confirm('Manually close this examination? Active in-progress attempts will be automatically finalized.');">
                 {% csrf_token %}
-                <button type="submit" class="bento-btn bento-btn--danger bento-btn--sm" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; cursor: pointer;">
-                    ⏹️ Close Exam
+                <button type="submit" class="btn btn-delete btn-sm">
+                    <i data-lucide="square" class="lucide-icon icon-sm"></i>
+                    <span>Close Exam</span>
                 </button>
             </form>
         {% endif %}
         {% if exam.can_modify %}
-            <a href="{% url 'edit_exam' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">⚙️ Edit Settings</a>
+            <a href="{% url 'edit_exam' exam.id %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="edit-3" class="lucide-icon icon-sm"></i>
+                <span>Edit Settings</span>
+            </a>
             <form method="POST" action="{% url 'publish_exam' exam.id %}" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm" onclick="return confirm('Are you sure you want to publish this examination? Eligible students will be notified in-app.');">
-                    🚀 Publish Exam
+                <button type="submit" class="btn btn-approve btn-sm" onclick="return confirm('Publish this examination? Enrolled students will get access.');">
+                    <i data-lucide="send" class="lucide-icon icon-sm"></i>
+                    <span>Publish Exam</span>
                 </button>
             </form>
         {% endif %}
-        <a href="{% url 'manage_exams' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; All Exams</a>
+        <a href="{% url 'manage_exams' %}" class="btn btn-ghost btn-sm">
+            <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+            <span>Back</span>
+        </a>
     </div>
 </div>
 
-<!-- Exam Metric Stats Bento Grid -->
-<div class="bento-grid bento-grid--4" style="margin-bottom: 1.5rem;">
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(92, 112, 87, 0.1); color: var(--eps-primary-sage);">❓</div>
-        <div>
-            <div class="bento-stat__value">{{ exam_questions.count }}</div>
-            <div class="bento-stat__label">Total Questions</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">In assessment paper</div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(137, 164, 130, 0.15); color: var(--eps-secondary-sage);">🎯</div>
-        <div>
-            <div class="bento-stat__value" style="color: {% if allocated_marks == exam.total_marks %}var(--eps-status-success){% else %}var(--eps-status-warning){% endif %};">
-                {{ allocated_marks }} / {{ exam.total_marks }}
-            </div>
-            <div class="bento-stat__label">Marks Allocated</div>
-            <div class="bento-stat__sub">
-                {% if allocated_marks == exam.total_marks %}
-                    <span style="color: var(--eps-status-success); font-weight: 600;">✓ Fully Allocated</span>
-                {% else %}
-                    <span style="color: var(--eps-status-warning); font-weight: 600;">{{ exam.total_marks|add:"-"|add:allocated_marks }} marks remaining</span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(209, 237, 211, 0.4); color: var(--eps-primary-sage);">🎖️</div>
-        <div>
-            <div class="bento-stat__value">{{ exam.passing_marks }}</div>
-            <div class="bento-stat__label">Passing Criteria</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Minimum passing score</div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(172, 197, 166, 0.2); color: var(--eps-primary-sage);">👥</div>
-        <div>
-            <div class="bento-stat__value">{{ exam.assigned_classes.count }}</div>
-            <div class="bento-stat__label">Classes Assigned</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Cohort enrollment</div>
-        </div>
-    </div>
-</div>
-
-<div class="bento-grid bento-grid--3" style="align-items: start; margin-bottom: 2rem;">
-    <!-- Left 2 Cols: Questions List -->
-    <div style="grid-column: span 2;" class="bento-card">
-        <div class="bento-card__header">
+<!-- 4 Pastel Stat Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+    <div class="card card--student" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <h2 class="bento-card__title" style="margin-bottom: 0.25rem;">Examination Questions ({{ exam_questions.count }})</h2>
-                <p class="bento-card__subtitle">Curated assessment questions presented to examinees in order.</p>
+                <span style="font-size: var(--font-size-xs); color: var(--pastel-blue-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Questions Count</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--pastel-blue-text); margin-top: 4px; line-height: 1;">{{ exam_questions.count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-blue-text); box-shadow: var(--shadow-sm);">
+                <i data-lucide="help-circle" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-blue-text); opacity: 0.9;">
+            Attached to this assessment
+        </div>
+    </div>
+
+    <div class="card {% if allocated_marks == exam.total_marks %}card--attendance{% else %}card--exam{% endif %}" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: {% if allocated_marks == exam.total_marks %}var(--pastel-mint-text){% else %}var(--pastel-peach-text){% endif %}; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Allocated Marks</span>
+                <div style="font-size: 32px; font-weight: 800; color: {% if allocated_marks == exam.total_marks %}var(--success){% else %}var(--danger){% endif %}; margin-top: 4px; line-height: 1;">
+                    {{ allocated_marks }}/{{ exam.total_marks }}
+                </div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: {% if allocated_marks == exam.total_marks %}var(--success){% else %}var(--danger){% endif %}; box-shadow: var(--shadow-sm);">
+                <i data-lucide="check-circle" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs);">
+            {% if allocated_marks == exam.total_marks %}
+                <span style="color: var(--success); font-weight: 700;">Complete marks allocated</span>
+            {% else %}
+                <span style="color: var(--danger); font-weight: 700;">{{ exam.total_marks|add:"-"|add:allocated_marks }} marks remaining</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card card--teacher" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--pastel-lavender-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Passing Criteria</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--pastel-lavender-text); margin-top: 4px; line-height: 1;">{{ exam.passing_marks }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-lavender-text); box-shadow: var(--shadow-sm);">
+                <i data-lucide="award" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-lavender-text); opacity: 0.9;">
+            Minimum passing score
+        </div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5); background: var(--bg-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Cohorts Assigned</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 4px; line-height: 1;">{{ exam.assigned_classes.count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--text-muted); box-shadow: var(--shadow-sm);">
+                <i data-lucide="users" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--text-muted);">
+            Enrolled class sections
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start; margin-bottom: var(--space-8);">
+    
+    <!-- Left 2 Cols: Questions List -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Examination Questions ({{ exam_questions.count }})</h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Ordered list of questions delivered to students during testing</p>
             </div>
             {% if exam.can_modify %}
-                <span class="bento-badge bento-badge--mint" style="font-size: 0.75rem;">Editable</span>
+                <span class="badge badge-mint">Paper Editable</span>
+            {% else %}
+                <span class="badge badge-secondary">Locked for Testing</span>
             {% endif %}
         </div>
 
         {% if exam_questions %}
-            <div class="bento-table-wrapper">
-                <table class="bento-table">
+            <div class="table-wrapper">
+                <table class="school-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>Question Details</th>
+                            <th style="width: 44px;">#</th>
+                            <th>Question Prompt</th>
                             <th>Type</th>
                             <th>Marks</th>
                             {% if exam.can_modify %}
@@ -123,30 +170,30 @@
                         {% for eq in exam_questions %}
                             <tr>
                                 <td>
-                                    <span class="bento-badge bento-badge--sage" style="font-weight: 700;">Q{{ eq.order }}</span>
+                                    <span class="badge badge-blue" style="font-family: var(--font-mono); font-weight: 700;">Q{{ eq.order }}</span>
                                 </td>
                                 <td>
-                                    <div style="font-size: 0.92rem; color: var(--eps-text-primary); font-weight: 500; line-height: 1.4;">
+                                    <div style="font-size: var(--font-size-sm); color: var(--text-primary); font-weight: 600; line-height: 1.4;">
                                         {{ eq.question.question_text|truncatechars:120 }}
                                     </div>
-                                    <div style="font-size: 0.78rem; color: var(--eps-text-muted); margin-top: 0.25rem;">
-                                        Difficulty: <strong style="text-transform: capitalize;">{{ eq.question.difficulty }}</strong> &bull; Module: {{ eq.question.topic|default:"General" }}
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+                                        Difficulty: <span style="text-transform: capitalize; font-weight: 600;">{{ eq.question.difficulty }}</span> &bull; Topic: {{ eq.question.topic|default:"General" }}
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="bento-badge bento-badge--neutral" style="font-size: 0.75rem;">
+                                    <span class="badge badge-lavender" style="font-size: 11px;">
                                         {{ eq.question.get_question_type_display }}
                                     </span>
                                 </td>
-                                <td>
-                                    <strong>{{ eq.effective_marks }}</strong>
+                                <td style="font-size: var(--font-size-xs);">
+                                    <strong style="color: var(--text-primary);">{{ eq.effective_marks }}</strong> pts
                                     {% if eq.effective_negative_marks %}
-                                        <span style="color: var(--eps-status-danger); font-size: 0.75rem; margin-left: 0.2rem;">(-{{ eq.effective_negative_marks }})</span>
+                                        <span style="color: var(--danger); font-size: 11px; margin-left: 2px;">(-{{ eq.effective_negative_marks }})</span>
                                     {% endif %}
                                 </td>
                                 {% if exam.can_modify %}
                                     <td style="text-align: right;">
-                                        <a href="{% url 'remove_question_from_exam' exam.id eq.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="color: var(--eps-status-danger); padding: 0.25rem 0.6rem;" onclick="return confirm('Remove Q{{ eq.order }} from this exam?');">
+                                        <a href="{% url 'remove_question_from_exam' exam.id eq.id %}" class="btn btn-delete btn-xs" onclick="return confirm('Remove Q{{ eq.order }} from this exam?');">
                                             Remove
                                         </a>
                                     </td>
@@ -157,73 +204,78 @@
                 </table>
             </div>
         {% else %}
-            <div class="bento-empty-state" style="padding: 3rem 1.5rem; text-align: center; border: 1.5px dashed var(--eps-border); border-radius: var(--eps-radius-md); background: var(--eps-canvas);">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">❓</div>
-                <h3 style="font-size: 1.1rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No questions attached yet</h3>
-                <p style="font-size: 0.88rem; color: var(--eps-text-muted); max-width: 420px; margin: 0 auto 1.25rem;">
-                    Use the toolcards on the right to auto-populate randomized questions or selectively pick from the course question bank.
+            <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted);">
+                <div style="width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-2) auto;">
+                    <i data-lucide="help-circle" class="lucide-icon icon-md"></i>
+                </div>
+                <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">No Questions Attached Yet</div>
+                <p style="font-size: var(--font-size-xs); margin: var(--space-1) 0 0 0;">
+                    Use the question selector tools on the right to populate this exam paper.
                 </p>
             </div>
         {% endif %}
     </div>
 
     <!-- Right Col: Add Questions Tools -->
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <div style="display: flex; flex-direction: column; gap: var(--space-5);">
         {% if exam.can_modify %}
-            <!-- Random Question Selector Bento Card -->
-            <div class="bento-card bento-card--mint">
-                <div class="bento-card__header" style="margin-bottom: 0.75rem;">
-                    <div>
-                        <h3 class="bento-card__title" style="font-size: 1.05rem;">🎲 Random Selector</h3>
-                        <p class="bento-card__subtitle" style="font-size: 0.8rem;">Auto-pick from {{ exam.subject.name }} bank</p>
-                    </div>
+            <!-- Random Question Selector Card -->
+            <div class="card" style="padding: var(--space-5);">
+                <div style="margin-bottom: var(--space-3);">
+                    <h2 class="card__title" style="font-size: var(--font-size-sm); display: flex; align-items: center; gap: var(--space-2);">
+                        <i data-lucide="shuffle" class="lucide-icon icon-xs"></i>
+                        <span>Auto-Pick Questions</span>
+                    </h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Auto-select from <strong>{{ exam.subject.name }}</strong> bank</p>
                 </div>
 
                 <form method="POST" action="{% url 'add_random_questions' exam.id %}">
                     {% csrf_token %}
-                    <div class="bento-form-group" style="margin-bottom: 0.75rem;">
-                        <label class="bento-label" style="font-size: 0.8rem;">Number of Questions</label>
+                    <div class="form-group" style="margin-bottom: var(--space-3);">
+                        <label class="form-label" style="font-size: var(--font-size-xs);">Number of Questions</label>
                         {{ random_form.count }}
                     </div>
-                    <div class="bento-form-group" style="margin-bottom: 0.75rem;">
-                        <label class="bento-label" style="font-size: 0.8rem;">Difficulty Filter</label>
+                    <div class="form-group" style="margin-bottom: var(--space-3);">
+                        <label class="form-label" style="font-size: var(--font-size-xs);">Difficulty Level</label>
                         {{ random_form.difficulty }}
                     </div>
-                    <div class="bento-form-group" style="margin-bottom: 1rem;">
-                        <label class="bento-label" style="font-size: 0.8rem;">Topic Filter (Optional)</label>
+                    <div class="form-group" style="margin-bottom: var(--space-4);">
+                        <label class="form-label" style="font-size: var(--font-size-xs);">Topic Filter (Optional)</label>
                         {{ random_form.topic }}
                     </div>
-                    <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%;">
-                        + Add Random Questions
+                    <button type="submit" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center;">
+                        <i data-lucide="plus" class="lucide-icon icon-xs"></i>
+                        <span>Add Random Questions</span>
                     </button>
                 </form>
             </div>
 
-            <!-- Add Specific Question From Bank Bento Card -->
-            <div class="bento-card">
-                <div class="bento-card__header" style="margin-bottom: 0.75rem;">
-                    <div>
-                        <h3 class="bento-card__title" style="font-size: 1.05rem;">📚 Available in Bank</h3>
-                        <p class="bento-card__subtitle" style="font-size: 0.8rem;">{{ available_questions.count }} unassigned questions</p>
-                    </div>
+            <!-- Pick Specific Question From Bank -->
+            <div class="card" style="padding: var(--space-5);">
+                <div style="margin-bottom: var(--space-3);">
+                    <h2 class="card__title" style="font-size: var(--font-size-sm); display: flex; align-items: center; gap: var(--space-2);">
+                        <i data-lucide="database" class="lucide-icon icon-xs"></i>
+                        <span>Question Bank</span>
+                    </h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">{{ available_questions.count }} available unassigned questions</p>
                 </div>
 
                 {% if available_questions %}
-                    <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 0.35rem;">
+                    <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-2); padding-right: 4px;">
                         {% for q in available_questions %}
-                            <div style="border: 1px solid var(--eps-border); border-radius: var(--eps-radius-md); padding: 0.85rem; background: var(--eps-surface); transition: border-color var(--eps-transition-fast);">
-                                <div style="font-size: 0.88rem; font-weight: 500; margin-bottom: 0.35rem; color: var(--eps-text-primary); line-height: 1.35;">
+                            <div class="card" style="padding: var(--space-3); background: var(--bg-subtle); border-radius: var(--radius-control);">
+                                <div style="font-size: var(--font-size-xs); font-weight: 600; margin-bottom: 4px; color: var(--text-primary); line-height: 1.4;">
                                     {{ q.question_text|truncatechars:75 }}
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
-                                    <span style="font-size: 0.75rem; color: var(--eps-text-muted);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-2);">
+                                    <span style="font-size: 11px; color: var(--text-muted);">
                                         <strong>{{ q.marks }}m</strong> &bull; {{ q.difficulty|title }}
                                     </span>
                                     <form method="POST" action="{% url 'add_question_to_exam' exam.id %}" style="display: inline;">
                                         {% csrf_token %}
                                         <input type="hidden" name="question_id" value="{{ q.id }}">
-                                        <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
-                                            + Add
+                                        <button type="submit" class="btn btn-secondary btn-xs">
+                                            <span>+ Add</span>
                                         </button>
                                     </form>
                                 </div>
@@ -231,44 +283,43 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div style="text-align: center; padding: 1.5rem 0.5rem; color: var(--eps-text-muted); font-size: 0.85rem;">
-                        <p style="margin-bottom: 0.75rem;">No unassigned questions found for this subject.</p>
-                        <a href="{% url 'create_question' %}" class="bento-btn bento-btn--outline bento-btn--sm">+ Create Question</a>
+                    <div style="text-align: center; padding: var(--space-4); color: var(--text-muted); font-size: var(--font-size-xs);">
+                        <p style="margin-bottom: var(--space-3);">No unassigned questions found for this subject.</p>
+                        <a href="{% url 'create_question' %}" class="btn btn-secondary btn-xs">+ Create New Question</a>
                     </div>
                 {% endif %}
             </div>
         {% else %}
-            <!-- Published State Information Bento Card -->
-            <div class="bento-card bento-card--sage">
-                <div class="bento-card__header" style="margin-bottom: 0.75rem;">
-                    <div>
-                        <h3 class="bento-card__title" style="font-size: 1.05rem;">🔒 Exam Configuration Locked</h3>
-                        <p class="bento-card__subtitle" style="font-size: 0.8rem;">Published assessment in progress</p>
-                    </div>
-                </div>
-                <p style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
-                    Questions and scoring models are immutably locked to maintain academic integrity for examinees.
+            <!-- Published State Locked Info Card -->
+            <div class="card card--alert" style="padding: var(--space-5);">
+                <h2 class="card__title" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--pastel-yellow-text); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="lock" class="lucide-icon icon-xs"></i>
+                    <span>Paper Locked</span>
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--pastel-yellow-text); margin-bottom: var(--space-4);">
+                    This examination is currently published and locked to safeguard assessment integrity.
                 </p>
-                <div style="background: rgba(255, 255, 255, 0.7); border: 1px solid var(--eps-border); border-radius: var(--eps-radius-md); padding: 0.85rem; font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.4rem;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--eps-text-muted);">Webcam:</span>
-                        <strong>{{ exam.camera_required|title }}</strong>
+                <div style="display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-xs);">
+                    <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-2); border-bottom: 1px dashed rgba(0,0,0,0.1);">
+                        <span style="color: var(--pastel-yellow-text); opacity: 0.8;">Webcam:</span>
+                        <strong style="color: var(--pastel-yellow-text);">{{ exam.camera_required|title }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-2); border-bottom: 1px dashed rgba(0,0,0,0.1);">
+                        <span style="color: var(--pastel-yellow-text); opacity: 0.8;">Microphone:</span>
+                        <strong style="color: var(--pastel-yellow-text);">{{ exam.microphone_required|title }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-bottom: var(--space-2); border-bottom: 1px dashed rgba(0,0,0,0.1);">
+                        <span style="color: var(--pastel-yellow-text); opacity: 0.8;">Fullscreen:</span>
+                        <strong style="color: var(--pastel-yellow-text);">{% if exam.fullscreen_required %}Enforced{% else %}Disabled{% endif %}</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--eps-text-muted);">Microphone:</span>
-                        <strong>{{ exam.microphone_required|title }}</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--eps-text-muted);">Fullscreen:</span>
-                        <strong>{% if exam.fullscreen_required %}Enforced{% else %}Disabled{% endif %}</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--eps-text-muted);">Max Warnings:</span>
-                        <strong>{{ exam.max_warning_count }}</strong>
+                        <span style="color: var(--pastel-yellow-text); opacity: 0.8;">Max Warnings:</span>
+                        <strong style="color: var(--pastel-yellow-text);">{{ exam.max_warning_count }}</strong>
                     </div>
                 </div>
             </div>
         {% endif %}
     </div>
+
 </div>
 {% endblock %}

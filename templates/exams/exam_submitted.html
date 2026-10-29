@@ -1,60 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}Submission Confirmation — EPS{% endblock %}
+{% block title %}Submission Confirmation — EPS School Management{% endblock %}
 
 {% block content %}
-<div style="max-width: 640px; margin: 3rem auto;">
-    <div class="bento-card bento-card--mint-subtle" style="padding: 2.75rem 2.25rem; text-align: center;">
+<div style="max-width: 640px; margin: var(--space-8) auto var(--space-12) auto;">
+    <div class="card" style="padding: var(--space-8); text-align: center;">
         
-        <div style="width: 68px; height: 68px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-mint); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; color: var(--eps-sage-primary); box-shadow: 0 4px 16px rgb(92 112 87 / 15%);">
-            ✓
+        <div style="width: 64px; height: 64px; margin: 0 auto var(--space-4) auto; border-radius: var(--radius-full); background: var(--pastel-mint-bg); border: 2px solid var(--pastel-mint-border); display: flex; align-items: center; justify-content: center; color: var(--pastel-mint-text); box-shadow: var(--shadow-sm);">
+            <i data-lucide="check" class="lucide-icon icon-lg"></i>
         </div>
 
-        <span class="bento-badge bento-badge--success" style="margin-bottom: 0.75rem;">Recorded Successfully</span>
-        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
+        <span class="badge badge-approved" style="margin-bottom: var(--space-2);">Submitted Successfully</span>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-2) 0; letter-spacing: -0.02em;">
             Examination Submitted
         </h1>
-        <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 2rem;">
-            Your responses for <strong>{{ exam.title }}</strong> have been securely recorded and locked in the institutional repository.
+        <p style="color: var(--text-secondary); font-size: var(--font-size-sm); line-height: 1.5; margin: 0 0 var(--space-6) 0;">
+            Your responses for <strong>{{ exam.title }}</strong> have been securely recorded into the institution ledger.
         </p>
 
-        <!-- Receipt Table Card -->
-        <div class="bento-card" style="background: white; border: 1px solid var(--eps-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 1.75rem; font-size: 0.9rem;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 0.6rem; margin-bottom: 0.6rem;">
-                <span style="color: var(--eps-text-muted);">Examinee:</span>
-                <strong style="color: var(--eps-text-primary);">{{ request.user.student_profile.full_name|default:request.user.username }} ({{ request.user.student_profile.roll_number }})</strong>
+        <!-- Official Academic Receipt Card -->
+        <div class="card card--student" style="padding: var(--space-5); text-align: left; margin-bottom: var(--space-6); font-size: var(--font-size-xs);">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: var(--space-2); margin-bottom: var(--space-2);">
+                <span style="color: var(--pastel-blue-text); opacity: 0.8;">Candidate:</span>
+                <strong style="color: var(--pastel-blue-text);">{{ request.user.student_profile.full_name|default:request.user.username }} ({{ request.user.student_profile.roll_number }})</strong>
             </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 0.6rem; margin-bottom: 0.6rem;">
-                <span style="color: var(--eps-text-muted);">Submission Mode:</span>
-                <span class="bento-badge {% if attempt.status == 'auto_submitted' %}bento-badge--warning{% else %}bento-badge--success{% endif %}">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: var(--space-2); margin-bottom: var(--space-2);">
+                <span style="color: var(--pastel-blue-text); opacity: 0.8;">Submission Mode:</span>
+                <span class="badge {% if attempt.status == 'auto_submitted' %}badge-yellow{% else %}badge-approved{% endif %}">
                     {{ attempt.get_status_display }}
                 </span>
             </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 0.6rem; margin-bottom: 0.6rem;">
-                <span style="color: var(--eps-text-muted);">Timestamp:</span>
-                <strong style="color: var(--eps-text-primary);">{{ attempt.submitted_at|date:"M d, Y H:i:s" }}</strong>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: var(--space-2); margin-bottom: var(--space-2);">
+                <span style="color: var(--pastel-blue-text); opacity: 0.8;">Submission Timestamp:</span>
+                <strong style="color: var(--pastel-blue-text);">{{ attempt.submitted_at|date:"M d, Y · H:i:s" }}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--eps-border-subtle); padding-bottom: 0.6rem; margin-bottom: 0.6rem;">
-                <span style="color: var(--eps-text-muted);">Questions Answered:</span>
-                <strong style="color: var(--eps-success);">{{ answered_count }} / {{ total_questions }}</strong>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(0,0,0,0.1); padding-bottom: var(--space-2); margin-bottom: var(--space-2);">
+                <span style="color: var(--pastel-blue-text); opacity: 0.8;">Questions Answered:</span>
+                <strong style="color: var(--pastel-blue-text); font-weight: 800;">{{ answered_count }} / {{ total_questions }}</strong>
             </div>
             <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--eps-text-muted);">Unanswered Questions:</span>
-                <strong style="color: {% if unanswered_count > 0 %}var(--eps-warning){% else %}var(--eps-text-muted){% endif %};">{{ unanswered_count }}</strong>
+                <span style="color: var(--pastel-blue-text); opacity: 0.8;">Unanswered Questions:</span>
+                <strong style="color: {% if unanswered_count > 0 %}var(--danger){% else %}var(--pastel-blue-text){% endif %};">{{ unanswered_count }}</strong>
             </div>
         </div>
 
-        <div class="bento-card bento-card--sage" style="padding: 1rem 1.25rem; text-align: left; margin-bottom: 2rem; font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.55;">
-            <strong style="color: var(--eps-sage-primary);">📢 Evaluation Notice:</strong><br>
-            Objective questions have been evaluated automatically. Official results will be published to your student portal once faculty complete manual grading of descriptive questions (if applicable).
+        <div class="card" style="padding: var(--space-4); background: var(--bg-subtle); text-align: left; margin-bottom: var(--space-6); font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; display: flex; gap: var(--space-3); align-items: flex-start;">
+            <i data-lucide="info" class="lucide-icon icon-sm" style="color: var(--text-muted); margin-top: 2px;"></i>
+            <div>
+                <strong style="color: var(--text-primary);">Evaluation Notice:</strong><br>
+                Objective multiple choice questions are evaluated automatically. Official marks and class percentiles will appear on your dashboard as soon as faculty finalize grading.
+            </div>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
-            <a href="{% url 'student_dashboard' %}" class="bento-btn bento-btn--primary bento-btn--lg">
-                Return to Dashboard &rarr;
+        <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
+            <a href="{% url 'student_dashboard' %}" class="btn btn-primary">
+                <span>Return to Dashboard</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
             </a>
-            <a href="{% url 'student_results' %}" class="bento-btn bento-btn--outline bento-btn--lg">
-                View Published Results
+            <a href="{% url 'student_results' %}" class="btn btn-secondary">
+                <span>View My Results</span>
             </a>
         </div>
     </div>

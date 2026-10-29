@@ -1,39 +1,41 @@
 {% extends 'base.html' %}
 
-{% block title %}Registration Submitted — EPS{% endblock %}
+{% block title %}Student Registration Submitted — EPS School Management{% endblock %}
 
 {% block content %}
-<div style="max-width: 620px; margin: 3rem auto;">
-    <div class="bento-card bento-card--mint-subtle" style="padding: 2.75rem 2.25rem; text-align: center;">
-        <div style="width: 64px; height: 64px; margin: 0 auto 1.25rem auto; border-radius: var(--eps-radius-full); background: var(--eps-mint); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--eps-sage-primary); box-shadow: 0 4px 16px rgb(92 112 87 / 15%);">
-            ✓
+<div style="max-width: 560px; margin: var(--space-8) auto var(--space-12) auto;">
+    <div class="card" style="padding: var(--space-8); text-align: center;">
+        <div style="width: 64px; height: 64px; margin: 0 auto var(--space-4) auto; border-radius: var(--radius-full); background-color: var(--pastel-mint-bg); border: 2px solid var(--pastel-mint-border); display: flex; align-items: center; justify-content: center; color: var(--pastel-mint-text); box-shadow: var(--shadow-sm);">
+            <i data-lucide="check" class="lucide-icon icon-lg"></i>
         </div>
 
-        <span class="bento-badge bento-badge--warning" style="margin-bottom: 0.75rem;">Status: Pending Approval</span>
-        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
-            Registration Submitted Successfully
+        <span class="badge badge-yellow" style="margin-bottom: var(--space-3);">Pending Department Review</span>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-2); letter-spacing: -0.02em;">
+            Registration Received!
         </h1>
-        <p style="color: var(--eps-text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto;">
-            Your student account has been created and assigned to your academic department's faculty review queue.
+        <p style="color: var(--text-secondary); font-size: var(--font-size-sm); line-height: 1.6; margin-bottom: var(--space-5);">
+            Your student account profile has been submitted to your department for approval.
         </p>
 
-        <div class="bento-card" style="background: white; border: 1px solid var(--eps-border); padding: 1.25rem 1.5rem; text-align: left; margin-bottom: 2rem;">
-            <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
-                📌 What Happens Next?
+        <div class="card card--student" style="padding: var(--space-4); text-align: left; margin-bottom: var(--space-6);">
+            <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--pastel-blue-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-1);">
+                <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                <span>What Happens Next</span>
             </div>
-            <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.65;">
-                <li>Your department faculty will review your register number and semester eligibility.</li>
-                <li>You can log in to view your real-time approval status at any time.</li>
-                <li>Upon faculty approval, your examination room access and schedule will be unlocked immediately.</li>
+            <ul style="margin: 0; padding-left: 1.2rem; font-size: var(--font-size-xs); color: var(--pastel-blue-text); line-height: 1.6;">
+                <li>Your department teacher will check your roll number and details.</li>
+                <li>You can sign in anytime to inspect your approval status.</li>
+                <li>Once approved, your exams and tests will immediately appear on your dashboard.</li>
             </ul>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 0.85rem; flex-wrap: wrap;">
-            <a href="{% url 'common_login' %}" class="bento-btn bento-btn--primary bento-btn--lg">
-                Go to Sign In &rarr;
+        <div style="display: flex; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
+            <a href="{% url 'common_login' %}" class="btn btn-primary">
+                <span>Sign In to Check Status</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
             </a>
-            <a href="{% url 'home' %}" class="bento-btn bento-btn--outline bento-btn--lg">
-                Return to Home
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <span>Back to Home</span>
             </a>
         </div>
     </div>

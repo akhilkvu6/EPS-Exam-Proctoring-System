@@ -1,46 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}Edit Question #{{ question.id }} — EPS Question Bank{% endblock %}
+{% block title %}Edit Question #{{ question.id }} — EPS School Management{% endblock %}
 
 {% block content %}
-<div style="max-width: 860px; margin: 0 auto;">
-    <div class="bento-page-header">
+<div style="max-width: 860px; margin: 0 auto var(--space-12) auto;">
+
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <h1 class="bento-page-title">Edit Question #{{ question.id }}</h1>
-            <p class="bento-page-subtitle">Modify repository question properties, options, evaluation criteria, and explanations.</p>
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'question_bank' %}" style="color: var(--text-muted); text-decoration: none;">Question Bank</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Edit Question #{{ question.id }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+                <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                    Edit Question
+                </h1>
+                <span class="badge badge-lavender">Item #{{ question.id }}</span>
+            </div>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+                Modify prompt wording, option choices, marks, or model explanations.
+            </p>
         </div>
-        <div class="bento-page-actions">
-            <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Back to Question Bank</a>
+        <div>
+            <a href="{% url 'question_bank' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Bank</span>
+            </a>
         </div>
     </div>
 
     {% if has_student_answers %}
-        <div class="bento-alert bento-alert--warning" style="margin-bottom: 1.5rem;">
-            <div>
-                <strong>🔒 Student Submissions Recorded:</strong> This question is referenced by existing student attempt answer records. To maintain academic grading integrity, the format and key structure cannot be deleted, but you may refine prompt phrasing, options wording, and explanation notes.
+        <div class="card card--alert" style="padding: var(--space-4); margin-bottom: var(--space-5); display: flex; align-items: flex-start; gap: var(--space-3);">
+            <i data-lucide="shield-alert" class="lucide-icon icon-sm" style="color: var(--pastel-yellow-text); margin-top: 2px;"></i>
+            <div style="font-size: var(--font-size-xs); color: var(--pastel-yellow-text); line-height: 1.5;">
+                <strong>Student Submissions Recorded:</strong> This question is referenced by existing student attempt answer records. To maintain grading integrity, the format and key structure cannot be deleted, but you may refine prompt phrasing, options wording, and explanations.
             </div>
         </div>
     {% endif %}
 
-    <div class="bento-card" style="padding: 2.25rem;">
+    <div class="card" style="padding: var(--space-6);">
         {% if form.non_field_errors %}
-            <div class="bento-alert bento-alert--danger" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: var(--eps-radius-md); background: #fef2f2; border: 1px solid #fecaca; color: var(--eps-status-danger);">
-                {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
+            <div class="alert alert--error" style="margin-bottom: var(--space-5);">
+                <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                    <i data-lucide="alert-circle" class="lucide-icon icon-sm" style="color: var(--danger); margin-top: 2px;"></i>
+                    <div>{% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}</div>
+                </div>
             </div>
         {% endif %}
 
         <form method="POST">
             {% csrf_token %}
 
-            <div class="bento-grid bento-grid--3" style="margin-bottom: 1rem;">
-                <div class="bento-form-group" style="grid-column: span 2;">
-                    <label class="bento-label" for="id_subject">Academic Subject *</label>
+            <div class="grid grid-cols-3" style="gap: var(--space-4); margin-bottom: var(--space-4);">
+                <div class="form-group" style="grid-column: span 2; margin-bottom: 0;">
+                    <label class="form-label" for="id_subject" style="font-size: var(--font-size-xs);">Subject *</label>
                     {{ form.subject }}
                 </div>
-                <div class="bento-form-group">
-                    <label class="bento-label" for="id_question_type">Question Format *</label>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="id_question_type" style="font-size: var(--font-size-xs);">Format *</label>
                     {% if has_student_answers %}
-                        <input type="text" class="bento-input" value="{{ question.get_question_type_display }}" readonly style="background: var(--eps-card-bg-subtle, #eee); cursor: not-allowed;">
+                        <input type="text" class="form-control" value="{{ question.get_question_type_display }}" readonly style="background: var(--bg-subtle); cursor: not-allowed; font-size: var(--font-size-xs);">
                         <input type="hidden" name="question_type" value="{{ question.question_type }}">
                     {% else %}
                         {{ form.question_type }}
@@ -48,104 +69,105 @@
                 </div>
             </div>
 
-            <div class="bento-grid bento-grid--2" style="margin-bottom: 1rem;">
-                <div class="bento-form-group">
-                    <label class="bento-label" for="id_difficulty">Difficulty Level *</label>
+            <div class="grid grid-cols-2" style="gap: var(--space-4); margin-bottom: var(--space-4);">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="id_difficulty" style="font-size: var(--font-size-xs);">Difficulty *</label>
                     {{ form.difficulty }}
                 </div>
-                <div class="bento-form-group">
-                    <label class="bento-label" for="id_topic">Topic / Unit / Module</label>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="id_topic" style="font-size: var(--font-size-xs);">Topic / Module</label>
                     {{ form.topic }}
                 </div>
             </div>
 
-            <div class="bento-form-group" style="margin-bottom: 1rem;">
-                <label class="bento-label" for="id_question_text">Question Prompt *</label>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="id_question_text" style="font-size: var(--font-size-xs);">Question Prompt *</label>
                 {{ form.question_text }}
             </div>
 
-            <div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem;">
-                <div class="bento-form-group">
-                    <label class="bento-label" for="id_marks">Marks Awarded *</label>
+            <div class="grid grid-cols-2" style="gap: var(--space-4); margin-bottom: var(--space-5);">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="id_marks" style="font-size: var(--font-size-xs);">Marks *</label>
                     {{ form.marks }}
                 </div>
-                <div class="bento-form-group">
-                    <label class="bento-label" for="id_negative_marks">Negative Deduction (Optional)</label>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label" for="id_negative_marks" style="font-size: var(--font-size-xs);">Negative Deduction (Optional)</label>
                     {{ form.negative_marks }}
                 </div>
             </div>
 
             <!-- Existing Options Section -->
             {% if question.question_type == 'mcq' %}
-                <div id="mcq-options-container" class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div id="mcq-options-container" class="card card--student" style="margin-bottom: var(--space-5); padding: var(--space-5);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2);">
                         <div>
-                            <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.2rem;">Multiple Choice Option Set</h3>
-                            <p style="font-size: 0.8rem; color: var(--eps-text-muted); margin: 0;">Update option texts or correct answer flag</p>
+                            <h2 class="card__title" style="font-size: var(--font-size-sm); margin: 0; color: var(--pastel-blue-text);">Multiple Choice Options</h2>
+                            <span style="font-size: 11px; color: var(--pastel-blue-text); opacity: 0.8;">Update option text or toggle correct response indicator</span>
                         </div>
-                        <span class="bento-badge bento-badge--sage" style="font-size: 0.75rem;">MCQ Keys</span>
+                        <span class="badge badge-blue">MCQ Keys</span>
                     </div>
 
                     {% if has_student_answers %}
-                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
                             {% for opt in options %}
-                                <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                    <span class="bento-badge {% if opt.is_correct %}bento-badge--mint{% else %}bento-badge--outline{% endif %}" style="min-width: 80px; justify-content: center;">
-                                        {% if opt.is_correct %}✓ Correct{% else %}Distractor{% endif %}
+                                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                    <span class="badge {% if opt.is_correct %}badge-mint{% else %}badge-secondary{% endif %}" style="min-width: 75px; justify-content: center; font-size: 11px;">
+                                        {% if opt.is_correct %}&#10003; Correct{% else %}Option{% endif %}
                                     </span>
                                     <input type="hidden" name="existing_option_id[]" value="{{ opt.id }}">
-                                    <input type="text" name="existing_option_text[]" value="{{ opt.option_text }}" class="bento-input" required>
+                                    <input type="text" name="existing_option_text[]" value="{{ opt.option_text }}" class="form-control" required style="font-size: var(--font-size-xs); background: #ffffff;">
                                 </div>
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div id="options-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div id="options-list" style="display: flex; flex-direction: column; gap: var(--space-3);">
                             {% for opt in options %}
-                                <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                    <input type="radio" name="correct_option" value="{{ forloop.counter0 }}" {% if opt.is_correct %}checked{% endif %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);">
-                                    <input type="text" name="option_text[]" value="{{ opt.option_text }}" class="bento-input" required>
+                                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                    <input type="radio" name="correct_option" value="{{ forloop.counter0 }}" {% if opt.is_correct %}checked{% endif %} style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--text-primary);">
+                                    <input type="text" name="option_text[]" value="{{ opt.option_text }}" class="form-control" required style="font-size: var(--font-size-xs); background: #ffffff;">
                                 </div>
                             {% empty %}
-                                <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                    <input type="radio" name="correct_option" value="0" checked style="width: 20px; height: 20px;">
-                                    <input type="text" name="option_text[]" class="bento-input" placeholder="Option A text" required>
+                                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                    <input type="radio" name="correct_option" value="0" checked style="width: 18px; height: 18px; accent-color: var(--text-primary);">
+                                    <input type="text" name="option_text[]" class="form-control" placeholder="Option A text" required style="font-size: var(--font-size-xs); background: #ffffff;">
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 0.85rem;">
-                                    <input type="radio" name="correct_option" value="1" style="width: 20px; height: 20px;">
-                                    <input type="text" name="option_text[]" class="bento-input" placeholder="Option B text" required>
+                                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                    <input type="radio" name="correct_option" value="1" style="width: 18px; height: 18px; accent-color: var(--text-primary);">
+                                    <input type="text" name="option_text[]" class="form-control" placeholder="Option B text" required style="font-size: var(--font-size-xs); background: #ffffff;">
                                 </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                 </div>
             {% elif question.question_type == 'true_false' %}
-                <div id="tf-options-container" class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
-                    <h3 style="font-size: 1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.75rem;">Select Correct Value</h3>
-                    <div style="display: flex; gap: 2rem;">
-                        <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
-                            <input type="radio" name="tf_correct" value="True" {% for opt in options %}{% if opt.option_text == 'True' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> True
+                <div id="tf-options-container" class="card card--attendance" style="margin-bottom: var(--space-5); padding: var(--space-4);">
+                    <h3 style="font-size: var(--font-size-xs); font-weight: 700; color: var(--pastel-mint-text); margin-bottom: var(--space-3);">Select Correct Value</h3>
+                    <div style="display: flex; gap: var(--space-6);">
+                        <label style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xs); font-weight: 600; color: var(--pastel-mint-text); cursor: pointer;">
+                            <input type="radio" name="tf_correct" value="True" {% for opt in options %}{% if opt.option_text == 'True' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 18px; height: 18px; accent-color: var(--text-primary);"> True
                         </label>
-                        <label style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.95rem; font-weight: 600; cursor: pointer;">
-                            <input type="radio" name="tf_correct" value="False" {% for opt in options %}{% if opt.option_text == 'False' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 20px; height: 20px; accent-color: var(--eps-primary-sage);"> False
+                        <label style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xs); font-weight: 600; color: var(--pastel-mint-text); cursor: pointer;">
+                            <input type="radio" name="tf_correct" value="False" {% for opt in options %}{% if opt.option_text == 'False' and opt.is_correct %}checked{% endif %}{% endfor %} style="width: 18px; height: 18px; accent-color: var(--text-primary);"> False
                         </label>
                     </div>
                 </div>
             {% endif %}
 
-            <div class="bento-form-group" style="margin-bottom: 1rem;">
-                <label class="bento-label" for="id_correct_text_answer">Expected Answer Reference / Keywords</label>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="id_correct_text_answer" style="font-size: var(--font-size-xs);">Expected Answer / Key</label>
                 {{ form.correct_text_answer }}
             </div>
 
-            <div class="bento-form-group" style="margin-bottom: 1.75rem;">
-                <label class="bento-label" for="id_explanation">Solution Explanation</label>
+            <div class="form-group" style="margin-bottom: var(--space-6);">
+                <label class="form-label" for="id_explanation" style="font-size: var(--font-size-xs);">Solution Explanation / Rubric</label>
                 {{ form.explanation }}
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--eps-border-subtle);">
-                <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--lg">Cancel</a>
-                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
-                    💾 Save Question Changes
+            <div style="display: flex; justify-content: flex-end; gap: var(--space-3); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+                <a href="{% url 'question_bank' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                    <span>Save Changes</span>
                 </button>
             </div>
         </form>

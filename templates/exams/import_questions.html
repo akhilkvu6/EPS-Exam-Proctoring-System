@@ -1,140 +1,159 @@
 {% extends 'base.html' %}
 
-{% block title %}Bulk Question Import — EPS Question Bank{% endblock %}
+{% block title %}Bulk Question Import — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Bulk Question Bank Import</h1>
-        <p class="page-subtitle">Batch onboard assessment items from Excel (.xlsx) or CSV files with automated option parsing and validation.</p>
-    </div>
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{% url 'download_question_template' %}" class="bento-btn bento-btn--mint bento-btn--sm">
-            📥 Download Excel Template (.xlsx)
-        </a>
-        <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">
-            &larr; Back to Question Bank
-        </a>
-    </div>
-</div>
+<div style="max-width: 1200px; margin: 0 auto var(--space-12) auto;">
 
-<div class="bento-grid bento-grid--3col" style="margin-bottom: 2rem; gap: 1.5rem; align-items: stretch;">
-    
-    <!-- Upload Form Card (Wide) -->
-    <div class="bento-card bento-card--wide" style="padding: 2.25rem;">
-        <div class="bento-card__header">
-            <div>
-                <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Batch Upload</span>
-                <h2 class="bento-card__title">Upload Questions File</h2>
-                <p class="bento-card__subtitle">Supported formats: <strong>.xlsx</strong>, <strong>.csv</strong>. Uses row-by-row validation with error reporting.</p>
-            </div>
-            <span style="font-size: 1.75rem;">📚</span>
-        </div>
-
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="bento-form-group">
-                <label class="bento-form-label" for="file">Select File (.xlsx or .csv) *</label>
-                <input type="file" name="file" id="file" accept=".xlsx, .csv" class="bento-input" required style="padding: 0.85rem 1rem; border: 2px dashed var(--eps-border); background: var(--eps-surface-muted);">
-                <span class="bento-form-hint">Ensure columns match the standard template format.</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="default_subject">Default Subject (Fallback) *</label>
-                    <select name="default_subject" id="default_subject" class="bento-select">
-                        <option value="">-- Use Subject Code from File --</option>
-                        {% for subj in subjects %}
-                            <option value="{{ subj.id }}">{{ subj.code }} - {{ subj.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <span class="bento-form-hint">Applied if row does not specify a valid subject code.</span>
-                </div>
-
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="mode">Validation Mode *</label>
-                    <select name="mode" id="mode" class="bento-select">
-                        <option value="skip_errors" selected>Skip Errored Rows (Recommended)</option>
-                        <option value="atomic">Atomic (Rollback entire batch on any error)</option>
-                    </select>
-                    <span class="bento-form-hint">Skip mode imports all valid questions and reports issues for failed rows.</span>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle);">
-                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
-                    📥 Validate & Import Questions
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Guidelines Bento Card -->
-    <div class="bento-card bento-card--mint-subtle" style="padding: 2rem; justify-content: space-between;">
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <div class="bento-card__header" style="margin-bottom: 0.75rem;">
-                <span class="bento-badge bento-badge--mint">Template Guide</span>
-                <span style="font-size: 1.35rem;">📋</span>
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'question_bank' %}" style="color: var(--text-muted); text-decoration: none;">Question Bank</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Spreadsheet Import</span>
             </div>
-            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.5rem;">Required Columns:</h3>
-            <ul style="font-size: 0.82rem; color: var(--eps-text-secondary); padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.4rem; margin: 0;">
-                <li><code>subject_code</code>: Course code matching registered Subject (e.g., <code>CS101</code>).</li>
-                <li><code>question_type</code>: <code>mcq</code>, <code>true_false</code>, or <code>short_answer</code>.</li>
-                <li><code>question_text</code>: Complete question prompt.</li>
-                <li><code>marks</code>: Decimal or integer points (e.g. <code>2.0</code>).</li>
-                <li><code>negative_marks</code>: Penalty points (e.g. <code>0.5</code>).</li>
-                <li><code>difficulty</code>: <code>easy</code>, <code>medium</code>, or <code>hard</code>.</li>
-                <li><code>option_a</code> to <code>option_d</code>: Multiple choice alternatives.</li>
-                <li><code>correct_option</code>: Key identifier (<code>A</code>, <code>B</code>, <code>True</code>, etc.).</li>
-            </ul>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                Bulk Question Import
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+                Batch import assessment items, answer keys, and options from Excel (.xlsx) or CSV files.
+            </p>
         </div>
-        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.06);">
-            <a href="{% url 'download_question_template' %}" class="bento-btn bento-btn--mint" style="width: 100%; justify-content: center; font-size: 0.85rem;">
-                Download Sample .XLSX
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+            <a href="{% url 'download_question_template' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Template (.xlsx)</span>
+            </a>
+            <a href="{% url 'question_bank' %}" class="btn btn-ghost btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Bank</span>
             </a>
         </div>
     </div>
 
-</div>
-
-<!-- Import Summary & Error Table if processed -->
-{% if import_summary %}
-    <div class="bento-card bento-card--full" style="margin-bottom: 2rem;">
-        <div class="bento-card__header">
-            <div>
-                <h2 class="bento-card__title">Import Batch Execution Summary</h2>
-                <p class="bento-card__subtitle">Processed {{ import_summary.total_rows }} total row(s) in {{ import_summary.mode }} mode.</p>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start; margin-bottom: var(--space-6);">
+        
+        <!-- Upload Form Card (Wide: Span 2) -->
+        <div class="card" style="padding: var(--space-6);">
+            <div style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-3);">
+                <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px; display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="file-spreadsheet" class="lucide-icon icon-sm"></i>
+                    <span>Upload Questions Spreadsheet</span>
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Supported formats: Microsoft Excel (.xlsx), Comma-Separated Values (.csv)</p>
             </div>
-            <div style="display: flex; gap: 0.5rem;">
-                <span class="bento-badge bento-badge--mint">{{ import_summary.imported_count }} Questions Imported</span>
-                {% if import_summary.error_count > 0 %}
-                    <span class="bento-badge bento-badge--danger">{{ import_summary.error_count }} Issues</span>
-                {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="file" style="font-size: var(--font-size-xs);">Select Spreadsheet File *</label>
+                    <input type="file" name="file" id="file" accept=".xlsx, .csv" class="form-control" required style="padding: var(--space-3); border: 2px dashed var(--border-subtle); background: #ffffff;">
+                    <span class="form-hint">Make sure columns match the template structure shown on the right.</span>
+                </div>
+
+                <div class="grid grid-cols-2" style="gap: var(--space-4); margin-bottom: var(--space-4);">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="default_subject" style="font-size: var(--font-size-xs);">Fallback Subject *</label>
+                        <select name="default_subject" id="default_subject" class="form-control" style="font-size: var(--font-size-xs);">
+                            <option value="">-- Use Subject Code from File --</option>
+                            {% for subj in subjects %}
+                                <option value="{{ subj.id }}">{{ subj.code }} - {{ subj.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="form-hint">Applied if any row leaves subject blank.</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="mode" style="font-size: var(--font-size-xs);">Validation Mode *</label>
+                        <select name="mode" id="mode" class="form-control" style="font-size: var(--font-size-xs);">
+                            <option value="skip_errors" selected>Skip Errored Rows (Recommended)</option>
+                            <option value="atomic">Atomic (Rollback all if any error)</option>
+                        </select>
+                        <span class="form-hint">Skip mode imports valid questions and reports bad rows.</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="upload" class="lucide-icon icon-sm"></i>
+                        <span>Validate &amp; Import Questions</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Guidelines Card -->
+        <div class="card card--student" style="padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <span class="badge badge-blue" style="margin-bottom: var(--space-2);">Template Guide</span>
+                <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--pastel-blue-text); margin: var(--space-1) 0 var(--space-3) 0;">Required Columns:</h3>
+                <ul style="font-size: 11px; color: var(--pastel-blue-text); padding-left: var(--space-4); display: flex; flex-direction: column; gap: var(--space-1); margin: 0; line-height: 1.5;">
+                    <li><code>subject_code</code>: Course code (e.g. CS101)</li>
+                    <li><code>question_type</code>: <code>mcq</code>, <code>true_false</code>, <code>short_answer</code></li>
+                    <li><code>question_text</code>: Prompt text</li>
+                    <li><code>marks</code>: e.g. <code>2.0</code></li>
+                    <li><code>negative_marks</code>: e.g. <code>0.5</code></li>
+                    <li><code>difficulty</code>: <code>easy</code>, <code>medium</code>, <code>hard</code></li>
+                    <li><code>option_a</code> to <code>option_d</code>: Choices for MCQ</li>
+                    <li><code>correct_option</code>: <code>A</code>, <code>B</code>, <code>True</code>, etc.</li>
+                </ul>
+            </div>
+            <div style="margin-top: var(--space-5); padding-top: var(--space-3); border-top: 1px dashed rgba(0,0,0,0.1);">
+                <a href="{% url 'download_question_template' %}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; background: #ffffff;">
+                    <i data-lucide="download" class="lucide-icon icon-xs"></i>
+                    <span>Download Sample .XLSX</span>
+                </a>
             </div>
         </div>
 
-        {% if import_summary.errors %}
-            <div style="margin-top: 1rem;">
-                <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--eps-danger); margin-bottom: 0.5rem;">Skipped / Errored Rows:</h3>
-                <table class="bento-table" style="width: 100%;">
-                    <thead>
-                        <tr>
-                            <th style="width: 100px;">Row Number</th>
-                            <th>Validation Issue</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for err in import_summary.errors %}
-                            <tr>
-                                <td><strong>Row {{ err.row }}</strong></td>
-                                <td style="color: var(--eps-danger);">{{ err.error }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endif %}
     </div>
-{% endif %}
+
+    <!-- Import Summary & Error Table if processed -->
+    {% if import_summary %}
+        <div class="card" style="margin-bottom: var(--space-6); padding: 0; overflow: hidden;">
+            <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+                <div>
+                    <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Import Execution Summary</h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Processed {{ import_summary.total_rows }} total rows from spreadsheet</p>
+                </div>
+                <div style="display: flex; gap: var(--space-2);">
+                    <span class="badge badge-mint">{{ import_summary.imported_count }} Questions Imported</span>
+                    {% if import_summary.error_count > 0 %}
+                        <span class="badge badge-peach">{{ import_summary.error_count }} Issues</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if import_summary.errors %}
+                <div style="padding: var(--space-5);">
+                    <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--danger); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                        <i data-lucide="alert-triangle" class="lucide-icon icon-sm"></i>
+                        <span>Skipped Rows</span>
+                    </h3>
+                    <div class="table-wrapper">
+                        <table class="school-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Row #</th>
+                                    <th>Error Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for err in import_summary.errors %}
+                                    <tr>
+                                        <td><span class="badge badge-peach">Row {{ err.row }}</span></td>
+                                        <td style="color: var(--danger); font-size: var(--font-size-xs);">{{ err.error }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}

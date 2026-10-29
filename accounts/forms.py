@@ -65,9 +65,18 @@ class StudentRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ['username', 'password1', 'password2']:
-            if field in self.fields:
-                self.fields[field].widget.attrs['class'] = 'form-control'
+        if 'username' in self.fields:
+            self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Choose a username'})
+            self.fields['username'].help_text = ''
+        if 'password1' in self.fields:
+            self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Create password (min. 6 chars)'})
+            self.fields['password1'].help_text = ''
+        if 'password2' in self.fields:
+            self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm password'})
+            self.fields['password2'].help_text = ''
+
+
+
 
     def clean_roll_number(self):
         roll_number = self.cleaned_data.get('roll_number', '').strip()
@@ -154,9 +163,18 @@ class TeacherRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ['username', 'password1', 'password2']:
-            if field in self.fields:
-                self.fields[field].widget.attrs['class'] = 'form-control'
+        if 'username' in self.fields:
+            self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Choose a username'})
+            self.fields['username'].help_text = ''
+        if 'password1' in self.fields:
+            self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Create password (min. 6 chars)'})
+            self.fields['password1'].help_text = ''
+        if 'password2' in self.fields:
+            self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm password'})
+            self.fields['password2'].help_text = ''
+
+
+
 
     def clean_employee_id(self):
         emp_id = self.cleaned_data.get('employee_id', '').strip()
@@ -353,11 +371,6 @@ class TeacherProfileEditForm(forms.ModelForm):
         help_text='Institutional contact email for official records only (no automated emails sent).',
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'teacher@institution.edu'})
     )
-    department = forms.CharField(
-        max_length=100,
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Academic Department'})
-    )
     qualification = forms.CharField(
         max_length=150,
         required=True,
@@ -371,7 +384,7 @@ class TeacherProfileEditForm(forms.ModelForm):
 
     class Meta:
         model = TeacherProfile
-        fields = ['department', 'qualification', 'institution']
+        fields = ['qualification', 'institution']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -381,6 +394,13 @@ class TeacherProfileEditForm(forms.ModelForm):
 
     def save(self, commit=True):
         profile = super().save(commit=False)
+        # Security: Department cannot be self-modified by teachers through profile edit.
+        # Preserve original department from the database instance.
+        if self.instance and self.instance.pk:
+            original_dept = TeacherProfile.objects.filter(pk=self.instance.pk).values_list('department', flat=True).first()
+            if original_dept:
+                profile.department = original_dept
+
         user = profile.user
         full_name = self.cleaned_data.get('full_name', '').strip()
         user.first_name = full_name

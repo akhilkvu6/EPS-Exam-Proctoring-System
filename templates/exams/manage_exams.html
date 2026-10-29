@@ -1,87 +1,119 @@
 {% extends 'base.html' %}
 
-{% block title %}Examination Management — EPS{% endblock %}
+{% block title %}Manage Exams — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
     <div>
-        <h1 class="page-title">Examination Authoring & Administration</h1>
-        <p class="page-subtitle">Configure proctoring policies, assemble question sets, and publish academic tests.</p>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <span>Faculty</span>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Exams Management</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                Manage Examinations
+            </h1>
+            <span class="badge badge-lavender">{{ exams|length }} total papers</span>
+        </div>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+            Author assessments, configure proctoring security levels, and schedule test sessions.
+        </p>
     </div>
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary bento-btn--sm">➕ Create Examination</a>
-        <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm">📚 Question Bank</a>
-    </div>
-</div>
-
-<!-- Bento Stats Overview -->
-<div class="bento-grid">
-    <div class="bento-card bento-card--compact">
-        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
-            <span class="bento-badge bento-badge--warning">Authoring</span>
-            <span style="font-size: 1.3rem;">📝</span>
-        </div>
-        <div class="bento-stat__value" style="color: var(--eps-warning);">
-            {{ draft_count }}
-        </div>
-        <div class="bento-stat__label">Draft Papers</div>
-    </div>
-
-    <div class="bento-card bento-card--compact bento-card--mint-subtle">
-        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
-            <span class="bento-badge bento-badge--mint">Scheduled</span>
-            <span style="font-size: 1.3rem;">📅</span>
-        </div>
-        <div class="bento-stat__value" style="color: var(--eps-sage-primary);">
-            {{ published_count }}
-        </div>
-        <div class="bento-stat__label">Published / Queued</div>
-    </div>
-
-    <div class="bento-card bento-card--compact">
-        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
-            <span class="bento-badge bento-badge--success">Live Active</span>
-            <span style="font-size: 1.3rem;">⚡</span>
-        </div>
-        <div class="bento-stat__value" style="color: var(--eps-success);">
-            {{ active_count }}
-        </div>
-        <div class="bento-stat__label">Active Right Now</div>
-    </div>
-
-    <div class="bento-card bento-card--compact">
-        <div class="bento-card__header" style="margin-bottom: 0.25rem;">
-            <span class="bento-badge bento-badge--sage">Archived</span>
-            <span style="font-size: 1.3rem;">📁</span>
-        </div>
-        <div class="bento-stat__value" style="color: var(--eps-text-muted);">
-            {{ closed_count }}
-        </div>
-        <div class="bento-stat__label">Closed Tests</div>
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <a href="{% url 'question_bank' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="help-circle" class="lucide-icon icon-sm"></i>
+            <span>Question Bank</span>
+        </a>
+        <a href="{% url 'create_exam' %}" class="btn btn-primary btn-sm">
+            <i data-lucide="plus" class="lucide-icon icon-sm"></i>
+            <span>Create New Exam</span>
+        </a>
     </div>
 </div>
 
-<!-- Examinations Roster Bento Card -->
-<div class="bento-card bento-card--full">
-    <div class="bento-card__header">
+<!-- 4 Pastel Stat Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+    <div class="card card--exam" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--pastel-peach-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Draft Papers</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--pastel-peach-text); margin-top: 4px; line-height: 1;">{{ draft_count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-peach-text); box-shadow: var(--shadow-sm);">
+                <i data-lucide="edit-3" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-peach-text); opacity: 0.9;">
+            Unpublished / In progress
+        </div>
+    </div>
+
+    <div class="card card--student" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--pastel-blue-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Scheduled</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--pastel-blue-text); margin-top: 4px; line-height: 1;">{{ published_count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-blue-text); box-shadow: var(--shadow-sm);">
+                <i data-lucide="calendar" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-blue-text); opacity: 0.9;">
+            Ready on student calendar
+        </div>
+    </div>
+
+    <div class="card card--attendance" style="padding: var(--space-5);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--pastel-mint-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Live Active</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--pastel-mint-text); margin-top: 4px; line-height: 1;">{{ active_count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-mint-text); box-shadow: var(--shadow-sm);">
+                <i data-lucide="radio" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-mint-text); opacity: 0.9;">
+            Taking tests right now
+        </div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5); background: var(--bg-subtle);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <span style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Closed Papers</span>
+                <div style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 4px; line-height: 1;">{{ closed_count }}</div>
+            </div>
+            <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--text-muted); box-shadow: var(--shadow-sm);">
+                <i data-lucide="archive" class="lucide-icon icon-sm"></i>
+            </div>
+        </div>
+        <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--text-muted);">
+            Concluded sessions
+        </div>
+    </div>
+</div>
+
+<!-- Examinations Table Card -->
+<div class="card" style="padding: 0; overflow: hidden; margin-bottom: var(--space-8);">
+    <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
         <div>
-            <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Roster</span>
-            <h2 class="bento-card__title">All Configured Examinations</h2>
-            <p class="bento-card__subtitle">Comprehensive list of drafts, published tests, and concluded sessions.</p>
+            <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Faculty Examinations Roster</h2>
+            <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Comprehensive roster of exam drafts, published schedules, and concluded sessions</p>
         </div>
-        <span class="bento-badge bento-badge--sage">{{ exams|length }} Total Exams</span>
     </div>
 
     {% if exams %}
-        <div class="bento-table-container">
-            <table class="bento-table">
+        <div class="table-wrapper">
+            <table class="school-table">
                 <thead>
                     <tr>
-                        <th>Title & Subject</th>
+                        <th>Exam Title &amp; Subject</th>
                         <th>Schedule Window</th>
                         <th>Duration</th>
                         <th>Marks</th>
-                        <th>Proctoring Policy</th>
+                        <th>Proctoring</th>
                         <th>Status</th>
                         <th style="text-align: right;">Actions</th>
                     </tr>
@@ -90,56 +122,62 @@
                     {% for exam in exams %}
                         <tr>
                             <td>
-                                <strong><a href="{% url 'exam_detail' exam.id %}" style="color: var(--eps-sage-primary); font-size: 1rem;">{{ exam.title }}</a></strong>
-                                <div style="font-size: 0.8rem; color: var(--eps-text-secondary); margin-top: 0.15rem;">
+                                <div>
+                                    <a href="{% url 'exam_detail' exam.id %}" style="font-weight: 700; color: var(--text-primary); text-decoration: none; font-size: var(--font-size-sm);">
+                                        {{ exam.title }}
+                                    </a>
+                                </div>
+                                <div style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 2px;">
                                     {{ exam.subject.name }} (<code>{{ exam.subject.code }}</code>) &bull; Author: {{ exam.created_by.username }}
                                 </div>
                             </td>
-                            <td style="font-size: 0.84rem;">
-                                <div><strong style="color: var(--eps-text-primary);">Start:</strong> {{ exam.start_time|date:"M d, Y H:i" }}</div>
-                                <div><strong style="color: var(--eps-text-secondary);">End:</strong> {{ exam.end_time|date:"M d, Y H:i" }}</div>
+                            <td style="font-size: var(--font-size-xs); white-space: nowrap;">
+                                <div><span style="color: var(--text-muted);">Start:</span> <strong>{{ exam.start_time|date:"M d, H:i" }}</strong></div>
+                                <div><span style="color: var(--text-muted);">End:</span> {{ exam.end_time|date:"M d, H:i" }}</div>
                             </td>
-                            <td>{{ exam.duration_minutes }} mins</td>
-                            <td>
-                                <strong style="color: var(--eps-text-primary);">{{ exam.total_marks }}</strong> pts
-                                <span style="font-size: 0.75rem; color: var(--eps-text-muted); display: block;">Pass: {{ exam.passing_marks }}</span>
+                            <td style="font-size: var(--font-size-xs); white-space: nowrap;">
+                                {{ exam.duration_minutes }} mins
+                            </td>
+                            <td style="font-size: var(--font-size-xs);">
+                                <strong style="color: var(--text-primary);">{{ exam.total_marks }}</strong> pts
+                                <div style="font-size: 11px; color: var(--text-muted);">Pass: {{ exam.passing_marks }}</div>
                             </td>
                             <td>
-                                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                                     {% if exam.camera_required != 'disabled' %}
-                                        <span class="bento-badge bento-badge--mint" style="font-size: 0.72rem;">📹 Camera</span>
+                                        <span class="badge badge-blue" style="font-size: 10px;">Camera</span>
                                     {% endif %}
                                     {% if exam.fullscreen_required %}
-                                        <span class="bento-badge bento-badge--sage" style="font-size: 0.72rem;">⛶ Fullscreen</span>
+                                        <span class="badge badge-yellow" style="font-size: 10px;">Fullscreen</span>
                                     {% endif %}
                                     {% if exam.block_tab_switch %}
-                                        <span class="bento-badge bento-badge--warning" style="font-size: 0.72rem;">🚫 Tab Lock</span>
+                                        <span class="badge badge-peach" style="font-size: 10px;">Tab Lock</span>
                                     {% endif %}
                                 </div>
                             </td>
                             <td>
                                 {% with live=exam.get_live_status %}
                                     {% if live == 'draft' %}
-                                        <span class="bento-badge bento-badge--warning">Draft</span>
+                                        <span class="badge badge-yellow">Draft</span>
                                     {% elif live == 'active' %}
-                                        <span class="bento-badge bento-badge--success">● Live Now</span>
+                                        <span class="badge badge-approved">Active</span>
                                     {% elif live == 'scheduled' %}
-                                        <span class="bento-badge bento-badge--mint">Scheduled</span>
+                                        <span class="badge badge-blue">Scheduled</span>
                                     {% else %}
-                                        <span class="bento-badge bento-badge--sage">Closed</span>
+                                        <span class="badge badge-secondary">Closed</span>
                                     {% endif %}
                                 {% endwith %}
                             </td>
                             <td style="text-align: right;">
-                                <div style="display: inline-flex; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap;">
-                                    <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn--primary bento-btn--sm">Manage</a>
+                                <div style="display: inline-flex; gap: var(--space-1); justify-content: flex-end; flex-wrap: wrap;">
+                                    <a href="{% url 'exam_detail' exam.id %}" class="btn btn-primary btn-xs">Manage</a>
                                     {% if exam.status == 'published' or exam.status == 'closed' %}
-                                        <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn--mint bento-btn--sm">Results</a>
+                                        <a href="{% url 'teacher_exam_results' exam.id %}" class="btn btn-secondary btn-xs">Results</a>
                                     {% endif %}
                                     {% if exam.can_modify %}
-                                        <a href="{% url 'edit_exam' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">Edit</a>
+                                        <a href="{% url 'edit_exam' exam.id %}" class="btn btn-secondary btn-xs">Edit</a>
                                     {% endif %}
-                                    <a href="{% url 'exam_preview' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">Preview</a>
+                                    <a href="{% url 'exam_preview' exam.id %}" class="btn btn-ghost btn-xs">Preview</a>
                                 </div>
                             </td>
                         </tr>
@@ -148,14 +186,17 @@
             </table>
         </div>
     {% else %}
-        <div class="bento-empty-state" style="padding: 3rem 1.5rem;">
-            <div class="bento-empty-state__icon">📋</div>
-            <div class="bento-empty-state__title">No Examinations Created Yet</div>
-            <p class="bento-empty-state__text">
-                Start by authoring your first online examination with customizable proctoring policies and question sets.
+        <div style="padding: var(--space-12) var(--space-4); text-align: center; color: var(--text-muted);">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-2) auto;">
+                <i data-lucide="clipboard-list" class="lucide-icon icon-md"></i>
+            </div>
+            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">No Examinations Created Yet</div>
+            <p style="font-size: var(--font-size-xs); margin: 0 0 var(--space-4) 0;">
+                Start by creating your first exam with custom questions and proctoring rules.
             </p>
-            <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary bento-btn--sm">
-                ➕ Create Examination &rarr;
+            <a href="{% url 'create_exam' %}" class="btn btn-primary btn-sm">
+                <i data-lucide="plus" class="lucide-icon icon-sm"></i>
+                <span>Create Examination</span>
             </a>
         </div>
     {% endif %}

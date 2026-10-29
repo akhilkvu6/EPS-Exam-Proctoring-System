@@ -1,170 +1,224 @@
 {% extends 'base.html' %}
 
-{% block title %}Results & Performance: {{ exam.title }} - EPS{% endblock %}
+{% block title %}Results & Performance: {{ exam.title }} — EPS{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
-            <h1 class="bento-page-title" style="margin-bottom: 0;">Performance Analytics & Evaluation</h1>
-            <span class="bento-badge {% if published_count > 0 %}bento-badge--success{% else %}bento-badge--warning{% endif %}">
-                {% if published_count > 0 %}● Results Published ({{ published_count }}){% else %}🔒 Results Withheld{% endif %}
-            </span>
-        </div>
-        <p class="bento-page-subtitle">
-            Exam: <strong>{{ exam.title }}</strong> &bull; Total Submissions: <strong>{{ total_submissions }}</strong> &bull; Pass Criterion: <strong>{{ exam.passing_marks }} Marks</strong>
-        </p>
-    </div>
+<div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-        <a href="{% url 'export_results_csv' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">
-            📥 Export CSV Report
-        </a>
-
-        {% if published_count > 0 %}
-            <form method="POST" action="{% url 'toggle_result_publication' exam.id %}" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="withhold">
-                <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" onclick="return confirm('Withhold results from student portal?');">
-                    🔒 Withhold Results
-                </button>
-            </form>
-        {% else %}
-            <form method="POST" action="{% url 'toggle_result_publication' exam.id %}" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="publish">
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm" onclick="return confirm('Publish all results? Examinees will receive instant in-app score notifications.');">
-                    📢 Publish All Results
-                </button>
-            </form>
-        {% endif %}
-
-        <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Exam Details</a>
-    </div>
-</div>
-
-<!-- Score Distribution & Analytics Metrics Bento Grid -->
-<div class="bento-grid bento-grid--4" style="margin-bottom: 1.5rem;">
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(92, 112, 87, 0.12); color: var(--eps-primary-sage);">📈</div>
+    <!-- Header Banner -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); flex-wrap: wrap;">
         <div>
-            <div class="bento-stat__value" style="color: var(--eps-primary-sage);">{{ avg_score }}</div>
-            <div class="bento-stat__label">Class Average Score</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Out of {{ exam.total_marks }} marks</div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(39, 112, 68, 0.12); color: var(--eps-status-success);">🎯</div>
-        <div>
-            <div class="bento-stat__value" style="color: var(--eps-status-success);">{{ pass_percentage }}%</div>
-            <div class="bento-stat__label">Overall Pass Rate</div>
-            <div class="bento-stat__sub" style="color: var(--eps-status-success);">
-                {{ pass_count }} of {{ total_submissions }} students passed
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); flex-wrap: wrap;">
+                <span class="bento-badge" style="background: var(--pastel-purple); color: var(--pastel-purple-text); border: 1px solid var(--pastel-purple-border);">
+                    <i data-lucide="award" class="lucide-icon icon-xs"></i>
+                    <span>Teacher Results Hub</span>
+                </span>
+                <span class="bento-badge {% if published_count > 0 %}bento-badge--success{% else %}bento-badge--warning{% endif %}">
+                    {% if published_count > 0 %}
+                        <i data-lucide="eye" class="lucide-icon icon-xs"></i>
+                        <span>Results Published ({{ published_count }})</span>
+                    {% else %}
+                        <i data-lucide="eye-off" class="lucide-icon icon-xs"></i>
+                        <span>Results Withheld</span>
+                    {% endif %}
+                </span>
             </div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(209, 237, 211, 0.5); color: var(--eps-primary-sage);">🏆</div>
-        <div>
-            <div class="bento-stat__value" style="color: var(--eps-primary-sage);">{{ max_score }}</div>
-            <div class="bento-stat__label">Highest Score</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Lowest score recorded: {{ min_score }}</div>
-        </div>
-    </div>
-
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: {% if pending_manual_count > 0 %}rgba(149, 86, 0, 0.12){% else %}rgba(92, 112, 87, 0.08){% endif %}; color: {% if pending_manual_count > 0 %}var(--eps-status-warning){% else %}var(--eps-text-muted){% endif %};">✍️</div>
-        <div>
-            <div class="bento-stat__value" style="color: {% if pending_manual_count > 0 %}var(--eps-status-warning){% else %}var(--eps-text-muted){% endif %};">
-                {{ pending_manual_count }}
-            </div>
-            <div class="bento-stat__label">Pending Grading</div>
-            <div class="bento-stat__sub" style="color: {% if pending_manual_count > 0 %}var(--eps-status-warning){% else %}var(--eps-text-muted){% endif %};">
-                {% if pending_manual_count > 0 %}Descriptive essays await score{% else %}All scripts evaluated{% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Student Results Ledger Bento Card -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <div>
-            <h2 class="bento-card__title" style="margin-bottom: 0.25rem;">Candidate Submissions Ledger</h2>
-            <p class="bento-card__subtitle">Itemized scorecards, evaluation states, and grading actions.</p>
-        </div>
-    </div>
-
-    {% if results %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Student Name</th>
-                        <th>Roll Number</th>
-                        <th>Score</th>
-                        <th>Percentage</th>
-                        <th>Pass / Fail</th>
-                        <th>Grading State</th>
-                        <th>Student Visibility</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in results %}
-                        <tr>
-                            <td>
-                                <strong style="color: var(--eps-text-primary);">
-                                    {{ r.student.student_profile.full_name|default:r.student.username }}
-                                </strong>
-                                <div style="font-size: 0.78rem; color: var(--eps-text-muted);">{{ r.student.username }}</div>
-                            </td>
-                            <td>
-                                <code style="font-family: monospace; font-weight: 700; color: var(--eps-secondary-sage);">{{ r.student.student_profile.roll_number }}</code>
-                            </td>
-                            <td>
-                                <strong>{{ r.total_marks_obtained }}</strong> / {{ r.maximum_marks }}
-                            </td>
-                            <td>
-                                <strong style="color: var(--eps-primary-sage);">{{ r.percentage }}%</strong>
-                            </td>
-                            <td>
-                                <span class="bento-badge {% if r.is_passed %}bento-badge--success{% else %}bento-badge--danger{% endif %}">
-                                    {% if r.is_passed %}PASS{% else %}FAIL{% endif %}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="bento-badge {% if r.grading_status == 'pending_manual' %}bento-badge--warning{% else %}bento-badge--mint{% endif %}" style="font-size: 0.75rem;">
-                                    {{ r.get_grading_status_display }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if r.is_published %}
-                                    <span class="bento-badge bento-badge--success" style="font-size: 0.75rem;">Published</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--neutral" style="font-size: 0.75rem;">Withheld</span>
-                                {% endif %}
-                            </td>
-                            <td style="text-align: right;">
-                                <a href="{% url 'grade_attempt' r.attempt.id %}" class="bento-btn bento-btn--outline bento-btn--sm" style="padding: 0.25rem 0.65rem;">
-                                    ✍️ Grade / Review
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="bento-empty-state" style="padding: 3.5rem 1.5rem; text-align: center; border: 1.5px dashed var(--eps-border); border-radius: var(--eps-radius-md); background: var(--eps-canvas);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📥</div>
-            <h3 style="font-size: 1.1rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No Submissions Recorded</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted);">
-                Examinee scores will populate this ledger as soon as candidate attempts are submitted.
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-1) 0; letter-spacing: -0.02em;">
+                Student Scores: {{ exam.title }}
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                {{ total_submissions }} students submitted this exam &bull; Pass mark is {{ exam.passing_marks }} out of {{ exam.total_marks }}
             </p>
         </div>
-    {% endif %}
+
+        <div style="display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'export_results_csv' exam.id %}" class="bento-btn bento-btn-secondary bento-btn-sm">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Export CSV</span>
+            </a>
+
+            {% if published_count > 0 %}
+                <form method="POST" action="{% url 'toggle_result_publication' exam.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="withhold">
+                    <button type="submit" class="bento-btn bento-btn-secondary bento-btn-sm" onclick="return confirm('Hide these results from students?');">
+                        <i data-lucide="lock" class="lucide-icon icon-sm"></i>
+                        <span>Withhold Results</span>
+                    </button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'toggle_result_publication' exam.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="publish">
+                    <button type="submit" class="bento-btn bento-btn-primary bento-btn-sm" style="background: var(--success); border-color: var(--success); color: #FFFFFF;" onclick="return confirm('Publish all results so students can view their scores?');">
+                        <i data-lucide="send" class="lucide-icon icon-sm"></i>
+                        <span>Publish All Results</span>
+                    </button>
+                </form>
+            {% endif %}
+
+            <a href="{% url 'exam_detail' exam.id %}" class="bento-btn bento-btn-secondary bento-btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Exam Details</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Pastel KPI Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4);">
+        <!-- Class Average (Pastel Blue) -->
+        <div class="bento-card" style="background: var(--pastel-blue); border: 1px solid var(--pastel-blue-border); color: var(--pastel-blue-text); padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">Class Average</div>
+                    <div style="font-size: var(--font-size-3xl); font-weight: 800; margin-top: var(--space-2); line-height: 1;">{{ avg_score }}</div>
+                    <div style="font-size: var(--font-size-xs); margin-top: var(--space-2); opacity: 0.9;">Out of {{ exam.total_marks }} total marks</div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: var(--radius-card); background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); color: var(--pastel-blue-text);">
+                    <i data-lucide="trending-up" class="lucide-icon icon-md"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pass Rate (Mint Green) -->
+        <div class="bento-card" style="background: var(--pastel-green); border: 1px solid var(--pastel-green-border); color: var(--pastel-green-text); padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">Pass Rate</div>
+                    <div style="font-size: var(--font-size-3xl); font-weight: 800; margin-top: var(--space-2); line-height: 1;">{{ pass_percentage }}%</div>
+                    <div style="font-size: var(--font-size-xs); margin-top: var(--space-2); opacity: 0.9;">{{ pass_count }} of {{ total_submissions }} passed</div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: var(--radius-card); background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); color: var(--pastel-green-text);">
+                    <i data-lucide="check-circle-2" class="lucide-icon icon-md"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Highest Score (Soft Lavender) -->
+        <div class="bento-card" style="background: var(--pastel-purple); border: 1px solid var(--pastel-purple-border); color: var(--pastel-purple-text); padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">Top Score</div>
+                    <div style="font-size: var(--font-size-3xl); font-weight: 800; margin-top: var(--space-2); line-height: 1;">{{ max_score }}</div>
+                    <div style="font-size: var(--font-size-xs); margin-top: var(--space-2); opacity: 0.9;">Lowest score: {{ min_score }}</div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: var(--radius-card); background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); color: var(--pastel-purple-text);">
+                    <i data-lucide="award" class="lucide-icon icon-md"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Grading (Soft Peach / Yellow) -->
+        <div class="bento-card" style="background: {% if pending_manual_count > 0 %}var(--pastel-peach){% else %}var(--pastel-yellow){% endif %}; border: 1px solid {% if pending_manual_count > 0 %}var(--pastel-peach-border){% else %}var(--pastel-yellow-border){% endif %}; color: {% if pending_manual_count > 0 %}var(--pastel-peach-text){% else %}var(--pastel-yellow-text){% endif %}; padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">Needs Grading</div>
+                    <div style="font-size: var(--font-size-3xl); font-weight: 800; margin-top: var(--space-2); line-height: 1;">{{ pending_manual_count }}</div>
+                    <div style="font-size: var(--font-size-xs); margin-top: var(--space-2); opacity: 0.9;">
+                        {% if pending_manual_count > 0 %}Written answers to check{% else %}All scripts checked{% endif %}
+                    </div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: var(--radius-card); background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); color: inherit;">
+                    <i data-lucide="edit-3" class="lucide-icon icon-md"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Submissions Table Card -->
+    <div class="bento-card">
+        <div class="bento-card__header">
+            <div>
+                <h2 class="bento-card__title">Candidate Submissions</h2>
+                <p class="bento-card__subtitle">Review each student's score, grading status, and manual assessment</p>
+            </div>
+            <div class="bento-badge bento-badge--neutral">
+                {{ results|length }} Record{{ results|length|pluralize }}
+            </div>
+        </div>
+
+        {% if results %}
+            <div class="table-container" style="margin-top: var(--space-2);">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Roll Number</th>
+                            <th>Score</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                            <th>Grading State</th>
+                            <th>Visibility</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <div style="width: 32px; height: 32px; border-radius: var(--radius-full); background: var(--pastel-blue); color: var(--pastel-blue-text); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--font-size-xs); flex-shrink: 0;">
+                                            {{ r.student.student_profile.full_name|default:r.student.username|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600; color: var(--text-primary);">
+                                                {{ r.student.student_profile.full_name|default:r.student.username }}
+                                            </div>
+                                            <div style="font-size: 11px; color: var(--text-muted);">@{{ r.student.username }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="font-family: monospace; font-weight: 600; font-size: var(--font-size-xs); background: var(--bg-surface-alt); padding: 2px 6px; border-radius: 4px;">
+                                        {{ r.student.student_profile.roll_number|default:"—" }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong>{{ r.total_marks_obtained }}</strong> / {{ r.maximum_marks }}
+                                </td>
+                                <td>
+                                    <span style="font-weight: 600;">{{ r.percentage }}%</span>
+                                </td>
+                                <td>
+                                    <span class="bento-badge {% if r.is_passed %}bento-badge--success{% else %}bento-badge--danger{% endif %}">
+                                        {% if r.is_passed %}PASS{% else %}FAIL{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="bento-badge {% if r.grading_status == 'pending_manual' %}bento-badge--warning{% else %}bento-badge--neutral{% endif %}">
+                                        {{ r.get_grading_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if r.is_published %}
+                                        <span class="bento-badge bento-badge--success">Published</span>
+                                    {% else %}
+                                        <span class="bento-badge bento-badge--neutral">Withheld</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'grade_attempt' r.attempt.id %}" class="bento-btn bento-btn-secondary bento-btn-sm" style="padding: 4px 10px; font-size: 11px;">
+                                        <i data-lucide="edit-3" class="lucide-icon icon-xs"></i>
+                                        <span>Grade</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="padding: var(--space-12) var(--space-4); text-align: center; color: var(--text-muted);">
+                <div style="width: 52px; height: 52px; border-radius: var(--radius-full); background: var(--pastel-blue); color: var(--pastel-blue-text); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-3) auto;">
+                    <i data-lucide="inbox" class="lucide-icon icon-md"></i>
+                </div>
+                <h3 style="font-size: var(--font-size-base); font-weight: 600; color: var(--text-primary); margin: 0 0 var(--space-1) 0;">No Submissions Recorded</h3>
+                <p style="font-size: var(--font-size-sm); margin: 0; max-width: 400px; margin-inline: auto;">
+                    Student scores and attempts will appear here as soon as candidates submit their exam papers.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
 </div>
 {% endblock %}

@@ -1,278 +1,259 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ student.full_name|default:student.user.username }} - Student Record - EPS{% endblock %}
+{% block title %}{{ student.full_name|default:student.user.username }} — Student Profile — EPS{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">STUDENT PROFILE DOSSIER</span>
-            {% if student.verification_status == 'approved' %}
-                <span class="bento-badge bento-badge--success">Verified & Active</span>
-            {% elif student.verification_status == 'pending' %}
-                <span class="bento-badge bento-badge--warning">Pending Verification</span>
-            {% elif student.verification_status == 'suspended' %}
-                <span class="bento-badge bento-badge--danger">Account Suspended</span>
-            {% else %}
-                <span class="bento-badge bento-badge--neutral">{{ student.verification_status|title }}</span>
-            {% endif %}
-        </div>
-        <h1 class="bento-page-title">{{ student.full_name|default:student.user.get_full_name|default:student.user.username }}</h1>
-        <p class="bento-page-subtitle">Roll Number: <strong>{{ student.roll_number }}</strong> &bull; Department: {{ student.department }} &bull; Semester: {{ student.semester }}</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_students' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Candidate Directory</a>
-        {% if student.verification_status == 'suspended' %}
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="activate">
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm">Reactivate Account</button>
-            </form>
-        {% else %}
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="suspend">
-                <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" style="color: var(--eps-status-danger); border-color: rgba(180, 35, 24, 0.3);" onclick="return confirm('Suspend student account?');">Suspend Account</button>
-            </form>
-        {% endif %}
-    </div>
-</div>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<!-- Quick Governance Actions Bento Card -->
-{% if student.verification_status == 'pending' %}
-<div class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; border-left: 4px solid var(--eps-primary-sage);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">Awaiting Administrative Verification</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin: 0;">This candidate's enrollment details require review before they can attempt institutional exams.</p>
-        </div>
-        <div style="display: flex; gap: 0.5rem;">
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm">✓ Approve Candidate</button>
-            </form>
-            <button type="button" class="bento-btn bento-btn--danger bento-btn--sm" onclick="document.getElementById('reject-student-modal').style.display='flex'">✕ Reject Candidate</button>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="bento-grid bento-grid--3" style="margin-bottom: 1.5rem; align-items: start;">
-    <!-- Card 1: Academic & Account Particulars -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Academic Information</h3>
-        </div>
-        <table class="bento-table" style="font-size: 0.88rem;">
-            <tbody>
-                <tr>
-                    <td style="color: var(--eps-text-muted); width: 40%;">Username</td>
-                    <td><code>{{ student.user.username }}</code></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Email</td>
-                    <td>{{ student.user.email }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Roll Number</td>
-                    <td><strong style="color: var(--eps-secondary-sage);">{{ student.roll_number }}</strong></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Department</td>
-                    <td>{{ student.department }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Semester</td>
-                    <td>Semester {{ student.semester }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Class Cohort</td>
-                    <td>{{ student.class_group.name|default:"Not Assigned" }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Registration Date</td>
-                    <td>{{ student.user.date_joined|date:"M d, Y H:i" }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Last Active</td>
-                    <td>{{ student.user.last_login|date:"M d, Y H:i"|default:"Never logged in" }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Card 2: Cohort Assignment -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Assign Class Cohort</h3>
-            <p class="bento-card__subtitle">Map candidate to departmental cohort.</p>
-        </div>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="assign_class">
-            <div class="bento-form-group" style="margin-bottom: 1rem;">
-                <label class="bento-label">Select Class Group</label>
-                <select name="class_group" class="bento-select">
-                    <option value="">-- Unassigned --</option>
-                    {% for cls in available_classes %}
-                        <option value="{{ cls.id }}" {% if student.class_group and student.class_group.id == cls.id %}selected{% endif %}>
-                            {{ cls.department.code }} - {{ cls.name }} (Sem {{ cls.semester }})
-                        </option>
-                    {% endfor %}
-                </select>
+    <!-- Page Header & Actions -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div class="profile-card__avatar profile-card__avatar--student" style="width: 58px; height: 58px; font-size: 22px;">
+                    {{ student.full_name|default:student.user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1); flex-wrap: wrap;">
+                        <span class="badge badge--student">Student Record</span>
+                        {% if student.verification_status == 'approved' %}
+                            <span class="badge badge--mint">Active</span>
+                        {% elif student.verification_status == 'pending' %}
+                            <span class="badge badge--peach">Pending Verification</span>
+                        {% elif student.verification_status == 'suspended' %}
+                            <span class="badge badge--danger">Suspended</span>
+                        {% else %}
+                            <span class="badge badge--neutral">{{ student.verification_status|title }}</span>
+                        {% endif %}
+                    </div>
+                    <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                        {{ student.full_name|default:student.user.get_full_name|default:student.user.username }}
+                    </h1>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                        Roll Number: <strong>{{ student.roll_number }}</strong> &bull; Department of {{ student.department }} &bull; Semester {{ student.semester }}
+                    </p>
+                </div>
             </div>
-            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%;">
-                Update Cohort Assignment
-            </button>
-        </form>
 
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--eps-border);">
-            <div style="font-size: 0.82rem; color: var(--eps-text-muted); margin-bottom: 0.35rem;">Review History:</div>
-            {% if student.reviewed_by %}
-                <div style="font-size: 0.85rem; color: var(--eps-text-primary);">
-                    Reviewed by <strong>{{ student.reviewed_by.username }}</strong> on {{ student.reviewed_at|date:"M d, Y" }}
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_students' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Back to Students</span>
+                </a>
+                {% if student.verification_status == 'suspended' %}
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="activate">
+                        <button type="submit" class="btn btn-approve btn-sm">Reactivate Student</button>
+                    </form>
+                {% else %}
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="suspend">
+                        <button type="submit" class="btn btn-danger-subtle btn-sm" onclick="return confirm('Suspend this student account?');">
+                            Suspend Account
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Verification Banner -->
+    {% if student.verification_status == 'pending' %}
+        <div class="card card--exam" style="padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+                <div>
+                    <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: 2px;">Registration Awaiting Verification</h3>
+                    <p style="font-size: var(--font-size-xs); opacity: 0.9; margin: 0;">Review particulars and verify student identity before granting examination access.</p>
+                </div>
+                <div style="display: flex; gap: var(--space-2);">
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-approve btn-sm">
+                            <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                            <span>Approve Student</span>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="document.getElementById('reject-student-modal').style.display='flex'">
+                        <i data-lucide="x" class="lucide-icon icon-sm"></i>
+                        <span>Reject</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 3-Column Info Grid -->
+    <div class="grid grid-cols-3">
+        <!-- Card 1: Academic & Account Particulars -->
+        <div class="card">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="book-open" class="lucide-icon"></i>
+                <span>Academic Information</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Username</span>
+                    <span style="font-family: var(--font-mono); font-weight: 600;">{{ student.user.username }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Email</span>
+                    <span>{{ student.user.email }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Roll Number</span>
+                    <span style="font-family: var(--font-mono); font-weight: 700;">{{ student.roll_number }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Department</span>
+                    <span>{{ student.department }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Class Section</span>
+                    <span>{{ student.class_group.name|default:"General Section" }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Semester</span>
+                    <span>Semester {{ student.semester }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Registered On</span>
+                    <span>{{ student.user.date_joined|date:"M d, Y, H:i" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Verification Audit Trail -->
+        <div class="card">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="shield-check" class="lucide-icon"></i>
+                <span>Verification Trail</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Current Status</span>
+                    <span>{{ student.verification_status|title }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Reviewed By</span>
+                    <span>{{ student.reviewed_by.get_full_name|default:student.reviewed_by.username|default:"Pending" }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Reviewed At</span>
+                    <span>{{ student.reviewed_at|date:"M d, Y, H:i"|default:"Not reviewed yet" }}</span>
                 </div>
                 {% if student.rejection_reason %}
-                    <div style="font-size: 0.82rem; color: var(--eps-status-danger); margin-top: 0.35rem;">
-                        Note: {{ student.rejection_reason }}
+                    <div style="margin-top: var(--space-2); padding: var(--space-3); border-radius: var(--radius-sm); background-color: var(--danger-surface); color: var(--danger-text);">
+                        <strong>Rejection Reason:</strong> {{ student.rejection_reason }}
                     </div>
                 {% endif %}
-            {% else %}
-                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">No administrative review record.</div>
-            {% endif %}
+            </div>
         </div>
-    </div>
 
-    <!-- Card 3: Metrics Summary -->
-    <div class="bento-card bento-card--sage">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Performance Overview</h3>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(92,112,87,0.15);">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Total Attempts:</span>
-                <strong style="font-size: 1.25rem; color: var(--eps-primary-sage);">{{ attempts.count }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(92,112,87,0.15);">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Graded Results:</span>
-                <strong style="font-size: 1.25rem; color: var(--eps-primary-sage);">{{ results.count }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Flagged Violations:</span>
-                <strong style="font-size: 1.25rem; color: var(--eps-status-danger);">
-                    {{ attempts.filter_flagged_count|default:"0" }}
-                </strong>
+        <!-- Card 3: Summary Statistics -->
+        <div class="card card--student">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="bar-chart-2" class="lucide-icon"></i>
+                <span>Performance Summary</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span>Exams Attempted</span>
+                    <strong style="font-size: var(--font-size-sm);">{{ student.user.exam_attempts.count }}</strong>
+                </div>
+                <div class="profile-card__info-row">
+                    <span>Scorecards Published</span>
+                    <strong style="font-size: var(--font-size-sm);">{{ student.user.results.count }}</strong>
+                </div>
+                <div class="profile-card__info-row">
+                    <span>Account Active</span>
+                    <strong>{% if student.user.is_active %}Yes{% else %}No{% endif %}</strong>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Examination Attempts & Results Table Bento Grid -->
-<div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem; align-items: start;">
-    <!-- Examination Attempts -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Examination Attempts</h3>
-            <p class="bento-card__subtitle">Candidate test session history.</p>
+    <!-- Examination Attempts History -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h2 class="card__title">
+                    <i data-lucide="clipboard-list" class="lucide-icon"></i>
+                    <span>Examination Attempts</span>
+                </h2>
+                <p class="card__description">All test sessions recorded for this student.</p>
+            </div>
         </div>
 
-        {% if attempts %}
-            <div class="bento-table-wrapper">
-                <table class="bento-table" style="font-size: 0.85rem;">
-                    <thead>
-                        <tr>
-                            <th>Exam Title</th>
-                            <th>Status</th>
-                            <th>Started</th>
-                            <th>Proctoring Flag</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for att in attempts %}
+        <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+            <table class="school-table">
+                <thead>
+                    <tr>
+                        <th>Exam Title</th>
+                        <th>Started At</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                        <th>Warnings</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if student.user.exam_attempts.exists %}
+                        {% for att in student.user.exam_attempts.all %}
                             <tr>
                                 <td>
-                                    <strong>{{ att.exam.title }}</strong>
-                                    <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ att.exam.subject.code }}</div>
+                                    <div style="font-weight: 600; color: var(--text-primary);">{{ att.exam.title }}</div>
+                                    <div style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ att.exam.subject.code }}</div>
+                                </td>
+                                <td style="font-size: var(--font-size-xs);">{{ att.started_at|date:"M d, H:i"|default:"—" }}</td>
+                                <td style="font-size: var(--font-size-xs);">{{ att.submitted_at|date:"M d, H:i"|default:"—" }}</td>
+                                <td>
+                                    <span class="badge {% if att.status == 'submitted' or att.status == 'auto_submitted' %}badge--mint{% else %}badge--neutral{% endif %}">
+                                        {{ att.status|title }}
+                                    </span>
                                 </td>
                                 <td>
-                                    <span class="bento-badge bento-badge--neutral">{{ att.status|title }}</span>
+                                    <span class="badge {% if att.warning_count > 0 %}badge--peach{% else %}badge--mint{% endif %}">
+                                        {{ att.warning_count }}
+                                    </span>
                                 </td>
-                                <td>{{ att.started_at|date:"M d, Y H:i" }}</td>
-                                <td>
-                                    {% if att.proctoring_flagged %}
-                                        <span class="bento-badge bento-badge--danger">Flagged</span>
-                                    {% else %}
-                                        <span class="bento-badge bento-badge--success">Normal</span>
-                                    {% endif %}
+                                <td style="font-weight: 700;">
+                                    {{ att.total_score }} / {{ att.exam.total_marks }}
                                 </td>
                             </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 1.5rem; text-align: center;">No examination attempts recorded for this candidate.</p>
-        {% endif %}
-    </div>
-
-    <!-- Examination Results -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Grading & Scorecards</h3>
-            <p class="bento-card__subtitle">Official evaluated score records.</p>
-        </div>
-
-        {% if results %}
-            <div class="bento-table-wrapper">
-                <table class="bento-table" style="font-size: 0.85rem;">
-                    <thead>
+                    {% else %}
                         <tr>
-                            <th>Exam</th>
-                            <th>Marks</th>
-                            <th>Percentage</th>
-                            <th>Outcome</th>
+                            <td colspan="6" style="text-align: center; padding: var(--space-6); color: var(--text-muted);">
+                                No exam attempts recorded yet.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for res in results %}
-                            <tr>
-                                <td><strong>{{ res.exam.title }}</strong></td>
-                                <td>{{ res.total_marks_obtained }} / {{ res.maximum_marks }}</td>
-                                <td><strong>{{ res.percentage }}%</strong></td>
-                                <td>
-                                    {% if res.is_passed %}
-                                        <span class="bento-badge bento-badge--success">PASS</span>
-                                    {% else %}
-                                        <span class="bento-badge bento-badge--danger">FAIL</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 1.5rem; text-align: center;">No published results recorded for this candidate.</p>
-        {% endif %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
 </div>
 
-<!-- Modal for Rejection -->
-<div id="reject-student-modal" style="display: none; position: fixed; inset: 0; background: rgba(38, 48, 38, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="bento-card" style="width: 100%; max-width: 480px; margin: 1rem; padding: 2rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-status-danger); margin-bottom: 0.5rem;">Reject Student Application</h3>
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); margin-bottom: 1.25rem;">Provide an institutional memo explaining why this registration is rejected.</p>
+<!-- Reject Modal -->
+<div id="reject-student-modal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.5); z-index: 100; backdrop-filter: blur(3px); align-items: center; justify-content: center;">
+    <div class="card" style="width: 100%; max-width: 440px; margin: var(--space-4); padding: var(--space-6); background: var(--bg-surface);">
+        <h3 style="font-size: var(--font-size-md); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-2);">Reject Registration</h3>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
+            Please state the reason for rejecting this student's application.
+        </p>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="action" value="reject">
-            <div class="bento-form-group">
-                <label class="bento-label">Rejection Reason</label>
-                <textarea name="reason" class="bento-input" rows="3" placeholder="e.g. Roll number invalid or cohort mapping error..." required style="resize: none;"></textarea>
+            <div class="form-group">
+                <label class="form-label">Rejection Reason</label>
+                <textarea name="reason" class="form-textarea" rows="3" placeholder="e.g. Invalid Roll Number, Wrong Department selected..." required></textarea>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                <button type="button" class="bento-btn bento-btn--ghost" onclick="document.getElementById('reject-student-modal').style.display='none'">Cancel</button>
-                <button type="submit" class="bento-btn bento-btn--danger">Confirm Rejection</button>
+            <div style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('reject-student-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
             </div>
         </form>
     </div>

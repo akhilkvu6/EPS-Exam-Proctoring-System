@@ -1,0 +1,32 @@
+# ==============================================================================
+# EPS (Exam Proctoring System) — Python Requirements
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. CORE / MUST-HAVE DEPENDENCIES (Required to run the application)
+# ------------------------------------------------------------------------------
+Django>=5.0,<6.2
+asgiref>=3.8.0
+sqlparse>=0.5.0
+openpyxl>=3.1.2
+et_xmlfile>=1.1.0
+
+# ------------------------------------------------------------------------------
+# 2. OPTIONAL: ENVIRONMENT & CONFIGURATION MANAGEMENT
+# ------------------------------------------------------------------------------
+python-dotenv>=1.0.1           # Load settings from .env file (SECRET_KEY, DEBUG, etc.)
+
+# ------------------------------------------------------------------------------
+# 3. OPTIONAL: PRODUCTION DEPLOYMENT & SERVERS
+# ------------------------------------------------------------------------------
+# gunicorn>=22.0.0             # High-performance WSGI server for Linux/Unix
+# waitress>=3.0.0              # Production WSGI server for Windows environments
+# whitenoise>=6.6.0            # Self-contained static file serving for production
+# psycopg2-binary>=2.9.9       # PostgreSQL database driver (if not using SQLite)
+
+# ------------------------------------------------------------------------------
+# 4. OPTIONAL: EXTENDED FEATURES & REPORTING
+# ------------------------------------------------------------------------------
+# pillow>=10.0.0               # Profile photos and image handling
+# reportlab>=4.0.0             # PDF certificate and official transcript generation
+# pandas>=2.2.0                # Advanced statistical score analysis

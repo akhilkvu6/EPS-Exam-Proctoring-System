@@ -1,127 +1,155 @@
 {% extends 'base.html' %}
 
-{% block title %}Scorecard: {{ exam.title }} — EPS{% endblock %}
+{% block title %}Scorecard: {{ exam.title }} — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--eps-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem;">
-            Official Institutional Scorecard
-        </div>
-        <h1 class="page-title">{{ exam.title }}</h1>
-        <p class="page-subtitle">{{ exam.subject.name }} ({{ exam.subject.code }}) &bull; Examinee: <strong>{{ request.user.student_profile.full_name|default:request.user.username }}</strong> ({{ request.user.student_profile.roll_number }})</p>
-    </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="{% url 'student_results' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Back to Results</a>
-    </div>
-</div>
+<div style="max-width: 1000px; margin: 0 auto var(--space-12) auto;">
 
-<!-- Score Summary Bento Grid -->
-<div class="bento-grid bento-grid--3col" style="margin-bottom: 2rem;">
-    
-    <!-- Large Feature Result Banner (2 Col) -->
-    <div class="bento-card bento-card--wide {% if result.is_passed %}bento-card--mint-subtle{% else %}bento-card--sage{% endif %}" style="padding: 2.25rem; justify-content: space-between;">
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <span class="bento-badge {% if result.is_passed %}bento-badge--success{% else %}bento-badge--danger{% endif %}" style="margin-bottom: 0.75rem;">
-                {% if result.is_passed %}OFFICIAL STATUS: PASSED{% else %}OFFICIAL STATUS: FAILED{% endif %}
-            </span>
-            <div style="font-size: 2.75rem; font-weight: 800; color: var(--eps-text-primary); line-height: 1.1; margin-bottom: 0.25rem;">
-                {{ result.total_marks_obtained }} <span style="font-size: 1.35rem; font-weight: 500; color: var(--eps-text-muted);">/ {{ result.maximum_marks }} pts</span>
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'student_results' %}" style="color: var(--text-muted); text-decoration: none;">My Results</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Official Scorecard</span>
             </div>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin-top: 0.5rem;">
-                Passing Threshold: <strong>{{ exam.passing_marks }} Marks</strong> &bull; Total Questions: <strong>{{ answers|length }}</strong>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; letter-spacing: -0.02em;">
+                {{ exam.title }}
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                Subject: <strong>{{ exam.subject.name }}</strong> ({{ exam.subject.code }}) &bull; Candidate: <strong>{{ request.user.student_profile.full_name|default:request.user.username }}</strong>
+                {% if request.user.student_profile.roll_number %}
+                    (Roll No: <strong>{{ request.user.student_profile.roll_number }}</strong>)
+                {% endif %}
             </p>
         </div>
-
-        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--eps-border-subtle); display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.85rem; color: var(--eps-text-muted);">Published by Faculty:</span>
-            <strong style="color: var(--eps-sage-primary);">{{ result.published_at|date:"M d, Y" }}</strong>
+        <div>
+            <a href="{% url 'student_results' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Gradebook</span>
+            </a>
         </div>
     </div>
 
-    <!-- Metric Card: Final Percentage -->
-    <div class="bento-card bento-card--compact" style="justify-content: center; text-align: center; padding: 2rem;">
-        <div style="font-size: 0.85rem; font-weight: 700; color: var(--eps-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">
-            Percentage Score
+    <!-- Score Summary Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-5); margin-bottom: var(--space-8); align-items: stretch;">
+        
+        <!-- Large Score Banner (Span 2) -->
+        <div class="card {% if result.is_passed %}card--attendance{% else %}card--exam{% endif %}" style="padding: var(--space-6); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3);">
+                    <span class="badge {% if result.is_passed %}badge-approved{% else %}badge-rejected{% endif %}">
+                        {% if result.is_passed %}OFFICIAL STATUS: PASSED{% else %}OFFICIAL STATUS: FAILED{% endif %}
+                    </span>
+                </div>
+                <div style="font-size: 3rem; font-weight: 800; color: {% if result.is_passed %}var(--pastel-mint-text){% else %}var(--pastel-peach-text){% endif %}; line-height: 1.1; margin-bottom: var(--space-2);">
+                    {{ result.total_marks_obtained }} <span style="font-size: var(--font-size-base); font-weight: 600; opacity: 0.8;">/ {{ result.maximum_marks }} pts</span>
+                </div>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: 0;">
+                    Passing Threshold: <strong>{{ exam.passing_marks }} Marks</strong> &bull; Total Questions: <strong>{{ answers|length }}</strong>
+                </p>
+            </div>
+
+            <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px dashed rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Published by Faculty:</span>
+                <span style="font-weight: 700; font-size: var(--font-size-xs); color: var(--text-primary);">{{ result.published_at|date:"M d, Y" }}</span>
+            </div>
         </div>
-        <div style="font-size: 3.25rem; font-weight: 800; color: {% if result.is_passed %}var(--eps-success){% else %}var(--eps-danger){% endif %}; line-height: 1;">
-            {{ result.percentage }}%
+
+        <!-- Percentage Card -->
+        <div class="card card--student" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: var(--space-6);">
+            <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--pastel-blue-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2);">
+                Percentage Score
+            </div>
+            <div style="font-size: 3.25rem; font-weight: 800; color: {% if result.is_passed %}var(--success){% else %}var(--danger){% endif %}; line-height: 1;">
+                {{ result.percentage }}%
+            </div>
+            <p style="font-size: 11px; color: var(--pastel-blue-text); margin: var(--space-2) 0 0 0; opacity: 0.9;">
+                Cumulative Assessment Grade
+            </p>
         </div>
-        <p style="font-size: 0.8rem; color: var(--eps-text-muted); margin-top: 0.5rem;">
-            Institutional Cumulative Grade
+    </div>
+
+    <!-- Question Breakdown List -->
+    <div style="margin-bottom: var(--space-4);">
+        <h2 style="font-size: var(--font-size-md); font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0;">
+            Itemized Question Evaluation Breakdown
+        </h2>
+        <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0 0 var(--space-4) 0;">
+            Review individual scores, examinee responses, and faculty feedback
         </p>
     </div>
 
-</div>
-
-<!-- Question Breakdown Cards -->
-<h2 style="font-size: 1.25rem; font-weight: 800; color: var(--eps-text-primary); margin-bottom: 1rem;">
-    Itemized Question Evaluation Breakdown
-</h2>
-
-<div style="display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 3rem;">
-    {% for ans in answers %}
-        <div class="bento-card" style="padding: 1.75rem;">
-            <div class="bento-card__header" style="margin-bottom: 0.85rem;">
-                <div>
-                    <span class="bento-badge bento-badge--mint">Question {{ forloop.counter }}</span>
-                    <span class="bento-badge bento-badge--sage" style="margin-left: 0.35rem;">
-                        {{ ans.question.get_question_type_display }}
-                    </span>
+    <div style="display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-12);">
+        {% for ans in answers %}
+            <div class="card" style="padding: var(--space-5);">
+                <div class="card__header" style="margin-bottom: var(--space-3);">
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <span class="badge badge-blue">Question {{ forloop.counter }}</span>
+                        <span class="badge badge-secondary">{{ ans.question.get_question_type_display }}</span>
+                    </div>
+                    <div>
+                        {% if ans.marks_awarded > 0 %}
+                            <span class="badge badge-mint">+{{ ans.marks_awarded }} / {{ ans.question.marks }} pts</span>
+                        {% elif ans.marks_awarded < 0 %}
+                            <span class="badge badge-peach">{{ ans.marks_awarded }} / {{ ans.question.marks }} pts</span>
+                        {% else %}
+                            <span class="badge badge-secondary">0.0 / {{ ans.question.marks }} pts</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <div>
-                    {% if ans.marks_awarded > 0 %}
-                        <span class="bento-badge bento-badge--success">+{{ ans.marks_awarded }} / {{ ans.question.marks }} pts</span>
-                    {% elif ans.marks_awarded < 0 %}
-                        <span class="bento-badge bento-badge--danger">{{ ans.marks_awarded }} / {{ ans.question.marks }} pts</span>
+
+                <!-- Question Text -->
+                <div style="font-size: var(--font-size-base); color: var(--text-primary); font-weight: 600; line-height: 1.5; margin-bottom: var(--space-4);">
+                    {{ ans.question.question_text }}
+                </div>
+
+                <!-- Candidate Submitted Response -->
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--space-4); margin-bottom: var(--space-3);">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2);">
+                        Your Submitted Response
+                    </div>
+                    {% if ans.question.question_type == 'mcq' or ans.question.question_type == 'true_false' %}
+                        {% if ans.selected_option %}
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);">
+                                <span style="font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary);">{{ ans.selected_option.option_text }}</span>
+                                {% if ans.selected_option.is_correct %}
+                                    <span class="badge badge-approved">
+                                        <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                        <span>Correct Option</span>
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-rejected">
+                                        <i data-lucide="x" class="lucide-icon icon-xs"></i>
+                                        <span>Incorrect Option</span>
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span style="color: var(--text-muted); font-style: italic; font-size: var(--font-size-sm);">Unanswered</span>
+                        {% endif %}
                     {% else %}
-                        <span class="bento-badge bento-badge--sage">0.0 / {{ ans.question.marks }} pts</span>
+                        <p style="white-space: pre-wrap; font-size: var(--font-size-sm); color: var(--text-primary); line-height: 1.6; margin: 0;">{{ ans.text_answer|default:"Unanswered" }}</p>
                     {% endif %}
                 </div>
-            </div>
 
-            <!-- Question Text -->
-            <div style="font-size: 1.05rem; color: var(--eps-text-primary); font-weight: 600; line-height: 1.6; margin-bottom: 1.25rem;">
-                {{ ans.question.question_text }}
-            </div>
+                <!-- Evaluator Feedback -->
+                {% if ans.evaluator_feedback %}
+                    <div class="card card--alert" style="padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2); font-size: var(--font-size-xs);">
+                        <strong style="color: var(--pastel-yellow-text);">Faculty Evaluator Feedback:</strong>
+                        <div style="color: var(--pastel-yellow-text); margin-top: 2px;">{{ ans.evaluator_feedback }}</div>
+                    </div>
+                {% endif %}
 
-            <!-- Student Submitted Response -->
-            <div style="background-color: var(--eps-surface-muted); border: 1px solid var(--eps-border); border-radius: var(--eps-radius-control); padding: 1rem 1.25rem; margin-bottom: 0.85rem;">
-                <div style="font-size: 0.78rem; font-weight: 700; color: var(--eps-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">
-                    Your Submitted Response
-                </div>
-                {% if ans.question.question_type == 'mcq' or ans.question.question_type == 'true_false' %}
-                    {% if ans.selected_option %}
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-size: 0.95rem; font-weight: 600; color: var(--eps-text-primary);">{{ ans.selected_option.option_text }}</span>
-                            {% if ans.selected_option.is_correct %}
-                                <span class="bento-badge bento-badge--success">✓ Correct Option</span>
-                            {% else %}
-                                <span class="bento-badge bento-badge--danger">✕ Incorrect Option</span>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <span style="color: var(--eps-text-muted); font-style: italic;">Unanswered</span>
-                    {% endif %}
-                {% else %}
-                    <p style="white-space: pre-wrap; font-size: 0.92rem; color: var(--eps-text-primary); margin: 0;">{{ ans.text_answer|default:"Unanswered" }}</p>
+                <!-- Correct Answer Explanation -->
+                {% if ans.question.explanation %}
+                    <div style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: var(--space-2);">
+                        <em>Solution Note: {{ ans.question.explanation }}</em>
+                    </div>
                 {% endif %}
             </div>
+        {% endfor %}
+    </div>
 
-            <!-- Evaluator Feedback (if provided) -->
-            {% if ans.evaluator_feedback %}
-                <div class="bento-card bento-card--mint" style="padding: 0.85rem 1.25rem; margin-bottom: 0.5rem; font-size: 0.88rem;">
-                    <strong>Faculty Evaluator Feedback:</strong> {{ ans.evaluator_feedback }}
-                </div>
-            {% endif %}
-
-            <!-- Correct Answer Explanation -->
-            {% if ans.question.explanation %}
-                <div style="font-size: 0.84rem; color: var(--eps-text-secondary); margin-top: 0.5rem;">
-                    <em>Official Solution Note: {{ ans.question.explanation }}</em>
-                </div>
-            {% endif %}
-        </div>
-    {% endfor %}
 </div>
 {% endblock %}

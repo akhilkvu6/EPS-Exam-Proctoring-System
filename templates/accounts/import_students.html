@@ -1,188 +1,183 @@
 {% extends 'base.html' %}
 
-{% block title %}Bulk Student Enrollment — EPS{% endblock %}
+{% block title %}Import Students — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3);">
     <div>
-        <h1 class="page-title">Bulk Student Enrollment & Excel Import</h1>
-        <p class="page-subtitle">Batch onboard students from institutional spreadsheets with duplicate validation and automated credential setup.</p>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <span>Students</span>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Bulk Enrollment</span>
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+            Import Students from Excel
+        </h1>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: var(--space-1);">
+            Quickly enroll a class or department cohort by uploading a spreadsheet.
+        </p>
     </div>
-    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{% url 'download_student_template' %}" class="bento-btn bento-btn--mint bento-btn--sm">
-            📥 Download Excel Template (.xlsx)
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <a href="{% url 'download_student_template' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="download" class="lucide-icon icon-sm"></i>
+            <span>Download Template (.xlsx)</span>
         </a>
         {% if request.user.role == 'teacher' %}
-            <a href="{% url 'teacher_dashboard' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Faculty Dashboard</a>
+            <a href="{% url 'teacher_students' %}" class="btn btn-ghost btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Student Roster</span>
+            </a>
         {% else %}
-            <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Admin Dashboard</a>
+            <a href="{% url 'admin_students' %}" class="btn btn-ghost btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Students Directory</span>
+            </a>
         {% endif %}
     </div>
 </div>
 
-<div class="bento-grid bento-grid--3col" style="margin-bottom: 2rem; gap: 1.5rem; align-items: stretch;">
-    <!-- Upload & Configuration Form (2 Col) -->
-    <div class="bento-card bento-card--wide" style="padding: 2.25rem;">
-        <div class="bento-card__header">
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start; margin-bottom: var(--space-6);">
+    <!-- Upload Form Card -->
+    <div class="card" style="padding: var(--space-6);">
+        <div class="card__header" style="margin-bottom: var(--space-4);">
             <div>
-                <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Batch Upload</span>
-                <h2 class="bento-card__title">Upload Student Spreadsheet</h2>
-                <p class="bento-card__subtitle">Supported formats: <strong>.xlsx</strong>, <strong>.xls</strong>. Ensure columns match the institutional template.</p>
+                <h2 class="card__title" style="display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="file-spreadsheet" class="lucide-icon" style="color: var(--text-primary);"></i>
+                    <span>Select Roster File</span>
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 2px;">
+                    Supports Excel formats (.xlsx, .xls)
+                </p>
             </div>
-            <span style="font-size: 1.75rem;">📑</span>
+            <span class="badge badge-blue">Spreadsheet Import</span>
         </div>
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <div class="bento-form-group">
-                <label class="bento-form-label" for="excel_file">Select Excel File (.xlsx) *</label>
-                <input type="file" name="excel_file" id="excel_file" accept=".xlsx, .xls" class="bento-input" required style="padding: 0.85rem 1rem; border: 2px dashed var(--eps-border); background: var(--eps-surface-muted);">
-                <span class="bento-form-hint">Maximum recommended batch size: 500 students per workbook.</span>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="excel_file">Upload Spreadsheet *</label>
+                <input type="file" name="excel_file" id="excel_file" accept=".xlsx, .xls" class="form-control" required style="padding: var(--space-3); background: #ffffff;">
+                <span class="form-hint">Recommended maximum: 500 student records per file upload.</span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="initial_status">Initial Account Status *</label>
-                    <select name="initial_status" id="initial_status" class="bento-select">
-                        <option value="approved" selected>Pre-Approved (Immediate exam access)</option>
-                        <option value="pending">Pending Verification (Awaiting faculty review)</option>
+            <div class="grid grid-cols-2" style="gap: var(--space-4); margin-bottom: var(--space-4);">
+                <div class="form-group">
+                    <label class="form-label" for="initial_status">Account Initial Status *</label>
+                    <select name="initial_status" id="initial_status" class="form-control">
+                        <option value="approved" selected>Pre-Approved (Ready for exams immediately)</option>
+                        <option value="pending">Pending Review (Requires faculty approval)</option>
                     </select>
-                    <span class="bento-form-hint">Pre-approved students can log in and start scheduled exams immediately.</span>
                 </div>
 
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="import_mode">Import Validation Mode *</label>
-                    <select name="import_mode" id="import_mode" class="bento-select">
+                <div class="form-group">
+                    <label class="form-label" for="import_mode">Error Handling Strategy *</label>
+                    <select name="import_mode" id="import_mode" class="form-control">
                         <option value="skip_errors" selected>Skip Errored Rows (Recommended)</option>
-                        <option value="atomic">Atomic (Rollback entire batch on any error)</option>
+                        <option value="atomic">Cancel All if Any Error Occurs</option>
                     </select>
-                    <span class="bento-form-hint">Skip mode imports all valid rows and reports errored ones for review.</span>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="default_department">Default Department (Fallback)</label>
-                    <select name="default_department" id="default_department" class="bento-select">
-                        <option value="">-- Use Value from Excel Spreadsheet --</option>
+            <div class="grid grid-cols-2" style="gap: var(--space-4); margin-bottom: var(--space-5);">
+                <div class="form-group">
+                    <label class="form-label" for="default_department">Default Department</label>
+                    <select name="default_department" id="default_department" class="form-control">
+                        <option value="">-- Read department from spreadsheet --</option>
                         {% for dept in departments %}
                             <option value="{{ dept.name }}">{{ dept.name }} ({{ dept.code }})</option>
                         {% endfor %}
                     </select>
                 </div>
 
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="default_class">Assign to Class / Section (Optional)</label>
-                    <select name="default_class" id="default_class" class="bento-select">
-                        <option value="">-- No Class Group Assigned --</option>
+                <div class="form-group">
+                    <label class="form-label" for="default_class">Assign to Class Cohort</label>
+                    <select name="default_class" id="default_class" class="form-control">
+                        <option value="">-- Optional (Cohort Assignment) --</option>
                         {% for cls in classes %}
-                            <option value="{{ cls.id }}">{{ cls.name }} - Sem {{ cls.semester }} ({{ cls.department.code }})</option>
+                            <option value="{{ cls.id }}">{{ cls.name }} — Sem {{ cls.semester }} ({{ cls.department.code }})</option>
                         {% endfor %}
                     </select>
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle);">
-                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
-                    📊 Validate & Import Students
+            <div style="display: flex; justify-content: flex-end; padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="upload" class="lucide-icon icon-sm"></i>
+                    <span>Process and Enroll Students</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Instructions & Guidelines Bento Card -->
-    <div class="bento-card bento-card--mint-subtle" style="padding: 2rem; justify-content: space-between;">
-        <div>
-            <div class="bento-card__header" style="margin-bottom: 0.75rem;">
-                <span class="bento-badge bento-badge--mint">Guidelines</span>
-                <span style="font-size: 1.35rem;">📋</span>
-            </div>
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--eps-sage-primary); margin-bottom: 0.75rem;">
-                Import Requirements
-            </h3>
-            <ul style="font-size: 0.84rem; color: var(--eps-text-secondary); line-height: 1.65; padding-left: 1.2rem; margin-bottom: 1.5rem;">
-                <li><strong>Unique Register No:</strong> Distinct institutional roll number for each student.</li>
-                <li><strong>Unique Username:</strong> Used for student portal credentials.</li>
-                <li><strong>Initial Password:</strong> Minimum 6 characters. Students can update post-login.</li>
-                <li><strong>Zero Email Policy:</strong> Strictly email-free. Notifications delivered in-app.</li>
-                <li><strong>Duplicate Protection:</strong> Existing usernames or roll numbers are flagged.</li>
-            </ul>
-        </div>
+    <!-- Requirements Card -->
+    <div class="card card--student" style="padding: var(--space-5);">
+        <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+            <i data-lucide="info" class="lucide-icon icon-sm"></i>
+            <span>Required Columns</span>
+        </h3>
+        <ul style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.6; padding-left: 1.2rem; margin-bottom: var(--space-4);">
+            <li><strong>Roll Number:</strong> Unique identifier (e.g. STU-1029).</li>
+            <li><strong>Full Name:</strong> Student's official name.</li>
+            <li><strong>Username:</strong> Unique login handle.</li>
+            <li><strong>Password:</strong> Initial password (min. 6 chars).</li>
+            <li><strong>Semester:</strong> Integer 1 through 8.</li>
+        </ul>
 
-        <div style="background: white; padding: 1.25rem; border-radius: var(--eps-radius-control); border: 1px solid var(--eps-border); text-align: center;">
-            <p style="font-size: 0.82rem; color: var(--eps-text-muted); margin-bottom: 0.75rem;">
-                Download pre-styled template with BCA sample rows:
-            </p>
-            <a href="{% url 'download_student_template' %}" class="bento-btn bento-btn--mint bento-btn--sm" style="width: 100%;">
-                📥 Download Template (.xlsx)
-            </a>
-        </div>
+        <a href="{% url 'download_student_template' %}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; background: #ffffff;">
+            <i data-lucide="file-down" class="lucide-icon icon-xs"></i>
+            <span>Get Sample Excel Template</span>
+        </a>
     </div>
 </div>
 
-<!-- Import Summary & Execution Report -->
+<!-- Import Summary Report -->
 {% if import_summary %}
-<div class="bento-card bento-card--full" style="margin-bottom: 2rem;">
-    <div class="bento-card__header">
+<div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+    <div class="card__header" style="margin-bottom: var(--space-4);">
         <div>
-            <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Execution Summary</span>
-            <h2 class="bento-card__title">Batch Import Report</h2>
-            <p class="bento-card__subtitle">Processed in <strong>{{ import_summary.mode|title }} Mode</strong>.</p>
+            <h2 class="card__title" style="font-size: var(--font-size-lg);">Import Execution Report</h2>
+            <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Strategy: {{ import_summary.mode|title }}</p>
         </div>
-        <div style="display: flex; gap: 0.5rem;">
+        <div style="display: flex; gap: var(--space-2);">
             {% if import_summary.imported_count > 0 %}
-                <span class="bento-badge bento-badge--success">{{ import_summary.imported_count }} Succeeded</span>
+                <span class="badge badge-mint">{{ import_summary.imported_count }} Enrolled</span>
             {% endif %}
             {% if import_summary.error_count > 0 %}
-                <span class="bento-badge bento-badge--danger">{{ import_summary.error_count }} Skipped / Errored</span>
+                <span class="badge badge-peach">{{ import_summary.error_count }} Failed</span>
             {% endif %}
         </div>
     </div>
 
-    <!-- Quick Outcome Counters -->
-    <div class="bento-grid bento-grid--3col" style="gap: 1rem; margin-bottom: 1.75rem;">
-        <div class="bento-card bento-card--compact">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value">{{ import_summary.total_rows }}</div>
-                    <div class="bento-stat__label">Total Rows Evaluated</div>
-                </div>
-                <div class="bento-stat__icon">📄</div>
-            </div>
+    <!-- 3 Pastel Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5);">
+        <div class="card" style="padding: var(--space-4); background: var(--bg-subtle);">
+            <div style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 600;">Total Evaluated</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">{{ import_summary.total_rows }}</div>
         </div>
-        <div class="bento-card bento-card--compact bento-card--mint-subtle">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value" style="color: var(--eps-success);">{{ import_summary.imported_count }}</div>
-                    <div class="bento-stat__label">Students Enrolled</div>
-                </div>
-                <div class="bento-stat__icon" style="background: var(--eps-mint); color: var(--eps-sage-primary);">✅</div>
-            </div>
+        <div class="card card--attendance" style="padding: var(--space-4);">
+            <div style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 600;">Successfully Enrolled</div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--success); margin-top: 4px;">{{ import_summary.imported_count }}</div>
         </div>
-        <div class="bento-card bento-card--compact">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value" style="color: {% if import_summary.error_count > 0 %}var(--eps-danger){% else %}var(--eps-text-muted){% endif %};">
-                        {{ import_summary.error_count }}
-                    </div>
-                    <div class="bento-stat__label">Rows Skipped / Errors</div>
-                </div>
-                <div class="bento-stat__icon">⚠️</div>
+        <div class="card card--exam" style="padding: var(--space-4);">
+            <div style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 600;">Errors / Skipped</div>
+            <div style="font-size: 28px; font-weight: 800; color: {% if import_summary.error_count > 0 %}var(--danger){% else %}var(--text-primary){% endif %}; margin-top: 4px;">
+                {{ import_summary.error_count }}
             </div>
         </div>
     </div>
 
-    <!-- Successfully Imported Students Table -->
+    <!-- Successful Students Table -->
     {% if import_summary.imported_students %}
-        <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--eps-success); margin-bottom: 0.75rem;">
-            ✓ Successfully Enrolled Students ({{ import_summary.imported_count }})
+        <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--success); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+            <i data-lucide="check-circle" class="lucide-icon icon-sm"></i>
+            <span>Enrolled Students</span>
         </h3>
-        <div class="bento-table-container" style="margin-bottom: 2rem;">
-            <table class="bento-table">
+        <div class="table-wrapper" style="margin-bottom: var(--space-5);">
+            <table class="school-table">
                 <thead>
                     <tr>
-                        <th>Register / Roll No</th>
+                        <th>Roll No</th>
                         <th>Student Name</th>
                         <th>Username</th>
                         <th>Department</th>
@@ -193,12 +188,12 @@
                 <tbody>
                     {% for item in import_summary.imported_students %}
                         <tr>
-                            <td><strong style="color: var(--eps-sage-primary);">{{ item.reg_no }}</strong></td>
-                            <td><strong>{{ item.full_name }}</strong></td>
+                            <td><strong style="color: var(--text-primary);">{{ item.reg_no }}</strong></td>
+                            <td style="font-weight: 600;">{{ item.full_name }}</td>
                             <td><code>{{ item.username }}</code></td>
                             <td>{{ item.department }}</td>
                             <td>Sem {{ item.semester }}</td>
-                            <td><span class="bento-badge bento-badge--success">Enrolled</span></td>
+                            <td><span class="badge badge-approved">Enrolled</span></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -206,35 +201,34 @@
         </div>
     {% endif %}
 
-    <!-- Errored / Skipped Rows Table -->
+    <!-- Errored Rows Table -->
     {% if import_summary.errors %}
-        <h3 style="font-size: 1.05rem; font-weight: 800; color: var(--eps-danger); margin-bottom: 0.75rem;">
-            ✕ Skipped Rows & Validation Issues ({{ import_summary.error_count }})
+        <h3 style="font-size: var(--font-size-sm); font-weight: 700; color: var(--danger); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+            <i data-lucide="alert-triangle" class="lucide-icon icon-sm"></i>
+            <span>Skipped Rows</span>
         </h3>
-        <div class="bento-table-container">
-            <table class="bento-table">
+        <div class="table-wrapper">
+            <table class="school-table">
                 <thead>
                     <tr>
-                        <th style="width: 90px;">Row No</th>
-                        <th>Register No</th>
+                        <th style="width: 80px;">Row</th>
+                        <th>Roll No</th>
                         <th>Username</th>
-                        <th>Student Name</th>
-                        <th>Reason for Failure</th>
+                        <th>Name</th>
+                        <th>Reason for Error</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for err in import_summary.errors %}
-                        <tr style="background: #fffafa;">
-                            <td><strong>Row {{ err.row }}</strong></td>
+                        <tr>
+                            <td><span class="badge badge-peach">Row {{ err.row }}</span></td>
                             <td><code>{{ err.reg_no }}</code></td>
                             <td><code>{{ err.username }}</code></td>
                             <td>{{ err.name }}</td>
-                            <td style="color: var(--eps-danger);">
-                                <ul style="margin: 0; padding-left: 1.2rem;">
-                                    {% for r in err.reasons %}
-                                        <li>{{ r }}</li>
-                                    {% endfor %}
-                                </ul>
+                            <td style="color: var(--danger); font-size: var(--font-size-xs);">
+                                {% for r in err.reasons %}
+                                    <div>• {{ r }}</div>
+                                {% endfor %}
                             </td>
                         </tr>
                     {% endfor %}

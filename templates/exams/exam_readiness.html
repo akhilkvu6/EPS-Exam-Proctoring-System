@@ -1,37 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %}Examination Readiness & Briefing — {{ exam.title }}{% endblock %}
+{% block title %}Exam Readiness — {{ exam.title }} — EPS School Management{% endblock %}
 
 {% block extra_css %}
 <style>
     .readiness-meter {
         width: 100%;
-        height: 10px;
-        background: var(--eps-border-subtle, #e0e5e0);
-        border-radius: 5px;
+        height: 8px;
+        background: rgba(0,0,0,0.1);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-full);
         overflow: hidden;
-        margin-top: 0.5rem;
+        margin-top: var(--space-2);
     }
     .readiness-meter__fill {
         height: 100%;
         width: 0%;
-        background: var(--eps-sage-primary, #5C7057);
-        transition: width 0.3s ease;
+        background: var(--success);
+        transition: width 0.15s ease;
     }
     .hardware-stream-box {
         width: 100%;
-        max-width: 320px;
         height: 180px;
-        background: #111;
-        border-radius: 8px;
+        background: #1e293b;
+        border-radius: var(--radius-card);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #888;
-        font-size: 0.85rem;
+        color: #94a3b8;
+        font-size: var(--font-size-xs);
         position: relative;
         overflow: hidden;
-        border: 2px solid var(--eps-border-subtle);
+        border: 1px solid var(--border-subtle);
     }
     .hardware-stream-box video {
         width: 100%;
@@ -42,274 +42,309 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <div style="font-size: 0.85rem; color: var(--eps-text-muted); margin-bottom: 0.25rem;">
-            <a href="{% url 'student_exam_list' %}" style="color: var(--eps-text-secondary); text-decoration: none;">Assigned Examinations</a>
-            &rsaquo; Pre-Flight Readiness Briefing
-        </div>
-        <h1 class="page-title">{{ exam.title }}</h1>
-        <p class="page-subtitle">{{ exam.subject.code }} &bull; {{ exam.subject.name }} &bull; Scheduled by {{ exam.created_by.get_full_name|default:exam.created_by.username }}</p>
-    </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
-        <a href="{% url 'student_exam_list' %}" class="bento-btn bento-btn--outline">&larr; Back to Catalogue</a>
-    </div>
-</div>
+<div style="max-width: 1200px; margin: 0 auto var(--space-12) auto;">
 
-<!-- Status Alerts & Schedule Notice -->
-{% if is_closed %}
-    <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
+    <!-- Breadcrumb & Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <strong>Examination Concluded:</strong> This examination window closed on {{ exam.end_time|date:"M d, Y H:i" }}. No further attempts may be initiated.
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'student_exam_list' %}" style="color: var(--text-muted); text-decoration: none;">Assigned Examinations</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Pre-Flight Hardware & Proctoring Diagnostic</span>
+            </div>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                {{ exam.title }}
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+                Subject: <strong>{{ exam.subject.name }}</strong> ({{ exam.subject.code }}) &bull; Invigilator: <strong>{{ exam.created_by.get_full_name|default:exam.created_by.username }}</strong>
+            </p>
         </div>
+        <a href="{% url 'student_exam_list' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+            <span>Back to Exams</span>
+        </a>
     </div>
-{% elif is_upcoming %}
-    <div class="bento-alert bento-alert--info" style="margin-bottom: 1.5rem;">
-        <div>
-            <strong>Scheduled Examination:</strong> This examination opens on <strong>{{ exam.start_time|date:"M d, Y at H:i" }}</strong> (Duration: {{ exam.duration_minutes }} minutes). You may test your audio/video readiness now.
-        </div>
-    </div>
-{% elif is_late_cutoff_passed and not active_attempt %}
-    <div class="bento-alert bento-alert--error" style="margin-bottom: 1.5rem;">
-        <div>
-            <strong>Late Entry Window Expired:</strong> Institutional governance policies mandate test session launch within {{ late_entry_mins }} minutes of exam commencement. The cutoff ({{ late_cutoff|date:"H:i" }}) has passed.
-        </div>
-    </div>
-{% elif attempts_exhausted and not active_attempt %}
-    <div class="bento-alert bento-alert--warning" style="margin-bottom: 1.5rem;">
-        <div>
-            <strong>Attempt Limit Reached:</strong> You have submitted {{ completed_count }} of {{ effective_attempt_limit }} allowed attempt(s) for this assessment paper.
-        </div>
-    </div>
-{% elif active_attempt %}
-    <div class="bento-alert bento-alert--warning" style="margin-bottom: 1.5rem; background: rgba(220, 100, 40, 0.12); border-color: rgba(220, 100, 40, 0.4);">
-        <div>
-            <strong>⚡ Session In Progress:</strong> You have an active attempt (#{{ active_attempt.attempt_number }}) in progress. Time remaining: <strong>{{ active_attempt.time_remaining_seconds|divisibleby:60|default:"Active" }}</strong>. Click below to immediately resume without penalty.
-        </div>
-    </div>
-{% else %}
-    <div class="bento-alert bento-alert--success" style="margin-bottom: 1.5rem;">
-        <div>
-            <strong>● Examination Window Live:</strong> This assessment is open. Complete your hardware pre-check and confirm the honor code to enter the examination room.
-        </div>
-    </div>
-{% endif %}
 
-<div class="bento-grid bento-grid--3col" style="gap: 1.5rem; align-items: stretch;">
-
-    <!-- Left / Center Column (Wide): Exam Scope, Rules, and Hardware Check -->
-    <div class="bento-card bento-card--wide" style="padding: 2rem;">
-        
-        <!-- Section 1: Academic Parameters Bento Strip -->
-        <div class="bento-card__header" style="margin-bottom: 1rem;">
-            <div>
-                <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.35rem;">Assessment Parameters</span>
-                <h2 class="bento-card__title">Examination Details & Format</h2>
-            </div>
-            <span style="font-size: 1.6rem;">📋</span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding: 1.25rem; background: var(--eps-card-bg-subtle, #f7f9f7); border-radius: 8px; border: 1px solid var(--eps-border-subtle);">
-            <div>
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700;">Duration</div>
-                <div style="font-weight: 800; font-size: 1.2rem; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ exam.duration_minutes }} Mins</div>
-                {% if adjusted_duration != exam.duration_minutes %}
-                    <div style="font-size: 0.72rem; color: var(--eps-primary); font-weight: 600;">Accommodated: {{ adjusted_duration }} mins</div>
-                {% endif %}
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700;">Questions</div>
-                <div style="font-weight: 800; font-size: 1.2rem; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ questions_count }} Questions</div>
-                <div style="font-size: 0.72rem; color: var(--eps-text-secondary);">Objective / Structural</div>
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700;">Maximum Score</div>
-                <div style="font-weight: 800; font-size: 1.2rem; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ exam.total_marks }} Marks</div>
-                <div style="font-size: 0.72rem; color: var(--eps-text-secondary);">Pass mark: {{ exam.passing_marks }}</div>
-            </div>
-            <div>
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700;">Attempts Allowed</div>
-                <div style="font-weight: 800; font-size: 1.2rem; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ completed_count }} / {{ effective_attempt_limit }}</div>
-                <div style="font-size: 0.72rem; color: var(--eps-text-secondary);">Max ceiling enforced</div>
-            </div>
-        </div>
-
-        {% if exam.instructions %}
-            <div style="margin-bottom: 1.5rem;">
-                <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.4rem;">Candidate Instructions:</h3>
-                <div style="padding: 1rem; background: var(--eps-card-bg-subtle, #fcfdfc); border-radius: 6px; border-left: 3px solid var(--eps-primary); font-size: 0.88rem; line-height: 1.5; color: var(--eps-text-secondary); white-space: pre-line;">
-                    {{ exam.instructions }}
-                </div>
-            </div>
-        {% endif %}
-
-        <!-- Section 2: Interactive Hardware Pre-Flight Check -->
-        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--eps-border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <!-- Status Alerts & Schedule Notice -->
+    {% if is_closed %}
+        <div class="alert alert--danger" style="margin-bottom: var(--space-5);">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <i data-lucide="x-circle" class="lucide-icon icon-sm" style="color: var(--danger);"></i>
                 <div>
-                    <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.2rem;">Pre-Flight Hardware & Proctoring Diagnostic</h3>
-                    <p style="font-size: 0.82rem; color: var(--eps-text-secondary);">Verify that your camera and microphone are operational before starting the exam session.</p>
+                    <strong>Examination Concluded:</strong> This examination window closed on {{ exam.end_time|date:"M d, Y · H:i" }}. No further attempts may be initiated.
                 </div>
-                <span class="bento-badge bento-badge--mint" id="overall-diag-badge">Checks Required</span>
             </div>
+        </div>
+    {% elif is_upcoming %}
+        <div class="card card--alert" style="padding: var(--space-4); margin-bottom: var(--space-5); display: flex; align-items: center; gap: var(--space-3);">
+            <i data-lucide="calendar" class="lucide-icon icon-md" style="color: var(--pastel-yellow-text);"></i>
+            <div>
+                <strong style="color: var(--pastel-yellow-text); font-size: var(--font-size-sm);">Scheduled Examination:</strong>
+                <div style="color: var(--pastel-yellow-text); font-size: var(--font-size-xs); margin-top: 2px;">
+                    This examination opens on <strong>{{ exam.start_time|date:"M d, Y at H:i" }}</strong> (Duration: {{ exam.duration_minutes }} minutes). You may test your camera and microphone readiness below.
+                </div>
+            </div>
+        </div>
+    {% elif is_late_cutoff_passed and not active_attempt %}
+        <div class="alert alert--danger" style="margin-bottom: var(--space-5);">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                <i data-lucide="alert-octagon" class="lucide-icon icon-sm" style="color: var(--danger);"></i>
+                <div>
+                    <strong>Late Entry Window Expired:</strong> Institutional policies require test launch within {{ late_entry_mins }} minutes of exam commencement. The cutoff ({{ late_cutoff|date:"H:i" }}) has passed.
+                </div>
+            </div>
+        </div>
+    {% elif attempts_exhausted and not active_attempt %}
+        <div class="card card--exam" style="padding: var(--space-4); margin-bottom: var(--space-5); display: flex; align-items: center; gap: var(--space-3);">
+            <i data-lucide="alert-circle" class="lucide-icon icon-md" style="color: var(--pastel-peach-text);"></i>
+            <div>
+                <strong style="color: var(--pastel-peach-text); font-size: var(--font-size-sm);">Attempt Limit Reached:</strong>
+                <div style="color: var(--pastel-peach-text); font-size: var(--font-size-xs); margin-top: 2px;">
+                    You have completed {{ completed_count }} of {{ effective_attempt_limit }} allowed attempt(s) for this assessment paper.
+                </div>
+            </div>
+        </div>
+    {% elif active_attempt %}
+        <div class="card card--attendance" style="padding: var(--space-4); margin-bottom: var(--space-5); display: flex; align-items: center; gap: var(--space-3);">
+            <i data-lucide="play-circle" class="lucide-icon icon-md" style="color: var(--pastel-mint-text);"></i>
+            <div>
+                <strong style="color: var(--pastel-mint-text); font-size: var(--font-size-sm);">Session In Progress:</strong>
+                <div style="color: var(--pastel-mint-text); font-size: var(--font-size-xs); margin-top: 2px;">
+                    You have an active attempt (#{{ active_attempt.attempt_number }}) in progress. Click Resume Attempt below to continue without penalty.
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card card--attendance" style="padding: var(--space-4); margin-bottom: var(--space-5); display: flex; align-items: center; gap: var(--space-3);">
+            <i data-lucide="check-circle" class="lucide-icon icon-md" style="color: var(--pastel-mint-text);"></i>
+            <div>
+                <strong style="color: var(--pastel-mint-text); font-size: var(--font-size-sm);">Examination Window Live:</strong>
+                <div style="color: var(--pastel-mint-text); font-size: var(--font-size-xs); margin-top: 2px;">
+                    This assessment is currently open. Complete your hardware test and accept the honor code below to enter the examination room.
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-                <!-- Webcam Card -->
-                <div class="bento-card" style="padding: 1.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <span style="font-weight: 700; font-size: 0.9rem;">📹 Video Stream Check</span>
-                        <span id="cam-status" class="bento-badge">Not Tested</span>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start;">
+
+        <!-- Left / Center Column (Wide): Parameters & Diagnostic -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+            
+            <!-- Section 1: Academic Parameters -->
+            <div class="card" style="padding: var(--space-6);">
+                <div style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-3);">
+                    <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px; display: flex; align-items: center; gap: var(--space-2);">
+                        <i data-lucide="file-text" class="lucide-icon icon-sm"></i>
+                        <span>Examination Parameters &amp; Format</span>
+                    </h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Time limit, question structure, and scoring criteria</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5);">
+                    <div class="card card--exam" style="padding: var(--space-4); text-align: center;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-peach-text); font-weight: 700;">Duration</div>
+                        <div style="font-weight: 800; font-size: var(--font-size-xl); color: var(--pastel-peach-text); margin-top: 2px;">{{ exam.duration_minutes }} Mins</div>
+                        {% if adjusted_duration != exam.duration_minutes %}
+                            <div style="font-size: 10px; color: var(--pastel-peach-text);">Extended: {{ adjusted_duration }}m</div>
+                        {% endif %}
                     </div>
-                    <div class="hardware-stream-box" id="cam-preview-box">
-                        <video id="preview-video" autoplay playsinline muted style="display: none;"></video>
-                        <span id="cam-placeholder-text">Camera stream inactive</span>
+                    <div class="card card--student" style="padding: var(--space-4); text-align: center;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-blue-text); font-weight: 700;">Questions</div>
+                        <div style="font-weight: 800; font-size: var(--font-size-xl); color: var(--pastel-blue-text); margin-top: 2px;">{{ questions_count }}</div>
+                        <div style="font-size: 10px; color: var(--pastel-blue-text);">Total Items</div>
                     </div>
-                    <div style="margin-top: 0.75rem;">
-                        <button type="button" onclick="testCameraStream()" id="btn-test-cam" class="bento-btn bento-btn--outline" style="width: 100%; justify-content: center; font-size: 0.85rem;">
-                            Test Camera Access
-                        </button>
+                    <div class="card card--attendance" style="padding: var(--space-4); text-align: center;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-mint-text); font-weight: 700;">Max Marks</div>
+                        <div style="font-weight: 800; font-size: var(--font-size-xl); color: var(--pastel-mint-text); margin-top: 2px;">{{ exam.total_marks }}</div>
+                        <div style="font-size: 10px; color: var(--pastel-mint-text);">Pass: {{ exam.passing_marks }}</div>
                     </div>
-                    <div id="cam-error-msg" style="display: none; margin-top: 0.5rem; font-size: 0.75rem; color: var(--eps-danger); line-height: 1.35;">
-                        ⚠️ Camera access denied or unavailable. Click the lock/camera icon in your browser address bar, set to <strong>Allow</strong>, and retry.
+                    <div class="card card--teacher" style="padding: var(--space-4); text-align: center;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-lavender-text); font-weight: 700;">Attempts</div>
+                        <div style="font-weight: 800; font-size: var(--font-size-xl); color: var(--pastel-lavender-text); margin-top: 2px;">{{ completed_count }}/{{ effective_attempt_limit }}</div>
+                        <div style="font-size: 10px; color: var(--pastel-lavender-text);">Allowed</div>
                     </div>
                 </div>
 
-                <!-- Microphone Card -->
-                <div class="bento-card" style="padding: 1.25rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <span style="font-weight: 700; font-size: 0.9rem;">🎙️ Audio Monitor Check</span>
-                        <span id="mic-status" class="bento-badge">Not Tested</span>
-                    </div>
-                    <div style="padding: 1.5rem 1rem; background: var(--eps-card-bg-subtle, #f3f6f3); border-radius: 8px; border: 1px solid var(--eps-border-subtle); text-align: center;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎙️</div>
-                        <div style="font-size: 0.82rem; color: var(--eps-text-secondary); margin-bottom: 0.5rem;">Speak into your microphone to verify sensor response.</div>
-                        <div class="readiness-meter">
-                            <div class="readiness-meter__fill" id="audio-meter-fill"></div>
+                {% if exam.instructions %}
+                    <div style="margin-bottom: var(--space-5);">
+                        <h3 style="font-size: var(--font-size-xs); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-2); text-transform: uppercase; letter-spacing: 0.05em;">
+                            Candidate Instructions
+                        </h3>
+                        <div style="padding: var(--space-4); background: var(--bg-subtle); border-radius: var(--radius-card); border-left: 3px solid var(--text-primary); font-size: var(--font-size-xs); line-height: 1.6; color: var(--text-secondary); white-space: pre-line;">
+                            {{ exam.instructions }}
                         </div>
                     </div>
-                    <div style="margin-top: 0.75rem;">
-                        <button type="button" onclick="testAudioStream()" id="btn-test-mic" class="bento-btn bento-btn--outline" style="width: 100%; justify-content: center; font-size: 0.85rem;">
-                            Test Microphone
-                        </button>
-                    </div>
-                    <div id="mic-error-msg" style="display: none; margin-top: 0.5rem; font-size: 0.75rem; color: var(--eps-danger); line-height: 1.35;">
-                        ⚠️ Microphone access denied. Check your browser permissions and ensure no other application is holding exclusive mic lock.
-                    </div>
-                </div>
-            </div>
-        </div>
+                {% endif %}
 
-        <!-- Section 3: Honor Code & Final Launch Action -->
-        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--eps-border-subtle);">
-            <div style="padding: 1.25rem; background: rgba(45, 90, 39, 0.05); border-radius: 8px; border: 1px solid rgba(45, 90, 39, 0.15); margin-bottom: 1.5rem;">
-                <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; font-size: 0.88rem; color: var(--eps-text-primary); line-height: 1.45;">
-                    <input type="checkbox" id="honor-code-checkbox" onchange="validateReadiness()" style="margin-top: 0.2rem; transform: scale(1.15);">
-                    <div>
-                        <strong>Institutional Examination Honor Code Declaration:</strong>
-                        <div style="font-size: 0.8rem; color: var(--eps-text-secondary); margin-top: 0.25rem;">
-                            I solemnly affirm that I am the registered candidate <strong>{{ request.user.student_profile.full_name|default:request.user.username }}</strong> (Roll No: <strong>{{ request.user.student_profile.roll_number }}</strong>). I agree to complete this assessment independently, without secondary screens, unauthorized communication, AI generators, or proxy participation. I consent to video, audio, and client environment proctoring.
+                <!-- Section 2: Interactive Hardware Diagnostic -->
+                <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-2);">
+                        <div>
+                            <h3 style="font-size: var(--font-size-md); font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">
+                                Hardware Diagnostic Test
+                            </h3>
+                            <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Confirm camera and audio feed readiness before entering the live room</p>
+                        </div>
+                        <span class="badge badge-secondary" id="overall-diag-badge">Checks Required</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                        <!-- Webcam Card -->
+                        <div class="card" style="padding: var(--space-4); background: var(--bg-subtle);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                                <span style="font-weight: 700; font-size: var(--font-size-xs); color: var(--text-primary);">Webcam Stream</span>
+                                <span id="cam-status" class="badge badge-secondary">Not Tested</span>
+                            </div>
+                            <div class="hardware-stream-box" id="cam-preview-box">
+                                <video id="preview-video" autoplay playsinline muted style="display: none;"></video>
+                                <span id="cam-placeholder-text">Camera stream inactive</span>
+                            </div>
+                            <div style="margin-top: var(--space-3);">
+                                <button type="button" onclick="testCameraStream()" id="btn-test-cam" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; background: #ffffff;">
+                                    <i data-lucide="camera" class="lucide-icon icon-xs"></i>
+                                    <span>Test Camera Access</span>
+                                </button>
+                            </div>
+                            <div id="cam-error-msg" style="display: none; margin-top: var(--space-2); font-size: 11px; color: var(--danger); line-height: 1.4;">
+                                Camera access denied. Allow permission in your browser address bar and try again.
+                            </div>
+                        </div>
+
+                        <!-- Microphone Card -->
+                        <div class="card" style="padding: var(--space-4); background: var(--bg-subtle);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+                                <span style="font-weight: 700; font-size: var(--font-size-xs); color: var(--text-primary);">Microphone Level</span>
+                                <span id="mic-status" class="badge badge-secondary">Not Tested</span>
+                            </div>
+                            <div style="padding: var(--space-6) var(--space-4); background: #1e293b; border-radius: var(--radius-card); border: 1px solid var(--border-subtle); text-align: center; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <i data-lucide="mic" class="lucide-icon icon-md" style="color: #94a3b8; margin-bottom: var(--space-2);"></i>
+                                <div style="font-size: 11px; color: #94a3b8; margin-bottom: var(--space-3);">Speak aloud to test input level</div>
+                                <div class="readiness-meter" style="width: 80%; background: #334155;">
+                                    <div class="readiness-meter__fill" id="audio-meter-fill"></div>
+                                </div>
+                            </div>
+                            <div style="margin-top: var(--space-3);">
+                                <button type="button" onclick="testAudioStream()" id="btn-test-mic" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; background: #ffffff;">
+                                    <i data-lucide="mic" class="lucide-icon icon-xs"></i>
+                                    <span>Test Microphone</span>
+                                </button>
+                            </div>
+                            <div id="mic-error-msg" style="display: none; margin-top: var(--space-2); font-size: 11px; color: var(--danger); line-height: 1.4;">
+                                Microphone access denied. Check browser permissions and retry.
+                            </div>
                         </div>
                     </div>
-                </label>
+                </div>
+
+                <!-- Section 3: Honor Code & Final Launch Action -->
+                <div style="margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--border-subtle);">
+                    <div class="card card--student" style="padding: var(--space-4); margin-bottom: var(--space-5);">
+                        <label style="display: flex; align-items: flex-start; gap: var(--space-3); cursor: pointer; font-size: var(--font-size-xs); color: var(--pastel-blue-text); line-height: 1.5;">
+                            <input type="checkbox" id="honor-code-checkbox" onchange="validateReadiness()" style="margin-top: 3px; cursor: pointer; accent-color: var(--text-primary); width: 18px; height: 18px;">
+                            <div>
+                                <strong style="font-size: var(--font-size-sm); color: var(--text-primary);">Institutional Examination Honor Code Declaration:</strong>
+                                <div style="font-size: var(--font-size-xs); color: var(--pastel-blue-text); margin-top: var(--space-1);">
+                                    I affirm that I am candidate <strong>{{ request.user.student_profile.full_name|default:request.user.username }}</strong> (Roll No: <strong>{{ request.user.student_profile.roll_number }}</strong>). I agree to complete this assessment independently, without secondary screens, unauthorized communication, AI tools, or proxy participation. I consent to video, audio, and browser invigilation telemetry.
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--space-3);">
+                        {% if active_attempt %}
+                            <a href="{% url 'exam_room' active_attempt.id %}" class="btn btn-primary">
+                                <span>Resume Attempt (#{{ active_attempt.attempt_number }})</span>
+                                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+                            </a>
+                        {% elif is_window_active and not is_late_cutoff_passed and not attempts_exhausted %}
+                            <a href="{% url 'start_exam' exam.id %}" id="btn-start-exam" class="btn btn-primary" style="opacity: 0.5; pointer-events: none;">
+                                <span>Launch Examination Session</span>
+                                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                <span>Session Entry Unavailable</span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
 
-            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
-                {% if active_attempt %}
-                    <a href="{% url 'exam_room' active_attempt.id %}" class="bento-btn bento-btn--primary bento-btn--lg" style="background: #c25e1a;">
-                        ⚡ Resume In-Progress Attempt (#{{ active_attempt.attempt_number }}) &rarr;
-                    </a>
-                {% elif is_window_active and not is_late_cutoff_passed and not attempts_exhausted %}
-                    <a href="{% url 'start_exam' exam.id %}" id="btn-start-exam" class="bento-btn bento-btn--primary bento-btn--lg" style="opacity: 0.5; pointer-events: none;">
-                        🚀 Launch Examination Session &rarr;
-                    </a>
-                {% else %}
-                    <button type="button" class="bento-btn bento-btn--outline bento-btn--lg" disabled style="opacity: 0.6; cursor: not-allowed;">
-                        🚫 Session Entry Unavailable
-                    </button>
-                {% endif %}
-            </div>
         </div>
 
-    </div>
+        <!-- Right Column: Institutional Rules & Environment Security -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-5);">
+            
+            <!-- Proctoring Rules Card -->
+            <div class="card" style="padding: var(--space-5);">
+                <div style="margin-bottom: var(--space-3);">
+                    <span class="badge badge-lavender">Proctoring Governance</span>
+                    <h2 class="card__title" style="font-size: var(--font-size-md); margin-top: var(--space-2);">
+                        {% if exam.camera_required != 'disabled' %}High Integrity Session{% else %}Standard Lockdown{% endif %}
+                    </h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Automated telemetry active</p>
+                </div>
 
-    <!-- Right Column: Institutional Rules & Environment Security -->
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        
-        <!-- Proctoring Level Summary Card -->
-        <div class="bento-card bento-card--mint-subtle">
-            <div class="bento-card__header" style="margin-bottom: 0.5rem;">
-                <span class="bento-badge bento-badge--mint">Integrity Level</span>
-                <span style="font-size: 1.35rem;">🛡️</span>
-            </div>
-            <div style="font-weight: 800; font-size: 1.15rem; color: var(--eps-text-primary);">
-                {% if exam.camera_required != 'disabled' %}Level 2 High Integrity{% else %}Standard Lockdown{% endif %}
-            </div>
-            <div style="font-size: 0.82rem; color: var(--eps-text-secondary); margin-top: 0.25rem;">
-                Automated Event Logging & Faculty Telemetry
+                <div style="display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-xs); border-top: 1px solid var(--border-subtle); padding-top: var(--space-3);">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Webcam Monitor:</span>
+                        <strong style="color: var(--text-primary);">{% if exam.camera_required != 'disabled' %}Active ({{ exam.get_camera_required_display }}){% else %}Disabled{% endif %}</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Audio Variance:</span>
+                        <strong style="color: var(--text-primary);">{% if exam.microphone_required != 'disabled' %}Decibel Telemetry{% else %}Disabled{% endif %}</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Fullscreen Lock:</span>
+                        <strong style="color: var(--text-primary);">{% if exam.fullscreen_required %}Enforced{% else %}Optional{% endif %}</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Tab Switch Trap:</span>
+                        <strong style="color: var(--text-primary);">{% if exam.block_tab_switch %}Warning Counter Active{% else %}Permitted{% endif %}</strong>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Clipboard Lock:</span>
+                        <strong style="color: var(--text-primary);">{% if exam.block_copy_paste %}Copy/Paste Blocked{% else %}Permitted{% endif %}</strong>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.82rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Webcam Monitor:</span>
-                    <strong>{% if exam.camera_required != 'disabled' %}Active ({{ exam.get_camera_required_display }}){% else %}Disabled{% endif %}</strong>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Audio Variance:</span>
-                    <strong>{% if exam.microphone_required != 'disabled' %}Decibel Telemetry{% else %}Disabled{% endif %}</strong>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Fullscreen Lock:</span>
-                    <strong>{% if exam.fullscreen_required %}Enforced{% else %}Optional{% endif %}</strong>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Tab Switch Trap:</span>
-                    <strong>{% if exam.block_tab_switch %}Warning Counter Active{% else %}Permitted{% endif %}</strong>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>Clipboard Neutralization:</span>
-                    <strong>{% if exam.block_copy_paste %}Copy/Paste Blocked{% else %}Permitted{% endif %}</strong>
+            <!-- Marking Scheme Card -->
+            <div class="card card--attendance" style="padding: var(--space-5);">
+                <h2 class="card__title" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--pastel-mint-text); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                    <span>Marking Scheme</span>
+                </h2>
+                <div style="font-size: var(--font-size-xs); color: var(--pastel-mint-text); line-height: 1.5;">
+                    {% if exam.negative_marking %}
+                        <p style="color: var(--danger); font-weight: 700; margin-bottom: var(--space-2);">
+                            Negative marking active: -{{ exam.default_negative_mark }} marks per incorrect MCQ answer.
+                        </p>
+                    {% else %}
+                        <p style="font-weight: 600; margin-bottom: var(--space-2);">
+                            No penalty for incorrect answers.
+                        </p>
+                    {% endif %}
+                    <p style="margin: 0;">Unanswered questions receive 0 marks. Responses are automatically saved on every selection.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Marking Scheme Card -->
-        <div class="bento-card">
-            <div class="bento-card__header">
-                <div>
-                    <h3 class="bento-card__title" style="font-size: 1rem;">Marking Scheme</h3>
-                    <p class="bento-card__subtitle" style="font-size: 0.8rem;">Evaluation policy</p>
-                </div>
-                <span style="font-size: 1.3rem;">⚖️</span>
+            <!-- Client Environment Rules -->
+            <div class="card" style="padding: var(--space-5);">
+                <h2 class="card__title" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="shield-alert" class="lucide-icon icon-xs"></i>
+                    <span>Browser Checklist</span>
+                </h2>
+                <ul style="font-size: var(--font-size-xs); color: var(--text-secondary); padding-left: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); margin: 0;">
+                    <li>Use a modern Chromium browser (Chrome, Edge, Brave) or Firefox.</li>
+                    <li>Single monitor configuration is required.</li>
+                    <li>Keep laptop charger plugged in during the test.</li>
+                    <li>Disable translation and adblocker extensions.</li>
+                </ul>
             </div>
-            <div style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.45;">
-                {% if exam.negative_marking %}
-                    <p style="color: var(--eps-danger); font-weight: 600; margin-bottom: 0.5rem;">
-                        ⚠️ Negative marking active: -{{ exam.default_negative_mark }} marks deducted per incorrect MCQ answer.
-                    </p>
-                {% else %}
-                    <p style="color: var(--eps-success); font-weight: 600; margin-bottom: 0.5rem;">
-                        ✓ No penalty for incorrect answers.
-                    </p>
-                {% endif %}
-                <p>Unanswered questions receive 0 marks without penalty. All responses are autosaved on every selection.</p>
-            </div>
-        </div>
 
-        <!-- System Requirements -->
-        <div class="bento-card">
-            <div class="bento-card__header">
-                <div>
-                    <h3 class="bento-card__title" style="font-size: 1rem;">Client Environment</h3>
-                    <p class="bento-card__subtitle" style="font-size: 0.8rem;">Browser readiness</p>
-                </div>
-                <span style="font-size: 1.3rem;">💻</span>
-            </div>
-            <ul style="font-size: 0.8rem; color: var(--eps-text-secondary); padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; margin: 0;">
-                <li>Modern Chromium browser (Chrome, Edge, Brave, Opera) or Firefox recommended.</li>
-                <li>Single monitor configuration is recommended.</li>
-                <li>Keep power adapter plugged in during testing.</li>
-                <li>Disable third-party browser extensions (translators, grammarly, adblockers).</li>
-            </ul>
         </div>
 
     </div>
@@ -329,7 +364,7 @@ async function testCameraStream() {
     const btn = document.getElementById('btn-test-cam');
 
     statusBadge.innerText = 'Requesting...';
-    statusBadge.className = 'bento-badge bento-badge--warning';
+    statusBadge.className = 'badge badge-yellow';
     errorMsg.style.display = 'none';
 
     try {
@@ -339,15 +374,16 @@ async function testCameraStream() {
         previewVideo.style.display = 'block';
         placeholder.style.display = 'none';
 
-        statusBadge.innerText = 'Operational ✓';
-        statusBadge.className = 'bento-badge bento-badge--mint';
+        statusBadge.innerText = 'Operational';
+        statusBadge.className = 'badge badge-approved';
         camTested = true;
-        btn.innerText = 'Retest Camera';
+        btn.innerHTML = '<i data-lucide="check" class="lucide-icon icon-xs"></i> <span>Retest Camera</span>';
+        if (window.lucide) window.lucide.createIcons();
         validateReadiness();
     } catch (err) {
         console.error('Camera diagnostic error:', err);
-        statusBadge.innerText = 'Denied ✕';
-        statusBadge.className = 'bento-badge bento-badge--danger';
+        statusBadge.innerText = 'Denied';
+        statusBadge.className = 'badge badge-rejected';
         errorMsg.style.display = 'block';
         camTested = false;
         validateReadiness();
@@ -361,18 +397,18 @@ async function testAudioStream() {
     const btn = document.getElementById('btn-test-mic');
 
     statusBadge.innerText = 'Listening...';
-    statusBadge.className = 'bento-badge bento-badge--warning';
+    statusBadge.className = 'badge badge-yellow';
     errorMsg.style.display = 'none';
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        statusBadge.innerText = 'Operational ✓';
-        statusBadge.className = 'bento-badge bento-badge--mint';
+        statusBadge.innerText = 'Operational';
+        statusBadge.className = 'badge badge-approved';
         meterFill.style.width = '75%';
         micTested = true;
-        btn.innerText = 'Retest Microphone';
+        btn.innerHTML = '<i data-lucide="check" class="lucide-icon icon-xs"></i> <span>Retest Microphone</span>';
+        if (window.lucide) window.lucide.createIcons();
 
-        // Connect minimal audio context to animate meter
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const analyser = audioCtx.createAnalyser();
@@ -398,8 +434,8 @@ async function testAudioStream() {
         validateReadiness();
     } catch (err) {
         console.error('Microphone diagnostic error:', err);
-        statusBadge.innerText = 'Denied ✕';
-        statusBadge.className = 'bento-badge bento-badge--danger';
+        statusBadge.innerText = 'Denied';
+        statusBadge.className = 'badge badge-rejected';
         errorMsg.style.display = 'block';
         micTested = false;
         validateReadiness();
@@ -415,18 +451,17 @@ function validateReadiness() {
 
     const honorAgreed = checkbox && checkbox.checked;
     
-    // Check if camera or microphone are required by this exam
     const camRequired = "{{ exam.camera_required }}" !== "disabled";
     const micRequired = "{{ exam.microphone_required }}" !== "disabled";
 
     const hardwarePassed = (!camRequired || camTested) && (!micRequired || micTested);
 
     if (hardwarePassed) {
-        diagBadge.innerText = 'Hardware Verified ✓';
-        diagBadge.className = 'bento-badge bento-badge--mint';
+        diagBadge.innerText = 'Hardware Verified';
+        diagBadge.className = 'badge badge-approved';
     } else {
         diagBadge.innerText = 'Diagnostics Pending';
-        diagBadge.className = 'bento-badge bento-badge--warning';
+        diagBadge.className = 'badge badge-yellow';
     }
 
     if (honorAgreed && hardwarePassed) {
@@ -438,7 +473,6 @@ function validateReadiness() {
     }
 }
 
-// Clean up tracks when navigating away
 window.addEventListener('beforeunload', () => {
     if (mediaStream) {
         mediaStream.getTracks().forEach(track => track.stop());

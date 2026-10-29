@@ -1,28 +1,52 @@
 {% extends 'base.html' %}
 
-{% block title %}Question Bank Repository - EPS{% endblock %}
+{% block title %}Question Bank — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
     <div>
-        <h1 class="bento-page-title">Question Bank Repository</h1>
-        <p class="bento-page-subtitle">Centralized institutional pool of verified questions across academic disciplines.</p>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <span>Faculty</span>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Question Repository</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                Question Bank
+            </h1>
+            <span class="badge badge-lavender">{{ questions.count }} questions</span>
+        </div>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+            Institutional repository of verified assessment questions and grading rubrics.
+        </p>
     </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a href="{% url 'create_question' %}" class="bento-btn bento-btn--primary bento-btn--sm">+ Create New Question</a>
-        <a href="{% url 'import_questions' %}" class="bento-btn bento-btn--mint bento-btn--sm">📥 Bulk Import (.xlsx/.csv)</a>
-        <a href="{% url 'export_questions_csv' %}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}" class="bento-btn bento-btn--outline bento-btn--sm">📊 Export CSV</a>
-        <a href="{% url 'manage_subjects' %}" class="bento-btn bento-btn--outline bento-btn--sm">Academic Subjects</a>
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <a href="{% url 'create_question' %}" class="btn btn-primary btn-sm">
+            <i data-lucide="plus" class="lucide-icon icon-sm"></i>
+            <span>Create Question</span>
+        </a>
+        <a href="{% url 'import_questions' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="file-spreadsheet" class="lucide-icon icon-sm"></i>
+            <span>Import Excel/CSV</span>
+        </a>
+        <a href="{% url 'export_questions_csv' %}{% if selected_subject %}?subject={{ selected_subject }}{% endif %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="download" class="lucide-icon icon-sm"></i>
+            <span>Export CSV</span>
+        </a>
+        <a href="{% url 'manage_subjects' %}" class="btn btn-ghost btn-sm">
+            <i data-lucide="book-open" class="lucide-icon icon-sm"></i>
+            <span>Subjects</span>
+        </a>
     </div>
 </div>
 
-<!-- Filters Bento Card -->
-<div class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
-    <form method="GET" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
-        <div style="flex: 1; min-width: 200px;">
-            <label class="bento-label" style="font-size: 0.8rem; margin-bottom: 0.35rem;">Subject</label>
-            <select name="subject" class="bento-input" style="padding: 0.5rem 0.75rem; height: auto;">
-                <option value="">All Academic Subjects</option>
+<!-- Filters Card -->
+<div class="card" style="margin-bottom: var(--space-5); padding: var(--space-4);">
+    <form method="GET" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end;">
+        <div style="flex: 1; min-width: 180px;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Subject Course</label>
+            <select name="subject" class="form-control" style="font-size: var(--font-size-xs);">
+                <option value="">All Subjects</option>
                 {% for subj in subjects %}
                     <option value="{{ subj.id }}" {% if selected_subject == subj.id|stringformat:"s" %}selected{% endif %}>
                         {{ subj.name }} ({{ subj.code }})
@@ -31,20 +55,20 @@
             </select>
         </div>
 
-        <div style="width: 170px;">
-            <label class="bento-label" style="font-size: 0.8rem; margin-bottom: 0.35rem;">Question Type</label>
-            <select name="type" class="bento-input" style="padding: 0.5rem 0.75rem; height: auto;">
-                <option value="">All Question Types</option>
+        <div style="width: 160px;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Question Type</label>
+            <select name="type" class="form-control" style="font-size: var(--font-size-xs);">
+                <option value="">All Types</option>
                 <option value="mcq" {% if selected_type == 'mcq' %}selected{% endif %}>Multiple Choice</option>
                 <option value="true_false" {% if selected_type == 'true_false' %}selected{% endif %}>True / False</option>
                 <option value="short_answer" {% if selected_type == 'short_answer' %}selected{% endif %}>Short Answer</option>
-                <option value="descriptive" {% if selected_type == 'descriptive' %}selected{% endif %}>Descriptive Essay</option>
+                <option value="descriptive" {% if selected_type == 'descriptive' %}selected{% endif %}>Descriptive</option>
             </select>
         </div>
 
-        <div style="width: 150px;">
-            <label class="bento-label" style="font-size: 0.8rem; margin-bottom: 0.35rem;">Difficulty</label>
-            <select name="difficulty" class="bento-input" style="padding: 0.5rem 0.75rem; height: auto;">
+        <div style="width: 140px;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Difficulty</label>
+            <select name="difficulty" class="form-control" style="font-size: var(--font-size-xs);">
                 <option value="">All Difficulties</option>
                 <option value="easy" {% if selected_difficulty == 'easy' %}selected{% endif %}>Easy</option>
                 <option value="medium" {% if selected_difficulty == 'medium' %}selected{% endif %}>Medium</option>
@@ -52,102 +76,98 @@
             </select>
         </div>
 
-        <div style="flex: 1.5; min-width: 220px;">
-            <label class="bento-label" style="font-size: 0.8rem; margin-bottom: 0.35rem;">Search Prompt</label>
-            <input type="text" name="q" value="{{ search_query }}" class="bento-input" placeholder="Search keywords, topics..." style="padding: 0.5rem 0.75rem; height: auto;">
+        <div style="flex: 1.5; min-width: 200px;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Search Prompt</label>
+            <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search keywords..." style="font-size: var(--font-size-xs);">
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="padding: 0.55rem 1.15rem;">
-                Filter
-            </button>
-            <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline bento-btn--sm" style="padding: 0.55rem 1.15rem;">
-                Clear
-            </a>
+        <div style="display: flex; gap: var(--space-2);">
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <a href="{% url 'question_bank' %}" class="btn btn-secondary btn-sm">Clear</a>
         </div>
     </form>
 </div>
 
-<!-- Questions Table Bento Card -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <div>
-            <h2 class="bento-card__title" style="margin-bottom: 0.25rem;">Repository Items ({{ questions.count }})</h2>
-            <p class="bento-card__subtitle">Standardized assessment items ready for syllabus distribution.</p>
-        </div>
+<!-- Questions Table Card -->
+<div class="card" style="padding: 0; overflow: hidden; margin-bottom: var(--space-8);">
+    <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header);">
+        <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Repository Questions ({{ questions.count }})</h2>
+        <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Verified questions across active departmental courses</p>
     </div>
 
     {% if questions %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
+        <div class="table-wrapper">
+            <table class="school-table">
                 <thead>
                     <tr>
-                        <th style="width: 180px;">Subject & Module</th>
-                        <th>Question Prompt & Key</th>
-                        <th style="width: 140px;">Format</th>
+                        <th style="width: 150px;">Subject &amp; Topic</th>
+                        <th>Question Prompt &amp; Answer Key</th>
+                        <th style="width: 120px;">Format</th>
                         <th style="width: 100px;">Difficulty</th>
-                        <th style="width: 80px;">Marks</th>
-                        <th style="width: 140px; text-align: right;">Actions</th>
+                        <th style="width: 90px;">Marks</th>
+                        <th style="width: 130px; text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for q in questions %}
                         <tr>
                             <td>
-                                <strong style="color: var(--eps-primary-sage);">{{ q.subject.code }}</strong>
-                                <div style="font-size: 0.78rem; color: var(--eps-text-muted); margin-top: 0.2rem;">
-                                    {{ q.topic|default:"General Module" }}
+                                <span class="badge badge-lavender" style="font-family: var(--font-mono); font-weight: 700;">{{ q.subject.code }}</span>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                                    {{ q.topic|default:"General" }}
                                 </div>
                             </td>
                             <td>
-                                <div style="font-weight: 500; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--eps-text-primary); line-height: 1.4;">
+                                <div style="font-weight: 600; font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--text-primary); line-height: 1.4;">
                                     {{ q.question_text }}
                                 </div>
 
                                 {% if q.question_type == 'mcq' or q.question_type == 'true_false' %}
-                                    <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                                         {% for opt in q.options.all %}
-                                            <span style="font-size: 0.76rem; padding: 0.2rem 0.55rem; border-radius: var(--eps-radius-sm); {% if opt.is_correct %}background: var(--eps-mint-green); color: var(--eps-status-success); font-weight: 700; border: 1px solid var(--eps-light-sage);{% else %}background: var(--eps-canvas); color: var(--eps-text-muted); border: 1px solid var(--eps-border);{% endif %}">
-                                                {% if opt.is_correct %}✓ {% endif %}{{ opt.option_text }}
+                                            <span style="font-size: 11px; padding: 2px 8px; border-radius: var(--radius-control); border: 1px solid var(--border-subtle); {% if opt.is_correct %}background: var(--pastel-mint-bg); font-weight: 700; color: var(--pastel-mint-text); border-color: var(--pastel-mint-border);{% else %}background: #ffffff; color: var(--text-muted);{% endif %}">
+                                                {% if opt.is_correct %}&#10003; {% endif %}{{ opt.option_text }}
                                             </span>
                                         {% endfor %}
                                     </div>
                                 {% elif q.correct_text_answer %}
-                                    <div style="font-size: 0.8rem; color: var(--eps-status-success); background: rgba(39, 112, 68, 0.08); padding: 0.25rem 0.6rem; border-radius: var(--eps-radius-sm); border: 1px solid rgba(39, 112, 68, 0.2); display: inline-block;">
-                                        <strong>Guide Key:</strong> {{ q.correct_text_answer|truncatechars:70 }}
+                                    <div style="font-size: 11px; color: var(--text-secondary); background: var(--bg-subtle); padding: 3px 8px; border-radius: var(--radius-control); border: 1px solid var(--border-subtle); display: inline-block;">
+                                        <strong>Model Key:</strong> {{ q.correct_text_answer|truncatechars:60 }}
                                     </div>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="bento-badge bento-badge--neutral" style="font-size: 0.75rem;">
+                                <span class="badge badge-secondary" style="font-size: 11px;">
                                     {{ q.get_question_type_display }}
                                 </span>
                             </td>
                             <td>
                                 {% if q.difficulty == 'easy' %}
-                                    <span class="bento-badge bento-badge--success" style="font-size: 0.75rem;">Easy</span>
+                                    <span class="badge badge-mint" style="font-size: 11px;">Easy</span>
                                 {% elif q.difficulty == 'medium' %}
-                                    <span class="bento-badge bento-badge--warning" style="font-size: 0.75rem;">Medium</span>
+                                    <span class="badge badge-yellow" style="font-size: 11px;">Medium</span>
                                 {% else %}
-                                    <span class="bento-badge bento-badge--danger" style="font-size: 0.75rem;">Hard</span>
+                                    <span class="badge badge-peach" style="font-size: 11px;">Hard</span>
                                 {% endif %}
                             </td>
-                            <td>
-                                <strong>{{ q.marks }}</strong>
+                            <td style="font-size: var(--font-size-xs);">
+                                <strong style="color: var(--text-primary);">{{ q.marks }}</strong> pts
                                 {% if q.negative_marks %}
-                                    <div style="font-size: 0.72rem; color: var(--eps-status-danger);">(-{{ q.negative_marks }})</div>
+                                    <div style="font-size: 11px; color: var(--danger);">(-{{ q.negative_marks }})</div>
                                 {% endif %}
                             </td>
                             <td style="text-align: right; white-space: nowrap;">
-                                <a href="{% url 'edit_question' q.id %}" class="bento-btn bento-btn--outline" style="padding: 0.25rem 0.55rem; font-size: 0.75rem; text-decoration: none;">
-                                    Edit
-                                </a>
-                                <form method="POST" action="{% url 'delete_question' q.id %}" style="display: inline;" onsubmit="return confirm('Permanently remove this question from the Question Bank?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="bento-btn bento-btn--danger" style="padding: 0.25rem 0.55rem; font-size: 0.75rem; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; cursor: pointer; border-radius: 4px;">
-                                        Delete
-                                    </button>
-                                </form>
+                                <div style="display: inline-flex; gap: var(--space-1); justify-content: flex-end;">
+                                    <a href="{% url 'edit_question' q.id %}" class="btn btn-secondary btn-xs">
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{% url 'delete_question' q.id %}" style="display: inline;" onsubmit="return confirm('Delete this question permanently?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-delete btn-xs">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -155,13 +175,8 @@
             </table>
         </div>
     {% else %}
-        <div class="bento-empty-state" style="padding: 3rem 1.5rem; text-align: center; border: 1.5px dashed var(--eps-border); border-radius: var(--eps-radius-md); background: var(--eps-canvas);">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❓</div>
-            <h3 style="font-size: 1.1rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No matching questions found</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted); max-width: 440px; margin: 0 auto 1.25rem;">
-                Adjust your filter criteria or create new question items to populate this subject's question bank.
-            </p>
-            <a href="{% url 'create_question' %}" class="bento-btn bento-btn--primary bento-btn--sm">+ Create Question</a>
+        <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--font-size-xs);">
+            No questions found matching your filter criteria.
         </div>
     {% endif %}
 </div>

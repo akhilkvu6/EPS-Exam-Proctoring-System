@@ -1,170 +1,194 @@
 {% extends 'base.html' %}
 
-{% block title %}Faculty Directory - Institutional Administration - EPS{% endblock %}
+{% block title %}Faculty Directory — EPS School Portal{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">FACULTY ROSTER</span>
-            <span class="bento-badge bento-badge--sage">Total Records: {{ total_count }}</span>
-        </div>
-        <h1 class="bento-page-title">Faculty Directory & Oversight</h1>
-        <p class="bento-page-subtitle">Inspect teaching faculty, department affiliations, exam authoring permissions, and verification states.</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_teacher_approvals' %}" class="bento-btn bento-btn--warning bento-btn--sm">Faculty Verification Queue</a>
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<!-- Filters Card -->
-<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; align-items: end;">
-        <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Search Query</label>
-            <input type="text" name="q" value="{{ q }}" placeholder="Name, Employee ID, Username..." class="bento-input" style="font-size: 0.85rem;">
-        </div>
-
-        <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Department</label>
-            <select name="department" class="bento-select" style="font-size: 0.85rem;">
-                <option value="">All Departments</option>
-                {% for dept in departments_list %}
-                    <option value="{{ dept }}" {% if department == dept %}selected{% endif %}>{{ dept }}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Verification Status</label>
-            <select name="status" class="bento-select" style="font-size: 0.85rem;">
-                <option value="">All Statuses</option>
-                <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved / Active</option>
-                <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending Verification</option>
-                <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
-                <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
-            </select>
-        </div>
-
-        <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Sort Order</label>
-            <select name="sort" class="bento-select" style="font-size: 0.85rem;">
-                <option value="-date" {% if sort == '-date' %}selected{% endif %}>Newest First</option>
-                <option value="date" {% if sort == 'date' %}selected{% endif %}>Oldest First</option>
-                <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
-                <option value="emp" {% if sort == 'emp' %}selected{% endif %}>Employee ID</option>
-                <option value="dept" {% if sort == 'dept' %}selected{% endif %}>Department</option>
-            </select>
-        </div>
-
-        <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="flex: 1;">Filter</button>
-            <a href="{% url 'admin_teachers' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Reset</a>
-        </div>
-    </form>
-</div>
-
-<!-- Teachers Table Card -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <div>
-            <h2 class="bento-card__title">Faculty Roster</h2>
-            <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_count }} faculty members.</p>
+    <!-- Page Header -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <span class="badge badge--teacher">Faculty Management</span>
+                    <span style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ total_count }} faculty members</span>
+                </div>
+                <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                    Faculty Directory
+                </h1>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                    Manage teachers, academic appointments, and account verification statuses.
+                </p>
+            </div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_teacher_approvals' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="user-check" class="lucide-icon icon-sm"></i>
+                    <span>Verification Queue</span>
+                </a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    {% if page_obj %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Faculty Member</th>
-                        <th>Employee ID</th>
-                        <th>Username</th>
-                        <th>Department</th>
-                        <th>Qualification</th>
-                        <th>Status</th>
-                        <th>Joined</th>
-                        <th style="text-align: right;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for teacher in page_obj %}
+    <!-- Filters Card -->
+    <div class="card" style="padding: var(--space-5);">
+        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-3); align-items: end;">
+            <div>
+                <label class="form-label">Search</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Name, Employee ID, Username..." class="form-input">
+            </div>
+
+            <div>
+                <label class="form-label">Department</label>
+                <select name="department" class="form-select">
+                    <option value="">All Departments</option>
+                    {% for dept in departments_list %}
+                        <option value="{{ dept }}" {% if department == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="approved" {% if status == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="suspended" {% if status == 'suspended' %}selected{% endif %}>Suspended</option>
+                    <option value="rejected" {% if status == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="form-label">Sort</label>
+                <select name="sort" class="form-select">
+                    <option value="-date" {% if sort == '-date' %}selected{% endif %}>Newest First</option>
+                    <option value="date" {% if sort == 'date' %}selected{% endif %}>Oldest First</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    <option value="emp" {% if sort == 'emp' %}selected{% endif %}>Employee ID</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: var(--space-2);">
+                <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">Filter</button>
+                <a href="{% url 'admin_teachers' %}" class="btn btn-secondary btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Teachers Table Card -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h2 class="card__title">
+                    <i data-lucide="users" class="lucide-icon"></i>
+                    <span>Faculty Records</span>
+                </h2>
+                <p class="card__description">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_count }} teachers</p>
+            </div>
+        </div>
+
+        {% if page_obj %}
+            <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                <table class="school-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <a href="{% url 'admin_teacher_detail' teacher.id %}" style="color: var(--eps-text-primary); font-weight: 600; text-decoration: none;">
-                                    {{ teacher.user.first_name|default:teacher.user.username }} {{ teacher.user.last_name }}
-                                </a>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ teacher.user.email }}</div>
-                            </td>
-                            <td>
-                                <span class="bento-badge bento-badge--sage" style="font-family: monospace; font-weight: 700;">{{ teacher.employee_id }}</span>
-                            </td>
-                            <td><code>{{ teacher.user.username }}</code></td>
-                            <td>{{ teacher.department }}</td>
-                            <td>{{ teacher.qualification|default:"—" }}</td>
-                            <td>
-                                {% if teacher.verification_status == 'approved' %}
-                                    <span class="bento-badge bento-badge--success">Approved</span>
-                                {% elif teacher.verification_status == 'pending' %}
-                                    <span class="bento-badge bento-badge--warning">Pending</span>
-                                {% elif teacher.verification_status == 'suspended' %}
-                                    <span class="bento-badge bento-badge--danger">Suspended</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--neutral">{{ teacher.verification_status|title }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span style="font-size: 0.82rem; color: var(--eps-text-secondary);">{{ teacher.user.date_joined|date:"M d, Y" }}</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <div style="display: inline-flex; gap: 0.35rem;">
-                                    <a href="{% url 'admin_teacher_detail' teacher.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.2rem 0.5rem;">
-                                        Inspect &rarr;
-                                    </a>
-                                </div>
-                            </td>
+                            <th>Faculty Member</th>
+                            <th>Staff ID</th>
+                            <th>Department</th>
+                            <th>Qualification</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for teacher in page_obj %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <div class="profile-card__avatar profile-card__avatar--teacher" style="width: 36px; height: 36px; font-size: 13px;">
+                                            {{ teacher.full_name|default:teacher.user.username|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'admin_teacher_detail' teacher.id %}" style="font-weight: 600; color: var(--text-primary);">
+                                                {{ teacher.full_name|default:teacher.user.get_full_name|default:teacher.user.username }}
+                                            </a>
+                                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ teacher.user.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--neutral" style="font-family: var(--font-mono); font-weight: 600;">{{ teacher.employee_id }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--teacher">{{ teacher.department|default:"General" }}</span>
+                                </td>
+                                <td style="font-size: var(--font-size-xs);">
+                                    {{ teacher.qualification|default:"—" }}
+                                </td>
+                                <td>
+                                    {% if teacher.verification_status == 'approved' %}
+                                        <span class="badge badge--mint">Approved</span>
+                                    {% elif teacher.verification_status == 'pending' %}
+                                        <span class="badge badge--peach">Pending</span>
+                                    {% elif teacher.verification_status == 'suspended' %}
+                                        <span class="badge badge--danger">Suspended</span>
+                                    {% else %}
+                                        <span class="badge badge--neutral">{{ teacher.verification_status|title }}</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size: var(--font-size-xs); color: var(--text-muted); white-space: nowrap;">
+                                    {{ teacher.user.date_joined|date:"M d, Y" }}
+                                </td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'admin_teacher_detail' teacher.id %}" class="btn btn-secondary btn-xs">
+                                        <span>View</span>
+                                        <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Bento Pagination -->
-        {% if page_obj.has_other_pages %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border); flex-wrap: wrap; gap: 0.75rem;">
-                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                </div>
-                <div style="display: flex; gap: 0.35rem;">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
-                    {% endif %}
-
-                    {% for p in page_obj.paginator.page_range %}
-                        {% if p == page_obj.number %}
-                            <span class="bento-btn bento-btn--primary bento-btn--sm">{{ p }}</span>
-                        {% elif p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
-                            <a href="?page={{ p }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">{{ p }}</a>
+            {% if page_obj.has_other_pages %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border-subtle); flex-wrap: wrap; gap: var(--space-3);">
+                    <div style="font-size: var(--font-size-xs); color: var(--text-muted);">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+                    <div style="display: flex; gap: var(--space-1);">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="btn btn-secondary btn-xs">&larr; Prev</a>
                         {% endif %}
-                    {% endfor %}
 
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
-                    {% endif %}
+                        {% for p in page_obj.paginator.page_range %}
+                            {% if p == page_obj.number %}
+                                <span class="btn btn-primary btn-xs">{{ p }}</span>
+                            {% elif p >= page_obj.number|add:"-2" and p <= page_obj.number|add:"2" %}
+                                <a href="?page={{ p }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="btn btn-secondary btn-xs">{{ p }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="btn btn-secondary btn-xs">Next &rarr;</a>
+                        {% endif %}
+                    </div>
                 </div>
+            {% endif %}
+        {% else %}
+            <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted);">
+                <i data-lucide="users" class="lucide-icon icon-lg" style="margin-bottom: var(--space-2); opacity: 0.6;"></i>
+                <div style="font-weight: 600; color: var(--text-primary); font-size: var(--font-size-sm);">No Teachers Found</div>
+                <p style="font-size: var(--font-size-xs); margin: 0 0 var(--space-3) 0;">No faculty records match your search criteria.</p>
+                <a href="{% url 'admin_teachers' %}" class="btn btn-secondary btn-xs">Reset Filters</a>
             </div>
         {% endif %}
-    {% else %}
-        <div class="bento-empty-state" style="padding: 3rem 1.5rem; text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
-            <h3 style="font-size: 1.15rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">No Faculty Records Found</h3>
-            <p style="font-size: 0.9rem; color: var(--eps-text-muted); max-width: 440px; margin: 0 auto 1.25rem;">
-                No faculty members match your filter parameters. Try clearing your search.
-            </p>
-            <a href="{% url 'admin_teachers' %}" class="bento-btn bento-btn--outline bento-btn--sm">Reset Filters</a>
-        </div>
-    {% endif %}
+    </div>
+
 </div>
 {% endblock %}

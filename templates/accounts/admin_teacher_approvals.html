@@ -1,156 +1,139 @@
 {% extends 'base.html' %}
 
-{% block title %}Faculty Verification Queue - Institutional Administration - EPS{% endblock %}
+{% block title %}Faculty Approvals — EPS Administration{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--warning" style="font-weight: 700;">FACULTY GOVERNANCE</span>
-            <span class="bento-badge bento-badge--sage">Awaiting Verification: {{ total_pending }}</span>
-        </div>
-        <h1 class="bento-page-title">Faculty Verification Queue</h1>
-        <p class="bento-page-subtitle">Inspect teaching credentials, institutional employee IDs, and department appointments before authorizing exam creation.</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_teachers' %}" class="bento-btn bento-btn--outline bento-btn--sm">Faculty Directory</a>
-        <a href="{% url 'admin_student_approvals' %}" class="bento-btn bento-btn--warning bento-btn--sm">Student Approvals</a>
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<!-- Filter Bar -->
-<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-    <form method="GET" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-        <input type="text" name="q" value="{{ q }}" placeholder="Search by name, employee ID, or username..." class="bento-input" style="flex: 1; min-width: 220px; font-size: 0.88rem;">
-        <select name="department" class="bento-select" style="width: auto; min-width: 180px; font-size: 0.88rem;">
-            <option value="">All Departments</option>
-            {% for d in departments_list %}
-                <option value="{{ d }}" {% if dept == d %}selected{% endif %}>{{ d }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm">Filter</button>
-        {% if q or dept %}
-            <a href="{% url 'admin_teacher_approvals' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Clear</a>
-        {% endif %}
-    </form>
-</div>
-
-<!-- Pending Teachers Queue Table -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <div>
-            <h2 class="bento-card__title">Pending Faculty Applications</h2>
-            <p class="bento-card__subtitle">Awaiting administrative validation of institutional faculty identity.</p>
-        </div>
-    </div>
-
-    {% if pending_teachers %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Faculty Applicant</th>
-                        <th>Employee ID</th>
-                        <th>Username / Email</th>
-                        <th>Department</th>
-                        <th>Qualification</th>
-                        <th>Institution</th>
-                        <th>Applied On</th>
-                        <th style="text-align: right;">Decision</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for teacher in pending_teachers %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'admin_teacher_detail' teacher.id %}" style="font-weight: 600; color: var(--eps-text-primary); text-decoration: none;">
-                                    {{ teacher.user.first_name|default:teacher.user.username }} {{ teacher.user.last_name }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="bento-badge bento-badge--sage" style="font-family: monospace; font-weight: 700;">{{ teacher.employee_id }}</span>
-                            </td>
-                            <td>
-                                <code>{{ teacher.user.username }}</code>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ teacher.user.email }}</div>
-                            </td>
-                            <td>{{ teacher.department }}</td>
-                            <td>{{ teacher.qualification|default:"—" }}</td>
-                            <td>{{ teacher.institution|default:"N/A" }}</td>
-                            <td>
-                                <span style="font-size: 0.82rem; color: var(--eps-text-secondary);">{{ teacher.user.date_joined|date:"M d, Y H:i" }}</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <div style="display: inline-flex; gap: 0.35rem; justify-content: flex-end;">
-                                    <form method="POST" action="{% url 'review_teacher' teacher.id %}" style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="bento-btn bento-btn--success bento-btn--sm" style="padding: 0.25rem 0.65rem;" onclick="return confirm('Approve faculty member {{ teacher.user.username }}?');">
-                                            ✓ Approve
-                                        </button>
-                                    </form>
-
-                                    <button type="button" class="bento-btn bento-btn--danger bento-btn--sm" style="padding: 0.25rem 0.65rem;" onclick="openRejectTeacherModal('{{ teacher.id }}', '{{ teacher.user.username }}')">
-                                        ✕ Reject
-                                    </button>
-
-                                    <a href="{% url 'admin_teacher_detail' teacher.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.25rem 0.5rem;">
-                                        Inspect
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="bento-empty-state" style="padding: 3rem 1.5rem; text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✨</div>
-            <h3 style="font-size: 1.15rem; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">Faculty Queue Empty</h3>
-            <p style="font-size: 0.9rem; color: var(--eps-text-muted); max-width: 440px; margin: 0 auto;">
-                All faculty registration requests have been audited and verified.
-            </p>
-        </div>
-    {% endif %}
-</div>
-
-<!-- Modal for Faculty Rejection -->
-<div id="reject-modal" style="display: none; position: fixed; inset: 0; background: rgba(38, 48, 38, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="bento-card" style="width: 100%; max-width: 480px; margin: 1rem; padding: 2rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-status-danger); margin-bottom: 0.5rem;">Reject Faculty Registration</h3>
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); margin-bottom: 1.25rem;">
-            Provide an institutional reason for rejecting faculty applicant <strong id="reject-name" style="color: var(--eps-text-primary);"></strong>.
-        </p>
-        <form id="reject-form" method="POST" action="">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="reject">
-            <div class="bento-form-group">
-                <label class="bento-label">Rejection Memo</label>
-                <textarea name="reason" class="bento-input" rows="3" placeholder="e.g. Employee ID verification failed..." required style="resize: none;"></textarea>
+    <!-- Page Header -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <span class="badge badge--teacher">Faculty Queue</span>
+                    <span style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ total_pending }} applications awaiting review</span>
+                </div>
+                <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                    Faculty Verification Queue
+                </h1>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                    Verify faculty credentials before granting exam authoring and grading permissions.
+                </p>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                <button type="button" class="bento-btn bento-btn--ghost" onclick="closeRejectTeacherModal()">Cancel</button>
-                <button type="submit" class="bento-btn bento-btn--danger">Confirm Rejection</button>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_teachers' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="users" class="lucide-icon icon-sm"></i>
+                    <span>Faculty Directory</span>
+                </a>
+                <a href="{% url 'admin_student_approvals' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="user-check" class="lucide-icon icon-sm"></i>
+                    <span>Student Approvals</span>
+                </a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Dashboard</span>
+                </a>
             </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="padding: var(--space-5);">
+        <form method="GET" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search by name, employee ID, or username..." class="form-input" style="flex: 1; min-width: 220px;">
+            <select name="department" class="form-select" style="width: auto; min-width: 180px;">
+                <option value="">All Departments</option>
+                {% for d in departments_list %}
+                    <option value="{{ d }}" {% if dept == d %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            {% if q or dept %}
+                <a href="{% url 'admin_teacher_approvals' %}" class="btn btn-secondary btn-sm">Clear</a>
+            {% endif %}
         </form>
     </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-function openRejectTeacherModal(id, username) {
-    const modal = document.getElementById('reject-modal');
-    const form = document.getElementById('reject-form');
-    const name = document.getElementById('reject-name');
-    form.action = `/accounts/admin/review-teacher/${id}/`;
-    name.textContent = username;
-    modal.style.display = 'flex';
-}
-function closeRejectTeacherModal() {
-    document.getElementById('reject-modal').style.display = 'none';
-}
-</script>
+    <!-- Pending Teachers Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h2 class="card__title">
+                    <i data-lucide="check-square" class="lucide-icon"></i>
+                    <span>Pending Faculty Registrations</span>
+                </h2>
+                <p class="card__description">Teachers waiting for institutional verification</p>
+            </div>
+            <span class="badge badge--teacher">{{ total_pending }} Pending</span>
+        </div>
+
+        {% if pending_teachers %}
+            <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                <table class="school-table">
+                    <thead>
+                        <tr>
+                            <th>Faculty Member</th>
+                            <th>Staff ID</th>
+                            <th>Department</th>
+                            <th>Qualification</th>
+                            <th>Applied</th>
+                            <th style="text-align: right;">Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in pending_teachers %}
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <div class="profile-card__avatar profile-card__avatar--teacher" style="width: 36px; height: 36px; font-size: 13px;">
+                                            {{ teacher.user.first_name|default:teacher.user.username|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'admin_teacher_detail' teacher.id %}" style="font-weight: 600; color: var(--text-primary);">
+                                                {{ teacher.user.first_name|default:teacher.user.username }} {{ teacher.user.last_name }}
+                                            </a>
+                                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ teacher.user.email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--neutral" style="font-family: var(--font-mono); font-weight: 600;">{{ teacher.employee_id }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--teacher">{{ teacher.department }}</span>
+                                </td>
+                                <td style="font-size: var(--font-size-xs);">{{ teacher.qualification|default:"—" }}</td>
+                                <td style="font-size: var(--font-size-xs); color: var(--text-muted); white-space: nowrap;">
+                                    {{ teacher.user.date_joined|date:"M d, Y" }}
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: inline-flex; gap: var(--space-1); justify-content: flex-end;">
+                                        <form method="POST" action="{% url 'review_teacher' teacher.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-approve btn-xs">
+                                                <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                                <span>Approve</span>
+                                            </button>
+                                        </form>
+                                        <a href="{% url 'admin_teacher_detail' teacher.id %}" class="btn btn-secondary btn-xs">
+                                            <span>Review</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted);">
+                <i data-lucide="check-circle" class="lucide-icon icon-lg" style="margin-bottom: var(--space-2); color: var(--success);"></i>
+                <div style="font-weight: 600; color: var(--text-primary); font-size: var(--font-size-sm);">Queue is Clear</div>
+                <p style="font-size: var(--font-size-xs); margin: 0;">No faculty applications are awaiting verification.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
 {% endblock %}

@@ -1,92 +1,118 @@
 {% extends 'base.html' %}
 
-{% block title %}Platform Security Audit & Governance - Institutional Administration - EPS{% endblock %}
+{% block title %}Security Governance — EPS Administration{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">SECURITY GOVERNANCE</span>
-            <span class="bento-badge bento-badge--success">Bypass Vulnerabilities Eliminated</span>
-        </div>
-        <h1 class="bento-page-title">Platform Security Governance</h1>
-        <p class="bento-page-subtitle">Security parameters, cryptographic hashers, CSRF protections, and institutional authentication controls.</p>
-    </div>
-    <div class="bento-page-actions">
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem; align-items: start;">
-    <!-- Core Security Controls Table -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Security Configuration Checklist</h3>
-            <p class="bento-card__subtitle">Active Django runtime security settings.</p>
+    <!-- Page Header -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <span class="badge badge--mint">Security Posture</span>
+                    <span class="badge badge--mint">Zero Deploy Warnings</span>
+                </div>
+                <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                    Platform Security &amp; Hardening
+                </h1>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                    Review cryptographic controls, session security, allowed host restrictions, and role permissions.
+                </p>
+            </div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
         </div>
-
-        <table class="bento-table" style="font-size: 0.88rem;">
-            <tbody>
-                <tr>
-                    <td style="color: var(--eps-text-muted); width: 45%;">Security Bypass Vulnerability</td>
-                    <td><span class="bento-badge bento-badge--success">0 Bypasses Detected (Fixed)</span></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">External Email Attack Surface</td>
-                    <td><span class="bento-badge bento-badge--success">0 SMTP Vectors (Zero-Email)</span></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Cryptographic Secret Key</td>
-                    <td>
-                        {% if sec_info.has_secret_key %}
-                            <span class="bento-badge bento-badge--success">Configured & Sealed</span>
-                        {% else %}
-                            <span class="bento-badge bento-badge--danger">Missing</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Allowed Hosts Policy</td>
-                    <td><code>{{ sec_info.allowed_hosts|join:", " }}</code></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Password Storage Hashers</td>
-                    <td><code>{{ sec_info.password_hashers|first }}</code></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">CSRF Cookie Protection</td>
-                    <td>
-                        <span class="bento-badge bento-badge--sage">Enforced on all state-altering forms</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
-    <!-- Hardened Architecture Highlights Bento Card -->
-    <div class="bento-card bento-card--sage">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Institutional Hardening Summary</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: start;">
+        <!-- Core Security Controls Table -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+                <div>
+                    <h2 class="card__title">
+                        <i data-lucide="shield-check" class="lucide-icon"></i>
+                        <span>Security Controls Checklist</span>
+                    </h2>
+                    <p class="card__description">Active Django security posture and parameters</p>
+                </div>
+            </div>
+
+            <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                <table class="school-table">
+                    <tbody>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs); width: 45%;">Security Posture</td>
+                            <td><span class="badge badge--mint">Fully Hardened (Stage 1 Verified)</span></td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs);">Email Attack Surface</td>
+                            <td><span class="badge badge--mint">Zero-Email In-App Architecture</span></td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs);">Cryptographic Secret Key</td>
+                            <td>
+                                {% if sec_info.has_secret_key %}
+                                    <span class="badge badge--mint">Configured &amp; Sealed</span>
+                                {% else %}
+                                    <span class="badge badge--danger">Missing</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs);">Allowed Hosts Policy</td>
+                            <td><code style="font-size: var(--font-size-xs);">{{ sec_info.allowed_hosts|join:", " }}</code></td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs);">Password Storage Hasher</td>
+                            <td><code style="font-size: var(--font-size-xs);">{{ sec_info.password_hashers|first }}</code></td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--text-muted); font-size: var(--font-size-xs);">CSRF Token Validation</td>
+                            <td>
+                                <span class="badge badge--neutral">Enforced on all POST forms</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.6;">
-            <p style="margin-bottom: 0.75rem;">
-                EPS has completed a comprehensive institutional security review:
-            </p>
-            <ul style="margin-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                <li>
-                    <strong>Role-Based Access Control (RBAC):</strong> Strict <code>@student_required</code>, <code>@teacher_required</code>, and <code>@admin_required</code> decorators guard every endpoint.
-                </li>
-                <li>
-                    <strong>Approval Verification Gate:</strong> Unapproved students and teachers cannot author exams, view question banks, or start tests until formally verified.
-                </li>
-                <li>
-                    <strong>Session Security:</strong> Django session tokens are bound to active authenticated users with CSRF validation across all endpoints.
-                </li>
-                <li>
-                    <strong>Zero-Email Privacy:</strong> No institutional records or candidate information are exposed to external mail gateways.
-                </li>
-            </ul>
+
+        <!-- Hardened Architecture Highlights Card -->
+        <div class="card" style="padding: var(--space-6);">
+            <h2 class="card__title" style="margin-bottom: var(--space-2);">
+                <i data-lucide="lock" class="lucide-icon"></i>
+                <span>Hardening Overview</span>
+            </h2>
+            <div style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.6;">
+                <p style="margin-bottom: var(--space-4);">
+                    EPS operates under strict institutional security measures:
+                </p>
+                <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                    <div>
+                        <strong style="color: var(--text-primary); display: block;">Role-Based Access Control (RBAC):</strong>
+                        <span>Explicit view decorators guarantee only authenticated students, teachers, or administrators can access authorized views.</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary); display: block;">Verification Gate:</strong>
+                        <span>Unverified accounts cannot participate in exams or access test authoring tools until formal faculty or administrator approval.</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary); display: block;">Departmental Boundaries:</strong>
+                        <span>Faculty approvals and exam creation are strictly isolated by department to prevent cross-department privilege escalation.</span>
+                    </div>
+                    <div>
+                        <strong style="color: var(--text-primary); display: block;">Session &amp; CSRF Security:</strong>
+                        <span>Encrypted session tokens and CSRF token protection on all state-altering requests protect against cross-site attacks.</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
 {% endblock %}

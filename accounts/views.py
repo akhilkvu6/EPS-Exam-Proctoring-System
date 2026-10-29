@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 from django.db import transaction, connection
 from django.db.models import Q, Count, Avg, Max, Min
@@ -355,7 +355,7 @@ def student_dashboard(request):
     avg_percentage = round(avg_score, 1) if avg_score is not None else None
 
     # GPA conversion (4.0 scale)
-    gpa = round(avg_percentage / 25.0, 2) if avg_percentage is not None else "N/A"
+    gpa = round(float(avg_percentage) / 25.0, 2) if avg_percentage is not None else "N/A"
 
     next_exam = scheduled_exams[0] if scheduled_exams else (available_exams[0] if available_exams else None)
     recent_notifications = student.notifications.all()[:5]
@@ -458,9 +458,38 @@ def teacher_dashboard(request):
 
 @teacher_required
 def review_student(request, student_id):
-    """Teacher action to approve or reject a student application."""
+    """
+    Teacher action to approve or reject a student application.
+    Enforces strict departmental boundary validation: teachers may only review
+    students belonging to their own assigned department.
+    """
     student = get_object_or_404(StudentProfile, id=student_id)
     teacher = request.user
+
+    # Administrators and superusers retain global review authority
+    is_admin = teacher.role == 'admin' or teacher.is_superuser or teacher.is_staff
+
+    if not is_admin:
+        teacher_prof = getattr(teacher, 'teacher_profile', None)
+        teacher_dept = (teacher_prof.department or '').strip().lower() if teacher_prof else ''
+        student_dept = (student.department or '').strip().lower()
+
+        # Unassigned departments cannot be verified or matched
+        if not teacher_dept or not student_dept:
+            messages.error(request, 'Access denied: Department authorization could not be verified.')
+            return HttpResponseForbidden('Access denied: You are not authorized to review this student.')
+
+        # Department match check (by department name or linked class group department name/code)
+        dept_match = (teacher_dept == student_dept)
+        if not dept_match and student.class_group and student.class_group.department:
+            class_dept_name = student.class_group.department.name.strip().lower()
+            class_dept_code = student.class_group.department.code.strip().lower()
+            if teacher_dept in (class_dept_name, class_dept_code):
+                dept_match = True
+
+        if not dept_match:
+            messages.error(request, 'Access denied: You can only review student applicants in your own department.')
+            return HttpResponseForbidden('Access denied: You are not authorized to review students outside your assigned department.')
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -521,16 +550,26 @@ def review_student(request, student_id):
 
 @teacher_required
 def teacher_student_approvals(request):
-    """Teacher queue to review and approve/reject pending student applicants."""
-    teacher_prof = request.user.teacher_profile
-    dept = teacher_prof.department
+    """
+    Teacher queue to review and approve/reject pending student applicants.
+    Strictly isolated to students within the teacher's department.
+    """
+    teacher_prof = getattr(request.user, 'teacher_profile', None)
+    dept = (teacher_prof.department or '').strip() if teacher_prof else ''
 
-    pending_students = StudentProfile.objects.filter(verification_status='pending').select_related('user', 'class_group')
-    dept_students = pending_students.filter(department__iexact=dept)
-    students_list = dept_students if dept_students.exists() else pending_students
+    if not dept:
+        students_list = StudentProfile.objects.none()
+    else:
+        pending_students = StudentProfile.objects.filter(verification_status='pending').select_related('user', 'class_group')
+        # Filter strictly within the teacher's department
+        students_list = pending_students.filter(
+            Q(department__iexact=dept) |
+            Q(class_group__department__name__iexact=dept) |
+            Q(class_group__department__code__iexact=dept)
+        )
 
     q = request.GET.get('q', '').strip()
-    if q:
+    if q and students_list.exists():
         students_list = students_list.filter(
             Q(full_name__icontains=q) |
             Q(roll_number__icontains=q) |

@@ -1,104 +1,142 @@
 {% extends 'base.html' %}
 
-{% block title %}Evaluate Attempt: {{ attempt.student.username }} - EPS{% endblock %}
+{% block title %}Evaluate Attempt: {{ attempt.student.username }} — EPS{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto;">
-    <div class="bento-page-header">
+<div style="max-width: 960px; margin: 0 auto var(--space-16) auto; display: flex; flex-direction: column; gap: var(--space-6);">
+
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); flex-wrap: wrap;">
         <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                <span class="bento-badge bento-badge--mint" style="font-weight: 700;">✍️ MANUAL EVALUATION SUITE</span>
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); flex-wrap: wrap;">
+                <span class="bento-badge" style="background: var(--pastel-peach); color: var(--pastel-peach-text); border: 1px solid var(--pastel-peach-border);">
+                    <i data-lucide="edit-3" class="lucide-icon icon-xs"></i>
+                    <span>Teacher Grading Room</span>
+                </span>
+                <span class="bento-badge bento-badge--neutral">
+                    {{ answers|length }} Question{{ answers|length|pluralize }}
+                </span>
             </div>
-            <h1 class="bento-page-title" style="margin-bottom: 0.25rem;">Candidate Response Assessment</h1>
-            <p class="bento-page-subtitle">
-                Candidate: <strong>{{ attempt.student.student_profile.full_name|default:attempt.student.username }}</strong> (<code style="font-family: monospace;">{{ attempt.student.student_profile.roll_number }}</code>) &bull; Exam: <strong>{{ exam.title }}</strong>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-1) 0; letter-spacing: -0.02em;">
+                Evaluate Candidate Responses
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                Candidate: <strong>{{ attempt.student.student_profile.full_name|default:attempt.student.username }}</strong>
+                {% if attempt.student.student_profile.roll_number %}
+                    (<span style="font-family: monospace;">{{ attempt.student.student_profile.roll_number }}</span>)
+                {% endif %}
+                &bull; Exam: <strong>{{ exam.title }}</strong>
             </p>
         </div>
-        <div class="bento-page-actions">
-            <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">&larr; Return to Results Ledger</a>
+
+        <div>
+            <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn-secondary bento-btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Return to Results</span>
+            </a>
         </div>
     </div>
 
+    <!-- Evaluation Form -->
     <form method="POST">
         {% csrf_token %}
 
-        <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 5rem;">
+        <div style="display: flex; flex-direction: column; gap: var(--space-5); margin-bottom: var(--space-12);">
             {% for ans in answers %}
-                <div class="bento-card" style="padding: 1.75rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; border-bottom: 1px solid var(--eps-border); padding-bottom: 0.85rem;">
-                        <div style="display: flex; align-items: center; gap: 0.6rem;">
-                            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">Question {{ forloop.counter }}</span>
-                            <span class="bento-badge bento-badge--neutral" style="font-size: 0.75rem;">
+                <div class="bento-card" style="padding: var(--space-6);">
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; gap: var(--space-2);">
+                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                            <span class="bento-badge" style="background: var(--pastel-blue); color: var(--pastel-blue-text); border: 1px solid var(--pastel-blue-border); font-weight: 700;">
+                                Question {{ forloop.counter }}
+                            </span>
+                            <span class="bento-badge bento-badge--neutral">
                                 {{ ans.question.get_question_type_display }}
                             </span>
                         </div>
-                        <div class="bento-badge bento-badge--mint" style="font-size: 0.82rem; font-weight: 700;">
+                        <span class="bento-badge bento-badge--neutral" style="font-weight: 700;">
                             Max: {{ ans.question.marks }} Marks
-                        </div>
+                        </span>
                     </div>
 
-                    <div style="font-size: 1rem; color: var(--eps-text-primary); margin-bottom: 1.25rem; line-height: 1.5; font-weight: 500;">
+                    <!-- Question Prompt -->
+                    <div style="font-size: var(--font-size-base); color: var(--text-primary); font-weight: 600; line-height: 1.5; margin-bottom: var(--space-4);">
                         {{ ans.question.question_text }}
                     </div>
 
-                    <!-- Student Submission Box -->
-                    <div style="background: var(--eps-canvas); border: 1.5px solid var(--eps-border); border-radius: var(--eps-radius-md); padding: 1.15rem; margin-bottom: 1rem;">
-                        <span style="color: var(--eps-text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.45rem;">
-                            Examinee Submitted Response:
-                        </span>
+                    <!-- Candidate's Response Box -->
+                    <div style="background: var(--bg-surface-alt); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--space-4); margin-bottom: var(--space-4);">
+                        <div style="display: flex; align-items: center; gap: var(--space-2); color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2);">
+                            <i data-lucide="user-check" class="lucide-icon icon-xs"></i>
+                            <span>Student's Submitted Answer</span>
+                        </div>
+
                         {% if ans.question.question_type == 'mcq' or ans.question.question_type == 'true_false' %}
                             {% if ans.selected_option %}
-                                <div style="font-size: 0.95rem; font-weight: 600; color: var(--eps-text-primary);">
+                                <div style="font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary);">
                                     {{ ans.selected_option.option_text }}
                                 </div>
                                 {% if ans.selected_option.is_correct %}
-                                    <div style="color: var(--eps-status-success); font-weight: 600; font-size: 0.85rem; margin-top: 0.35rem;">
-                                        ✓ Auto-Graded Correct (+{{ ans.marks_awarded }})
+                                    <div style="color: var(--success); font-weight: 600; font-size: var(--font-size-xs); margin-top: var(--space-2); display: flex; align-items: center; gap: var(--space-1);">
+                                        <i data-lucide="check-circle-2" class="lucide-icon icon-xs"></i>
+                                        <span>Auto-Graded Correct (+{{ ans.marks_awarded }} marks)</span>
                                     </div>
                                 {% else %}
-                                    <div style="color: var(--eps-status-danger); font-weight: 600; font-size: 0.85rem; margin-top: 0.35rem;">
-                                        ✗ Auto-Graded Incorrect ({{ ans.marks_awarded }})
+                                    <div style="color: var(--danger); font-weight: 600; font-size: var(--font-size-xs); margin-top: var(--space-2); display: flex; align-items: center; gap: var(--space-1);">
+                                        <i data-lucide="x-circle" class="lucide-icon icon-xs"></i>
+                                        <span>Auto-Graded Incorrect ({{ ans.marks_awarded }} marks)</span>
                                     </div>
                                 {% endif %}
                             {% else %}
-                                <span style="color: var(--eps-text-muted); font-style: italic; font-size: 0.9rem;">No response selected (0.0)</span>
+                                <span style="color: var(--text-muted); font-style: italic; font-size: var(--font-size-sm);">No answer selected by student (0.0 marks)</span>
                             {% endif %}
                         {% else %}
-                            <p style="white-space: pre-wrap; font-size: 0.95rem; color: var(--eps-text-primary); line-height: 1.6; margin: 0;">{{ ans.text_answer|default:"No response entered by student." }}</p>
+                            <p style="white-space: pre-wrap; font-size: var(--font-size-sm); color: var(--text-primary); line-height: 1.6; margin: 0; font-family: inherit;">
+                                {{ ans.text_answer|default:"No response entered by student." }}
+                            </p>
                         {% endif %}
                     </div>
 
-                    <!-- Grading Fields for Short/Descriptive Questions -->
+                    <!-- Reference Answer Key (if teacher provided one) -->
                     {% if ans.question.question_type == 'short_answer' or ans.question.question_type == 'descriptive' %}
                         {% if ans.question.correct_text_answer %}
-                            <div class="bento-card bento-card--mint" style="padding: 0.85rem 1.15rem; margin-bottom: 1.25rem; font-size: 0.88rem; color: var(--eps-primary-sage);">
-                                <strong>Reference Answer Key / Evaluation Guide:</strong><br>
-                                <span style="color: var(--eps-text-secondary); margin-top: 0.25rem; display: block;">{{ ans.question.correct_text_answer }}</span>
+                            <div style="padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); background: #FAF9F6; border-left: 3px solid var(--text-primary); border-radius: var(--radius-control); font-size: var(--font-size-xs);">
+                                <strong style="color: var(--text-primary); display: flex; align-items: center; gap: var(--space-1); margin-bottom: 2px;">
+                                    <i data-lucide="key" class="lucide-icon icon-xs"></i>
+                                    <span>Teacher Reference Guide / Answer Key:</span>
+                                </strong>
+                                <div style="color: var(--text-secondary); line-height: 1.5;">{{ ans.question.correct_text_answer }}</div>
                             </div>
                         {% endif %}
 
-                        <div class="bento-grid bento-grid--3" style="gap: 1rem; align-items: start; padding-top: 1rem; border-top: 1px solid var(--eps-border);">
-                            <div class="bento-form-group" style="margin-bottom: 0;">
-                                <label class="bento-label">Marks Awarded *</label>
+                        <!-- Grading Controls for Subjective Answer -->
+                        <div style="display: grid; grid-template-columns: 180px 1fr; gap: var(--space-4); align-items: start; padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); font-weight: 600;">
+                                    Marks Awarded *
+                                </label>
                                 <input type="number"
                                        name="marks_{{ ans.id }}"
                                        value="{{ ans.marks_awarded|default:'0' }}"
                                        min="0"
                                        max="{{ ans.question.marks }}"
                                        step="0.5"
-                                       class="bento-input"
-                                       style="font-weight: 700; font-size: 1.05rem;"
+                                       class="form-control"
+                                       style="font-weight: 700; font-size: var(--font-size-base); border-radius: var(--radius-control);"
                                        required>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-muted); margin-top: 0.25rem;">Max: {{ ans.question.marks }} marks</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Max: {{ ans.question.marks }} marks</div>
                             </div>
 
-                            <div class="bento-form-group" style="grid-column: span 2; margin-bottom: 0;">
-                                <label class="bento-label">Evaluator Feedback / Commentary</label>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); font-weight: 600;">
+                                    Teacher Feedback / Notes
+                                </label>
                                 <input type="text"
                                        name="feedback_{{ ans.id }}"
                                        value="{{ ans.evaluator_feedback }}"
-                                       placeholder="Provide constructive feedback for student..."
-                                       class="bento-input">
+                                       placeholder="Give helpful feedback for the student..."
+                                       class="form-control"
+                                       style="font-size: var(--font-size-sm); border-radius: var(--radius-control);">
                             </div>
                         </div>
                     {% endif %}
@@ -106,13 +144,15 @@
             {% endfor %}
         </div>
 
-        <!-- Sticky Floating Evaluator Footer Bar -->
-        <div style="position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: calc(100% - 3rem); max-width: 900px; z-index: 50; background: var(--eps-surface); padding: 1.15rem 1.75rem; border-radius: var(--eps-radius-lg); box-shadow: var(--eps-shadow-card-hover); border: 1.5px solid var(--eps-primary-sage); display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-            <div style="font-size: 0.88rem; color: var(--eps-text-secondary);">
-                <span>Review scores carefully before saving. Results recalculate instantly.</span>
+        <!-- Sticky Floating Evaluator Bar -->
+        <div style="position: fixed; bottom: var(--space-5); left: 50%; transform: translateX(-50%); width: calc(100% - 2rem); max-width: 960px; z-index: 50; background: #FFFFFF; padding: var(--space-3) var(--space-5); border-radius: var(--radius-card); box-shadow: var(--shadow-lg); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                <i data-lucide="info" class="lucide-icon icon-sm" style="color: var(--text-muted);"></i>
+                <span>Review scores carefully before saving. Totals will update automatically.</span>
             </div>
-            <button type="submit" class="bento-btn bento-btn--primary" style="padding: 0.75rem 1.75rem; font-size: 0.95rem; white-space: nowrap;">
-                💾 Save Assessment & Update Grade
+            <button type="submit" class="bento-btn bento-btn-primary bento-btn-sm" style="background: var(--text-primary); color: #FFFFFF;">
+                <i data-lucide="save" class="lucide-icon icon-sm"></i>
+                <span>Save Grades &amp; Update Result</span>
             </button>
         </div>
     </form>

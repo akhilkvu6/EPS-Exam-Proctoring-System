@@ -1,218 +1,233 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}EPS — Exam Proctoring System{% endblock %}</title>
+    <title>{% block title %}EPS — School Management & Exam System{% endblock %}</title>
     
-    <!-- Centralized Sage Design Tokens & Bento Grid CSS -->
+    <!-- Prevent Theme Flash -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('eps-theme') || 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design Tokens & School Component Styles -->
     <link rel="stylesheet" href="{% static 'css/design-tokens.css' %}">
     <link rel="stylesheet" href="{% static 'css/bento.css' %}">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-    <!-- Mobile Drawer Overlay Backdrop -->
-    <div id="sidebar-overlay" style="display: none; position: fixed; inset: 0; background: rgba(38, 48, 38, 0.4); z-index: 90; backdrop-filter: blur(2px);"></div>
+    <!-- Mobile Navigation Drawer Overlay Backdrop -->
+    <div id="sidebar-overlay" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.4); z-index: 55; backdrop-filter: blur(2px);"></div>
 
     {% if request.user.is_authenticated %}
-        <!-- ===================================================================
-             AUTHENTICATED APPLICATION SHELL: Sidebar + Main Content Area
-             =================================================================== -->
+        <!-- Application Shell -->
         <div class="app-shell">
-            <!-- Collapsible Desktop Sidebar -->
+            <!-- Warm Off-White Sidebar (#F3F1EB) -->
             <aside class="app-sidebar" id="app-sidebar">
                 <div class="app-sidebar__header">
                     <a href="{% url 'home' %}" class="app-sidebar__brand">
-                        <span class="brand-leaf-icon">🌿</span>
-                        <span class="app-sidebar__brand-text">EPS Platform</span>
+                        <span class="brand-badge">EPS</span>
+                        <span class="app-sidebar__brand-text">School Portal</span>
                     </a>
-                    <button type="button" id="sidebar-toggle" title="Toggle Sidebar" style="background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--eps-text-secondary); padding: 4px;">
-                        ⇔
+                    <button type="button" id="sidebar-toggle" title="Collapse Sidebar" class="app-sidebar__toggle-btn" aria-label="Toggle Sidebar">
+                        <i data-lucide="chevrons-left" class="lucide-icon"></i>
                     </button>
                 </div>
 
                 <nav class="app-sidebar__nav">
                     {% if request.user.role == 'student' %}
-                        <!-- Student Portal Navigation -->
-                        <div class="nav-section-title">Student Portal</div>
-                        <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📊</span>
+                        <!-- Student Navigation -->
+                        <div class="nav-section-title">Student</div>
+                        <a href="{% url 'student_dashboard' %}" data-tooltip="Dashboard" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="layout-dashboard" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Dashboard</span>
                         </a>
-                        <a href="{% url 'student_exam_list' %}" class="nav-item {% if request.resolver_match.url_name == 'student_exam_list' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📝</span>
-                            <span class="nav-item__label">Examinations</span>
+                        <a href="{% url 'student_exam_list' %}" data-tooltip="My Exams" class="nav-item {% if request.resolver_match.url_name == 'student_exam_list' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="file-text" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">My Exams</span>
                         </a>
-                        <a href="{% url 'student_results' %}" class="nav-item {% if request.resolver_match.url_name == 'student_results' or request.resolver_match.url_name == 'student_result_detail' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🎓</span>
+                        <a href="{% url 'student_results' %}" data-tooltip="My Results" class="nav-item {% if request.resolver_match.url_name == 'student_results' or request.resolver_match.url_name == 'student_result_detail' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="award" class="lucide-icon"></i></span>
                             <span class="nav-item__label">My Results</span>
                         </a>
-                        <a href="{% url 'notifications_list' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications_list' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🔔</span>
+                        <a href="{% url 'notifications_list' %}" data-tooltip="Notifications" class="nav-item {% if request.resolver_match.url_name == 'notifications_list' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="bell" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Notifications</span>
                             {% if unread_notification_count and unread_notification_count > 0 %}
-                                <span class="bento-badge bento-badge--danger" style="margin-left: auto; padding: 0.1rem 0.45rem; font-size: 0.72rem;">{{ unread_notification_count }}</span>
+                                <span class="badge badge--danger" style="margin-left: auto;">{{ unread_notification_count }}</span>
                             {% endif %}
                         </a>
 
                     {% elif request.user.role == 'teacher' %}
-                        <!-- Faculty Portal Navigation -->
+                        <!-- Teacher Navigation -->
                         <div class="nav-section-title">Overview</div>
-                        <a href="{% url 'teacher_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📊</span>
+                        <a href="{% url 'teacher_dashboard' %}" data-tooltip="Dashboard" class="nav-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="layout-dashboard" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Dashboard</span>
                         </a>
 
-                        <div class="nav-section-title">Student Management</div>
-                        <a href="{% url 'teacher_students' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_students' %}is-active{% endif %}">
-                            <span class="nav-item__icon">👥</span>
+                        <div class="nav-section-title">Students</div>
+                        <a href="{% url 'teacher_students' %}" data-tooltip="My Students" class="nav-item {% if request.resolver_match.url_name == 'teacher_students' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="users" class="lucide-icon"></i></span>
                             <span class="nav-item__label">My Students</span>
                         </a>
-                        <a href="{% url 'teacher_student_approvals' %}" class="nav-item {% if request.resolver_match.url_name == 'teacher_student_approvals' %}is-active{% endif %}">
-                            <span class="nav-item__icon">⏳</span>
+                        <a href="{% url 'teacher_student_approvals' %}" data-tooltip="Student Approvals" class="nav-item {% if request.resolver_match.url_name == 'teacher_student_approvals' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="user-check" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Student Approvals</span>
                         </a>
-                        <a href="{% url 'import_students' %}" class="nav-item {% if request.resolver_match.url_name == 'import_students' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📑</span>
+                        <a href="{% url 'import_students' %}" data-tooltip="Excel Import" class="nav-item {% if request.resolver_match.url_name == 'import_students' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="file-spreadsheet" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Excel Import</span>
                         </a>
 
-                        <div class="nav-section-title">Examinations & Grading</div>
-                        <a href="{% url 'manage_exams' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_exams' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'edit_exam' or request.resolver_match.url_name == 'exam_detail' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📋</span>
+                        <div class="nav-section-title">Exams & Classes</div>
+                        <a href="{% url 'manage_exams' %}" data-tooltip="Manage Exams" class="nav-item {% if request.resolver_match.url_name == 'manage_exams' or request.resolver_match.url_name == 'create_exam' or request.resolver_match.url_name == 'edit_exam' or request.resolver_match.url_name == 'exam_detail' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="clipboard-list" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Manage Exams</span>
                         </a>
-                        <a href="{% url 'question_bank' %}" class="nav-item {% if request.resolver_match.url_name == 'question_bank' or request.resolver_match.url_name == 'create_question' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📚</span>
+                        <a href="{% url 'question_bank' %}" data-tooltip="Question Bank" class="nav-item {% if request.resolver_match.url_name == 'question_bank' or request.resolver_match.url_name == 'create_question' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="help-circle" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Question Bank</span>
                         </a>
-                        <a href="{% url 'manage_subjects' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_subjects' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🏛️</span>
+                        <a href="{% url 'manage_subjects' %}" data-tooltip="Subjects" class="nav-item {% if request.resolver_match.url_name == 'manage_subjects' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="book-open" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Subjects</span>
                         </a>
 
-                        <div class="nav-section-title">Communications</div>
-                        <a href="{% url 'notifications_list' %}" class="nav-item {% if request.resolver_match.url_name == 'notifications_list' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🔔</span>
+                        <div class="nav-section-title">Messages</div>
+                        <a href="{% url 'notifications_list' %}" data-tooltip="Notifications" class="nav-item {% if request.resolver_match.url_name == 'notifications_list' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="bell" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Notifications</span>
                             {% if unread_notification_count and unread_notification_count > 0 %}
-                                <span class="bento-badge bento-badge--danger" style="margin-left: auto; padding: 0.1rem 0.45rem; font-size: 0.72rem;">{{ unread_notification_count }}</span>
+                                <span class="badge badge--danger" style="margin-left: auto;">{{ unread_notification_count }}</span>
                             {% endif %}
                         </a>
 
                     {% elif request.user.role == 'admin' or request.user.is_superuser %}
-                        <!-- Comprehensive Administrator Portal Navigation -->
+                        <!-- Administrator Navigation -->
                         <div class="nav-section-title">Overview</div>
-                        <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🛡️</span>
+                        <a href="{% url 'admin_dashboard' %}" data-tooltip="Dashboard" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="shield" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Dashboard</span>
                         </a>
-                        <a href="{% url 'admin_analytics' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_analytics' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📈</span>
+                        <a href="{% url 'admin_analytics' %}" data-tooltip="Analytics" class="nav-item {% if request.resolver_match.url_name == 'admin_analytics' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="bar-chart-2" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Analytics</span>
                         </a>
-                        <a href="{% url 'admin_audit_logs' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_audit_logs' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📜</span>
+                        <a href="{% url 'admin_audit_logs' %}" data-tooltip="Audit Logs" class="nav-item {% if request.resolver_match.url_name == 'admin_audit_logs' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="list-ordered" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Audit Logs</span>
                         </a>
 
-                        <div class="nav-section-title">Accounts & Approvals</div>
-                        <a href="{% url 'admin_students' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_students' or request.resolver_match.url_name == 'admin_student_detail' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🎓</span>
+                        <div class="nav-section-title">School People</div>
+                        <a href="{% url 'admin_students' %}" data-tooltip="All Students" class="nav-item {% if request.resolver_match.url_name == 'admin_students' or request.resolver_match.url_name == 'admin_student_detail' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="graduation-cap" class="lucide-icon"></i></span>
                             <span class="nav-item__label">All Students</span>
                         </a>
-                        <a href="{% url 'admin_teachers' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_teachers' or request.resolver_match.url_name == 'admin_teacher_detail' %}is-active{% endif %}">
-                            <span class="nav-item__icon">👩‍🏫</span>
+                        <a href="{% url 'admin_teachers' %}" data-tooltip="All Teachers" class="nav-item {% if request.resolver_match.url_name == 'admin_teachers' or request.resolver_match.url_name == 'admin_teacher_detail' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="users" class="lucide-icon"></i></span>
                             <span class="nav-item__label">All Teachers</span>
                         </a>
-                        <a href="{% url 'admin_student_approvals' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_student_approvals' %}is-active{% endif %}">
-                            <span class="nav-item__icon">⏳</span>
+                        <a href="{% url 'admin_student_approvals' %}" data-tooltip="Student Approvals" class="nav-item {% if request.resolver_match.url_name == 'admin_student_approvals' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="user-check" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Student Approvals</span>
                         </a>
-                        <a href="{% url 'admin_teacher_approvals' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_teacher_approvals' %}is-active{% endif %}">
-                            <span class="nav-item__icon">⚖️</span>
+                        <a href="{% url 'admin_teacher_approvals' %}" data-tooltip="Teacher Approvals" class="nav-item {% if request.resolver_match.url_name == 'admin_teacher_approvals' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="check-square" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Teacher Approvals</span>
                         </a>
-                        <a href="{% url 'admin_suspended_accounts' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_suspended_accounts' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🚫</span>
+                        <a href="{% url 'admin_suspended_accounts' %}" data-tooltip="Suspended Users" class="nav-item {% if request.resolver_match.url_name == 'admin_suspended_accounts' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="user-x" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Suspended</span>
                         </a>
-                        <a href="{% url 'admin_approval_history' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_approval_history' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📑</span>
+                        <a href="{% url 'admin_approval_history' %}" data-tooltip="Approval History" class="nav-item {% if request.resolver_match.url_name == 'admin_approval_history' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="history" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Approval History</span>
                         </a>
 
-                        <div class="nav-section-title">Academic Hierarchy</div>
-                        <a href="{% url 'admin_departments' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_departments' or request.resolver_match.url_name == 'admin_edit_department' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🏛️</span>
+                        <div class="nav-section-title">Academic Setup</div>
+                        <a href="{% url 'admin_departments' %}" data-tooltip="Departments" class="nav-item {% if request.resolver_match.url_name == 'admin_departments' or request.resolver_match.url_name == 'admin_edit_department' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="building-2" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Departments</span>
                         </a>
-                        <a href="{% url 'admin_classes' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_classes' or request.resolver_match.url_name == 'admin_edit_class' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🏫</span>
-                            <span class="nav-item__label">Classes & Groups</span>
+                        <a href="{% url 'admin_classes' %}" data-tooltip="Classes" class="nav-item {% if request.resolver_match.url_name == 'admin_classes' or request.resolver_match.url_name == 'admin_edit_class' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="layers" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Classes</span>
                         </a>
 
-                        <div class="nav-section-title">Examinations & Oversight</div>
-                        <a href="{% url 'admin_all_exams' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_all_exams' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📋</span>
+                        <div class="nav-section-title">Exams & Proctoring</div>
+                        <a href="{% url 'admin_all_exams' %}" data-tooltip="All Exams" class="nav-item {% if request.resolver_match.url_name == 'admin_all_exams' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="clipboard-list" class="lucide-icon"></i></span>
                             <span class="nav-item__label">All Exams</span>
                         </a>
-                        <a href="{% url 'admin_exam_attempts' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_exam_attempts' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📝</span>
+                        <a href="{% url 'admin_exam_attempts' %}" data-tooltip="Exam Attempts" class="nav-item {% if request.resolver_match.url_name == 'admin_exam_attempts' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="clipboard-check" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Exam Attempts</span>
                         </a>
-                        <a href="{% url 'admin_results_overview' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_results_overview' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📊</span>
-                            <span class="nav-item__label">Results Oversight</span>
+                        <a href="{% url 'admin_results_overview' %}" data-tooltip="Results" class="nav-item {% if request.resolver_match.url_name == 'admin_results_overview' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="award" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Results</span>
                         </a>
-                        <a href="{% url 'admin_proctoring_overview' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_proctoring_overview' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🛡️</span>
+                        <a href="{% url 'admin_proctoring_overview' %}" data-tooltip="Live Monitoring" class="nav-item {% if request.resolver_match.url_name == 'admin_proctoring_overview' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="video" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Live Monitoring</span>
                         </a>
-                        <a href="{% url 'admin_proctoring_incidents' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_proctoring_incidents' %}is-active{% endif %}">
-                            <span class="nav-item__icon">⚠️</span>
-                            <span class="nav-item__label">Incidents Ledger</span>
+                        <a href="{% url 'admin_proctoring_incidents' %}" data-tooltip="Incidents" class="nav-item {% if request.resolver_match.url_name == 'admin_proctoring_incidents' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="alert-triangle" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Incidents</span>
                         </a>
 
-                        <div class="nav-section-title">Reports & Settings</div>
-                        <a href="{% url 'admin_results_export' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_results_export' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📥</span>
-                            <span class="nav-item__label">Reports & Exports</span>
+                        <div class="nav-section-title">Settings & Tools</div>
+                        <a href="{% url 'admin_results_export' %}" data-tooltip="Reports & Export" class="nav-item {% if request.resolver_match.url_name == 'admin_results_export' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="download" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Reports & Export</span>
                         </a>
-                        <a href="{% url 'import_students' %}" class="nav-item {% if request.resolver_match.url_name == 'import_students' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📊</span>
+                        <a href="{% url 'import_students' %}" data-tooltip="Excel Import" class="nav-item {% if request.resolver_match.url_name == 'import_students' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="file-spreadsheet" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Excel Import</span>
                         </a>
-                        <a href="{% url 'admin_policies' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_policies' %}is-active{% endif %}">
-                            <span class="nav-item__icon">📜</span>
-                            <span class="nav-item__label">Platform Policies</span>
+                        <a href="{% url 'admin_policies' %}" data-tooltip="Exam Policies" class="nav-item {% if request.resolver_match.url_name == 'admin_policies' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="sliders" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Exam Policies</span>
                         </a>
-                        <a href="{% url 'admin_backup' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_backup' %}is-active{% endif %}">
-                            <span class="nav-item__icon">💾</span>
+                        <a href="{% url 'admin_backup' %}" data-tooltip="Backup & Health" class="nav-item {% if request.resolver_match.url_name == 'admin_backup' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="hard-drive" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Backup & Health</span>
                         </a>
-                        <a href="{% url 'admin_security' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_security' %}is-active{% endif %}">
-                            <span class="nav-item__icon">🔒</span>
-                            <span class="nav-item__label">System Security</span>
+                        <a href="{% url 'admin_security' %}" data-tooltip="Security" class="nav-item {% if request.resolver_match.url_name == 'admin_security' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="lock" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Security</span>
                         </a>
-                        <a href="/admin/" target="_blank" class="nav-item">
-                            <span class="nav-item__icon">⚙️</span>
-                            <span class="nav-item__label">Django Admin ↗</span>
+                        <a href="/admin/" target="_blank" data-tooltip="Django Admin" class="nav-item">
+                            <span class="nav-item__icon"><i data-lucide="external-link" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Django Admin</span>
                         </a>
                     {% endif %}
 
-                    <!-- Shared System Section -->
-                    <div class="nav-section-title">Security & Account</div>
-                    <a href="{% url 'user_profile' %}" class="nav-item {% if request.resolver_match.url_name == 'user_profile' %}is-active{% endif %}">
-                        <span class="nav-item__icon">👤</span>
+                    <!-- Shared Account Section -->
+                    <div class="nav-section-title">Account</div>
+                    <a href="{% url 'user_profile' %}" data-tooltip="My Profile" class="nav-item {% if request.resolver_match.url_name == 'user_profile' %}is-active{% endif %}">
+                        <span class="nav-item__icon"><i data-lucide="user" class="lucide-icon"></i></span>
                         <span class="nav-item__label">My Profile</span>
                     </a>
-                    <a href="{% url 'change_password' %}" class="nav-item {% if request.resolver_match.url_name == 'change_password' %}is-active{% endif %}">
-                        <span class="nav-item__icon">🔑</span>
+                    <a href="{% url 'change_password' %}" data-tooltip="Change Password" class="nav-item {% if request.resolver_match.url_name == 'change_password' %}is-active{% endif %}">
+                        <span class="nav-item__icon"><i data-lucide="key" class="lucide-icon"></i></span>
                         <span class="nav-item__label">Change Password</span>
                     </a>
                 </nav>
@@ -221,39 +236,44 @@
                     <div class="user-avatar-circle">
                         {{ request.user.username|slice:":1"|upper }}
                     </div>
-                    <div class="user-info-text" style="flex: 1 1 auto; overflow: hidden; font-size: 0.85rem;">
-                        <div style="font-weight: 700; color: var(--eps-text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                    <div class="user-info-text" style="flex: 1 1 auto; overflow: hidden;">
+                        <div style="font-weight: 600; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-size: var(--font-size-sm);">
                             {{ request.user.get_full_name|default:request.user.username }}
                         </div>
-                        <div style="color: var(--eps-text-muted); font-size: 0.75rem;">
+                        <div style="color: var(--text-muted); font-size: var(--font-size-xs);">
                             {{ request.user.role|title }}
                         </div>
                     </div>
-                    <a href="{% url 'user_logout' %}" title="Log Out" style="color: var(--eps-danger); font-size: 1.1rem; padding: 4px;">
-                        🚪
+                    <a href="{% url 'user_logout' %}" title="Log Out" class="btn btn-ghost btn-xs" aria-label="Log out">
+                        <i data-lucide="log-out" class="lucide-icon" style="color: var(--danger);"></i>
                     </a>
                 </div>
             </aside>
 
-            <!-- Main Workspace Container -->
+            <!-- Main Content Area -->
             <div class="app-main">
-                <!-- Top Authenticated Utility Header -->
+                <!-- Header -->
                 <header class="app-header">
                     <div class="app-header__left">
-                        <button type="button" id="mobile-menu-toggle" style="background: none; border: none; font-size: 1.35rem; cursor: pointer; color: var(--eps-text-primary); display: none;">
-                            ☰
+                        <button type="button" id="mobile-menu-toggle" class="btn btn-ghost btn-sm" style="display: none;" aria-label="Open menu">
+                            <i data-lucide="menu" class="lucide-icon"></i>
                         </button>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--eps-text-secondary);">
-                            <span style="font-weight: 700; color: var(--eps-sage-primary);">EPS</span>
-                            <span>&bull;</span>
-                            <span>Institutional Proctoring System</span>
+                        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); color: var(--text-secondary);">
+                            <span style="font-weight: 700; color: var(--text-primary);">EPS</span>
+                            <span>/</span>
+                            <span>School Portal</span>
                         </div>
                     </div>
 
                     <div class="app-header__right">
-                        <!-- Unread In-App Notification Bell -->
-                        <a href="{% url 'notifications_list' %}" class="notification-bell-btn" title="View In-App Notifications">
-                            🔔
+                        <!-- Theme Toggle Button -->
+                        <button type="button" class="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                            <i data-lucide="sun-moon" class="lucide-icon"></i>
+                        </button>
+
+                        <!-- Notification Bell -->
+                        <a href="{% url 'notifications_list' %}" class="notification-bell-btn" title="Notifications" aria-label="Notifications">
+                            <i data-lucide="bell" class="lucide-icon"></i>
                             {% if unread_notification_count and unread_notification_count > 0 %}
                                 <span class="notification-pill-badge">{{ unread_notification_count }}</span>
                             {% endif %}
@@ -261,48 +281,59 @@
 
                         <!-- User Profile Chip -->
                         <div class="user-identity-chip">
-                            <span class="user-avatar-circle" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                            <span class="user-avatar-circle" style="width: 26px; height: 26px; font-size: 11px;">
                                 {{ request.user.username|slice:":1"|upper }}
                             </span>
-                            <span style="font-weight: 600; font-size: 0.88rem; color: var(--eps-text-primary);">
+                            <span style="font-weight: 600; font-size: var(--font-size-sm); color: var(--text-primary);">
                                 {{ request.user.username }}
                             </span>
-                            <span class="bento-badge {% if request.user.role == 'student' %}bento-badge--success{% elif request.user.role == 'teacher' %}bento-badge--mint{% else %}bento-badge--sage{% endif %}">
+                            <span class="badge badge--neutral">
                                 {{ request.user.role|title }}
                             </span>
                         </div>
                     </div>
                 </header>
     {% else %}
-        <!-- ===================================================================
-             PUBLIC / GUEST NAVIGATION: Exactly 1 Login & 1 Register Button
-             =================================================================== -->
+        <!-- Public Guest Header -->
         <header class="public-header">
             <div class="public-header__container">
                 <a href="{% url 'home' %}" class="nav-brand">
-                    <span class="brand-badge">🌿 EPS</span>
-                    <span style="font-size: 1.15rem; font-weight: 800; color: var(--eps-sage-primary);">Exam Proctoring System</span>
+                    <span class="brand-badge">EPS</span>
+                    <span>School Portal</span>
                 </a>
 
-                <nav style="display: flex; align-items: center; gap: 0.75rem;">
-                    <a href="{% url 'home' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Home</a>
-                    <a href="{% url 'register' %}" class="bento-btn bento-btn--outline bento-btn--sm">Register</a>
-                    <a href="{% url 'common_login' %}" class="bento-btn bento-btn--primary bento-btn--sm">Login</a>
+                <nav style="display: flex; align-items: center; gap: var(--space-3);">
+                    <button type="button" class="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                        <i data-lucide="sun-moon" class="lucide-icon"></i>
+                    </button>
+                    <a href="{% url 'home' %}" class="btn btn-ghost btn-sm">Home</a>
+                    <a href="{% url 'register' %}" class="btn btn-secondary btn-sm">Register</a>
+                    <a href="{% url 'common_login' %}" class="btn btn-primary btn-sm">Sign In</a>
                 </nav>
             </div>
         </header>
     {% endif %}
 
-    <!-- Unified Main Page Content Area & Alerts -->
-    <main class="app-content" {% if not request.user.is_authenticated %}style="padding-top: 2rem;"{% endif %}>
+    <!-- Page Content & Alerts -->
+    <main class="app-content" {% if not request.user.is_authenticated %}style="padding-top: var(--space-8);"{% endif %}>
         {% if messages %}
             {% for message in messages %}
-                <div class="bento-alert {% if message.tags == 'error' %}bento-alert--error{% elif message.tags == 'success' %}bento-alert--success{% elif message.tags == 'warning' %}bento-alert--warning{% else %}bento-alert--info{% endif %}">
-                    <div style="display: flex; align-items: center; gap: 0.65rem;">
-                        <span>{% if message.tags == 'error' %}⚠️{% elif message.tags == 'success' %}✓{% else %}ℹ️{% endif %}</span>
+                <div class="alert {% if message.tags == 'error' %}alert--error{% elif message.tags == 'success' %}alert--success{% elif message.tags == 'warning' %}alert--warning{% else %}alert--info{% endif %}">
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        {% if message.tags == 'error' %}
+                            <i data-lucide="alert-circle" class="lucide-icon" style="color: var(--danger);"></i>
+                        {% elif message.tags == 'success' %}
+                            <i data-lucide="check-circle-2" class="lucide-icon" style="color: var(--success);"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i data-lucide="alert-triangle" class="lucide-icon" style="color: var(--warning);"></i>
+                        {% else %}
+                            <i data-lucide="info" class="lucide-icon" style="color: var(--info);"></i>
+                        {% endif %}
                         <span>{{ message }}</span>
                     </div>
-                    <button type="button" class="alert-close-btn" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: inherit;">&times;</button>
+                    <button type="button" class="alert-close-btn" aria-label="Close notification">
+                        <i data-lucide="x" class="lucide-icon icon-sm"></i>
+                    </button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -312,11 +343,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        {% if request.user.is_authenticated %}
-            <p>&copy; 2026 Exam Proctoring System (EPS) &bull; Official Bento Grid Edition &bull; BCA Final-Year Project</p>
-        {% else %}
-            <p>&copy; 2026 Exam Proctoring System (EPS) &bull; Institutional Examination & Proctoring Platform</p>
-        {% endif %}
+        <p>&copy; 2026 EPS School Management & Examination System. All rights reserved.</p>
     </footer>
 
     {% if request.user.is_authenticated %}
@@ -325,6 +352,11 @@
     {% endif %}
 
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

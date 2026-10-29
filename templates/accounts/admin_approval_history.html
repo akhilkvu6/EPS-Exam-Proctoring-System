@@ -1,120 +1,151 @@
 {% extends 'base.html' %}
 
-{% block title %}Approval Decision Ledger - Institutional Administration - EPS{% endblock %}
+{% block title %}Approval History — EPS Administration{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">GOVERNANCE LEDGER</span>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
+
+    <!-- Page Header -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <span class="badge badge--mint">Governance Ledger</span>
+                    <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Historical decisions record</span>
+                </div>
+                <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                    Approval History Ledger
+                </h1>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                    Complete audit trail of all student and faculty registration decisions made by reviewers.
+                </p>
+            </div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_student_approvals' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="user-check" class="lucide-icon icon-sm"></i>
+                    <span>Student Queue</span>
+                </a>
+                <a href="{% url 'admin_teacher_approvals' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="briefcase" class="lucide-icon icon-sm"></i>
+                    <span>Faculty Queue</span>
+                </a>
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
         </div>
-        <h1 class="bento-page-title">Approval Decision History</h1>
-        <p class="bento-page-subtitle">Immutable chronological audit trail of all student and faculty registration decisions made by teachers and administrators.</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_student_approvals' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Student Queue</a>
-        <a href="{% url 'admin_teacher_approvals' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Faculty Queue</a>
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
-
-<!-- Filters -->
-<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-    <form method="GET" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
-        <select name="role" class="bento-select" style="width: auto; min-width: 160px; font-size: 0.88rem;">
-            <option value="">All Roles</option>
-            <option value="student" {% if role == 'student' %}selected{% endif %}>Student Applicants</option>
-            <option value="teacher" {% if role == 'teacher' %}selected{% endif %}>Faculty Applicants</option>
-        </select>
-        <select name="decision" class="bento-select" style="width: auto; min-width: 160px; font-size: 0.88rem;">
-            <option value="">All Decisions</option>
-            <option value="approved" {% if decision == 'approved' %}selected{% endif %}>Approved</option>
-            <option value="rejected" {% if decision == 'rejected' %}selected{% endif %}>Rejected</option>
-        </select>
-        <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm">Filter</button>
-        {% if role or decision %}
-            <a href="{% url 'admin_approval_history' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Clear</a>
-        {% endif %}
-    </form>
-</div>
-
-<!-- Approval History Ledger Table -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <h2 class="bento-card__title">Verification Log Entries</h2>
-        <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of recorded decisions.</p>
     </div>
 
-    {% if page_obj %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Applicant</th>
-                        <th>Role</th>
-                        <th>Reviewer</th>
-                        <th>Decision</th>
-                        <th>Official Institutional Memo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for rec in page_obj %}
+    <!-- Filters -->
+    <div class="card" style="padding: var(--space-5);">
+        <form method="GET" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+            <select name="role" class="form-select" style="width: auto; min-width: 170px;">
+                <option value="">All Roles</option>
+                <option value="student" {% if role == 'student' %}selected{% endif %}>Student Applicants</option>
+                <option value="teacher" {% if role == 'teacher' %}selected{% endif %}>Faculty Applicants</option>
+            </select>
+            <select name="decision" class="form-select" style="width: auto; min-width: 170px;">
+                <option value="">All Decisions</option>
+                <option value="approved" {% if decision == 'approved' %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if decision == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            {% if role or decision %}
+                <a href="{% url 'admin_approval_history' %}" class="btn btn-secondary btn-sm">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Approval History Ledger Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h2 class="card__title">
+                    <i data-lucide="history" class="lucide-icon"></i>
+                    <span>Verification Log Entries</span>
+                </h2>
+                <p class="card__description">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of recorded decisions</p>
+            </div>
+        </div>
+
+        {% if page_obj %}
+            <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                <table class="school-table">
+                    <thead>
                         <tr>
-                            <td style="font-family: monospace; font-size: 0.82rem; white-space: nowrap; color: var(--eps-text-secondary);">
-                                {{ rec.created_at|date:"Y-m-d H:i:s" }}
-                            </td>
-                            <td>
-                                <strong style="color: var(--eps-text-primary);">{{ rec.applicant.get_full_name|default:rec.applicant.username }}</strong>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">{{ rec.applicant.email }}</div>
-                            </td>
-                            <td>
-                                {% if rec.role == 'teacher' %}
-                                    <span class="bento-badge bento-badge--sage">Faculty</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--mint">Student</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if rec.reviewed_by %}
-                                    <strong>{{ rec.reviewed_by.username }}</strong>
-                                {% else %}
-                                    <span style="color: var(--eps-text-muted);">System</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if rec.decision == 'approved' %}
-                                    <span class="bento-badge bento-badge--success">✓ Approved</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--danger">✕ Rejected</span>
-                                {% endif %}
-                            </td>
-                            <td style="font-size: 0.85rem; color: var(--eps-text-secondary);">
-                                {{ rec.reason|default:"—" }}
-                            </td>
+                            <th>Timestamp</th>
+                            <th>Applicant</th>
+                            <th>Role</th>
+                            <th>Reviewer</th>
+                            <th>Decision</th>
+                            <th>Reason / Memo</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for rec in page_obj %}
+                            <tr>
+                                <td style="font-family: var(--font-mono); font-size: var(--font-size-xs); white-space: nowrap; color: var(--text-muted);">
+                                    {{ rec.created_at|date:"Y-m-d H:i:s" }}
+                                </td>
+                                <td>
+                                    <strong style="color: var(--text-primary); font-size: var(--font-size-xs);">{{ rec.applicant.get_full_name|default:rec.applicant.username }}</strong>
+                                    <div style="font-size: var(--font-size-xs); color: var(--text-muted);">{{ rec.applicant.email }}</div>
+                                </td>
+                                <td>
+                                    {% if rec.role == 'teacher' %}
+                                        <span class="badge badge--teacher">Faculty</span>
+                                    {% else %}
+                                        <span class="badge badge--student">Student</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if rec.reviewed_by %}
+                                        <span style="font-weight: 600; font-size: var(--font-size-xs);">{{ rec.reviewed_by.username }}</span>
+                                    {% else %}
+                                        <span style="color: var(--text-muted); font-size: var(--font-size-xs);">System</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if rec.decision == 'approved' %}
+                                        <span class="badge badge--mint">Approved</span>
+                                    {% else %}
+                                        <span class="badge badge--danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+                                    {{ rec.reason|default:"—" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-        {% if page_obj.has_other_pages %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border);">
-                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            {% if page_obj.has_other_pages %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border-subtle); flex-wrap: wrap; gap: var(--space-3);">
+                    <div style="font-size: var(--font-size-xs); color: var(--text-muted);">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+                    <div style="display: flex; gap: var(--space-1);">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="btn btn-secondary btn-xs">&larr; Prev</a>
+                        {% endif %}
+                        <span class="btn btn-primary btn-xs">{{ page_obj.number }}</span>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="btn btn-secondary btn-xs">Next &rarr;</a>
+                        {% endif %}
+                    </div>
                 </div>
-                <div style="display: flex; gap: 0.35rem;">
-                    {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
-                    {% endif %}
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if role %}&role={{ role }}{% endif %}{% if decision %}&decision={{ decision }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
-                    {% endif %}
-                </div>
+            {% endif %}
+        {% else %}
+            <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted);">
+                <i data-lucide="history" class="lucide-icon icon-lg" style="margin-bottom: var(--space-2); opacity: 0.6;"></i>
+                <div style="font-weight: 600; color: var(--text-primary); font-size: var(--font-size-sm);">No Records Found</div>
+                <p style="font-size: var(--font-size-xs); margin: 0;">No approval or rejection events recorded yet.</p>
             </div>
         {% endif %}
-    {% else %}
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No decision records logged.</p>
-    {% endif %}
+    </div>
+
 </div>
 {% endblock %}

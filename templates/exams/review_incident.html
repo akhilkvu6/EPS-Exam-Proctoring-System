@@ -3,42 +3,53 @@
 {% block title %}Review Incident #{{ incident.id }} — EPS Proctoring{% endblock %}
 
 {% block content %}
-<div style="max-width: 860px; margin: 0 auto;">
-    <div class="page-header">
+<div style="max-width: 900px; margin: 0 auto var(--space-12) auto;">
+
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <div style="font-size: 0.85rem; color: var(--eps-text-muted); margin-bottom: 0.25rem;">
-                <a href="{% url 'live_invigilation' exam.id %}" style="color: var(--eps-text-secondary); text-decoration: none;">Live Invigilation</a>
-                &rsaquo; Incident Audit Review
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <a href="{% url 'live_invigilation' exam.id %}" style="color: var(--text-muted); text-decoration: none;">Live Invigilation</a>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Incident Audit Review</span>
             </div>
-            <h1 class="page-title">Proctoring Incident Review #{{ incident.id }}</h1>
-            <p class="page-subtitle">Evaluate candidate telemetry events, record faculty findings, and enforce academic integrity standards.</p>
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+                <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                    Proctoring Incident #{{ incident.id }}
+                </h1>
+                <span class="badge {% if incident.severity == 'high' %}badge-peach{% elif incident.severity == 'medium' %}badge-yellow{% else %}badge-secondary{% endif %}">
+                    {{ incident.get_severity_display }} Severity
+                </span>
+            </div>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+                Evaluate candidate telemetry, record reviewer findings, and enforce examination governance rules.
+            </p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
-            <a href="{% url 'live_invigilation' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm">
-                &larr; Back to Invigilation Room
+        <div>
+            <a href="{% url 'live_invigilation' exam.id %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Invigilation</span>
             </a>
         </div>
     </div>
 
-    <div class="bento-grid bento-grid--3col" style="gap: 1.5rem; align-items: stretch;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start;">
         
-        <!-- Left Column (Wide): Incident Review Evaluation Form -->
-        <div class="bento-card bento-card--wide" style="padding: 2.25rem;">
-            <div class="bento-card__header">
-                <div>
-                    <span class="bento-badge {% if incident.severity == 'high' %}bento-badge--danger{% elif incident.severity == 'medium' %}bento-badge--warning{% else %}bento-badge--mint{% endif %}" style="margin-bottom: 0.35rem;">
-                        {{ incident.get_severity_display }} Severity Telemetry
-                    </span>
-                    <h2 class="bento-card__title">{{ incident.get_event_type_display }}</h2>
-                    <p class="bento-card__subtitle">Event captured at {{ incident.timestamp|date:"H:i:s" }} on {{ incident.timestamp|date:"M d, Y" }}</p>
+        <!-- Left Column (Wide): Incident Evaluation Form -->
+        <div class="card" style="padding: var(--space-6);">
+            <div style="margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-3);">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 4px;">
+                    <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Timestamp: {{ incident.timestamp|date:"M d, H:i:s" }}</span>
                 </div>
-                <span style="font-size: 1.75rem;">⚖️</span>
+                <h2 class="card__title" style="font-size: var(--font-size-lg); margin-top: 2px;">{{ incident.get_event_type_display }}</h2>
             </div>
 
-            <!-- Incident Telemetry Details Strip -->
-            <div style="padding: 1.25rem; background: var(--eps-card-bg-subtle, #f7f9f7); border-radius: 8px; border: 1px solid var(--eps-border-subtle); margin-bottom: 1.5rem;">
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; margin-bottom: 0.3rem;">Raw Client Event Details:</div>
-                <div style="font-size: 0.9rem; color: var(--eps-text-primary); line-height: 1.5;">
+            <!-- Incident Raw Details Card -->
+            <div class="card card--alert" style="padding: var(--space-4); margin-bottom: var(--space-5);">
+                <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-yellow-text); font-weight: 700; margin-bottom: 2px;">
+                    Automated Event Telemetry:
+                </div>
+                <div style="font-size: var(--font-size-xs); color: var(--pastel-yellow-text); line-height: 1.5;">
                     {{ incident.details|default:"Automated browser proctoring telemetry signal." }}
                 </div>
             </div>
@@ -47,99 +58,106 @@
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ request.GET.next }}">
 
-                <div class="bento-form-group" style="margin-bottom: 1.5rem;">
-                    <label class="bento-form-label" style="margin-bottom: 0.5rem;">Invigilation Assessment Outcome *</label>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--eps-border-subtle); cursor: pointer; background: {% if incident.review_status == 'reviewed' %}rgba(45, 90, 39, 0.08){% else %}transparent{% endif %};">
-                            <input type="radio" name="review_status" value="reviewed" {% if incident.review_status == 'reviewed' %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--eps-primary);">
+                <div class="form-group" style="margin-bottom: var(--space-5);">
+                    <label class="form-label" style="font-size: var(--font-size-xs); margin-bottom: var(--space-2);">Invigilation Assessment Outcome *</label>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                        <label style="display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-card); border: 1px solid var(--border-subtle); cursor: pointer; background: var(--bg-subtle);">
+                            <input type="radio" name="review_status" value="reviewed" {% if incident.review_status == 'reviewed' %}checked{% endif %} style="margin-top: 3px; cursor: pointer; accent-color: var(--text-primary);">
                             <div>
-                                <strong style="color: var(--eps-success, #2D5A27);">Reviewed - Cleared (False Positive / Permitted)</strong>
-                                <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.15rem;">Incident investigated and deemed non-malicious (e.g., brief lighting flicker or browser repaint).</div>
+                                <strong style="color: var(--text-primary); font-size: var(--font-size-sm); display: block;">Reviewed - Cleared (False Positive / Permitted)</strong>
+                                <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4; display: block; margin-top: 2px;">Incident investigated and verified non-malicious (e.g. lighting shift or browser repaint).</span>
                             </div>
                         </label>
 
-                        <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--eps-border-subtle); cursor: pointer; background: {% if incident.review_status == 'inconclusive' %}rgba(220, 150, 40, 0.08){% else %}transparent{% endif %};">
-                            <input type="radio" name="review_status" value="inconclusive" {% if incident.review_status == 'inconclusive' %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--eps-warning, #d97706);">
+                        <label style="display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-card); border: 1px solid var(--border-subtle); cursor: pointer; background: var(--bg-subtle);">
+                            <input type="radio" name="review_status" value="inconclusive" {% if incident.review_status == 'inconclusive' %}checked{% endif %} style="margin-top: 3px; cursor: pointer; accent-color: var(--text-primary);">
                             <div>
-                                <strong style="color: #b45309;">Inconclusive (Under Active Monitoring)</strong>
-                                <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.15rem;">Ambiguous telemetry; cross-reference with subsequent test segments or audio spikes.</div>
+                                <strong style="color: var(--text-primary); font-size: var(--font-size-sm); display: block;">Inconclusive (Under Active Monitoring)</strong>
+                                <span style="font-size: 11px; color: var(--text-muted); line-height: 1.4; display: block; margin-top: 2px;">Ambiguous telemetry; cross-reference with subsequent test segments or audio spikes.</span>
                             </div>
                         </label>
 
-                        <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--eps-border-subtle); cursor: pointer; background: {% if incident.review_status == 'action_required' %}rgba(220, 40, 40, 0.08){% else %}transparent{% endif %};">
-                            <input type="radio" name="review_status" value="action_required" {% if incident.review_status == 'action_required' %}checked{% endif %} style="width: 18px; height: 18px; accent-color: var(--eps-danger, #dc2626);">
+                        <label style="display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-card); border: 1px solid var(--border-subtle); cursor: pointer; background: var(--pastel-peach-bg);">
+                            <input type="radio" name="review_status" value="action_required" {% if incident.review_status == 'action_required' %}checked{% endif %} style="margin-top: 3px; cursor: pointer; accent-color: var(--danger);">
                             <div>
-                                <strong style="color: var(--eps-danger, #dc2626);">Requires Action / Academic Misconduct Follow-up</strong>
-                                <div style="font-size: 0.78rem; color: var(--eps-text-secondary); margin-top: 0.15rem;">Confirmed protocol violation; flag for academic committee inquiry or marks invalidation.</div>
+                                <strong style="color: var(--danger); font-size: var(--font-size-sm); display: block;">Requires Action / Misconduct Follow-up</strong>
+                                <span style="font-size: 11px; color: var(--danger); opacity: 0.9; line-height: 1.4; display: block; margin-top: 2px;">Confirmed integrity protocol breach; flag for inquiry, deduction, or test cancellation.</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <div class="bento-form-group" style="margin-bottom: 1.75rem;">
-                    <label class="bento-form-label" for="review_notes">Faculty Invigilator Findings & Audit Notes</label>
-                    <textarea name="review_notes" id="review_notes" rows="4" class="bento-input" placeholder="Record your review reasoning, timestamp cross-references, or disciplinary notes...">{{ incident.review_notes }}</textarea>
-                    <span class="bento-form-hint">These notes are permanently attached to this examination session's immutable audit trail.</span>
+                <div class="form-group" style="margin-bottom: var(--space-5);">
+                    <label class="form-label" for="review_notes" style="font-size: var(--font-size-xs);">Faculty Findings &amp; Review Notes</label>
+                    <textarea name="review_notes" id="review_notes" rows="4" class="form-control" placeholder="Record reason for outcome..." style="resize: vertical; font-size: var(--font-size-xs); background: #ffffff;">{{ incident.review_notes }}</textarea>
+                    <span class="form-hint">These notes will be attached to the student's exam attempt audit trail.</span>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle);">
-                    <a href="{% url 'live_invigilation' exam.id %}" class="bento-btn bento-btn--outline bento-btn--lg">Cancel</a>
-                    <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
-                        💾 Save Incident Review
+                <div style="display: flex; justify-content: flex-end; gap: var(--space-2); border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+                    <a href="{% url 'live_invigilation' exam.id %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                        <span>Save Incident Review</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Right Column: Candidate & Examination Context -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- Right Column: Candidate & Exam Context -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-5);">
             
             <!-- Candidate Information Card -->
-            <div class="bento-card bento-card--mint-subtle">
-                <div class="bento-card__header" style="margin-bottom: 0.5rem;">
-                    <span class="bento-badge bento-badge--mint">Candidate Dossier</span>
-                    <span style="font-size: 1.35rem;">👤</span>
-                </div>
-                <div style="font-weight: 800; font-size: 1.15rem; color: var(--eps-text-primary);">
+            <div class="card card--student" style="padding: var(--space-5);">
+                <span class="badge badge-blue" style="margin-bottom: var(--space-2);">Candidate Dossier</span>
+                <div style="font-weight: 800; font-size: var(--font-size-md); color: var(--text-primary); margin-top: 2px;">
                     {{ incident.attempt.student.student_profile.full_name|default:incident.attempt.student.username }}
                 </div>
-                <div style="font-size: 0.85rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">
+                <div style="font-size: var(--font-size-xs); color: var(--pastel-blue-text); margin-top: 2px;">
                     Roll Number: <strong>{{ incident.attempt.student.student_profile.roll_number }}</strong>
                 </div>
-                <div style="font-size: 0.82rem; color: var(--eps-text-secondary); margin-top: 0.2rem;">
+                <div style="font-size: var(--font-size-xs); color: var(--pastel-blue-text); margin-top: 2px;">
                     Department: {{ incident.attempt.student.student_profile.department }}
                 </div>
 
-                <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(0,0,0,0.06); font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.35rem;">
-                    <div>Attempt Number: <strong>#{{ incident.attempt.attempt_number }}</strong></div>
-                    <div>Attempt Status: <strong>{{ incident.attempt.get_status_display }}</strong></div>
-                    <div>Total Incidents Logged: <strong>{{ incident.attempt.proctoring_incidents.count }}</strong></div>
-                    <div>Flagged by System: <strong>{% if incident.attempt.proctoring_flagged %}Yes (Exceeded Warnings){% else %}No{% endif %}</strong></div>
+                <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed rgba(0,0,0,0.1); font-size: var(--font-size-xs); display: flex; flex-direction: column; gap: var(--space-2);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--pastel-blue-text); opacity: 0.8;">Attempt:</span>
+                        <strong style="color: var(--text-primary);">#{{ incident.attempt.attempt_number }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--pastel-blue-text); opacity: 0.8;">State:</span>
+                        <strong style="color: var(--text-primary);">{{ incident.attempt.get_status_display }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--pastel-blue-text); opacity: 0.8;">Incidents:</span>
+                        <strong style="color: var(--text-primary);">{{ incident.attempt.proctoring_incidents.count }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--pastel-blue-text); opacity: 0.8;">Flagged:</span>
+                        <strong style="color: var(--danger);">{% if incident.attempt.proctoring_flagged %}Yes{% else %}No{% endif %}</strong>
+                    </div>
                 </div>
             </div>
 
             <!-- Examination Details Card -->
-            <div class="bento-card">
-                <div class="bento-card__header">
-                    <div>
-                        <h3 class="bento-card__title" style="font-size: 1rem;">Examination Context</h3>
-                        <p class="bento-card__subtitle" style="font-size: 0.8rem;">Course & session</p>
-                    </div>
-                    <span style="font-size: 1.3rem;">📋</span>
-                </div>
-                <div style="font-size: 0.85rem; color: var(--eps-text-secondary); line-height: 1.45;">
-                    <p style="margin-bottom: 0.35rem;"><strong>{{ exam.title }}</strong></p>
-                    <p style="margin-bottom: 0.35rem;">Subject: {{ exam.subject.code }} &bull; {{ exam.subject.name }}</p>
-                    <p style="margin-bottom: 0.35rem;">Duration: {{ exam.duration_minutes }} minutes</p>
-                    <p style="margin-bottom: 0;">Integrity Protocol: {{ exam.get_camera_required_display }}</p>
+            <div class="card" style="padding: var(--space-5);">
+                <h2 class="card__title" style="font-size: var(--font-size-sm); margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="book-open" class="lucide-icon icon-xs"></i>
+                    <span>Exam Context</span>
+                </h2>
+                <div style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5;">
+                    <div style="margin-bottom: 4px;"><strong style="color: var(--text-primary);">{{ exam.title }}</strong></div>
+                    <div style="margin-bottom: 4px;">{{ exam.subject.code }} &bull; {{ exam.subject.name }}</div>
+                    <div style="margin-bottom: 4px;">Duration: {{ exam.duration_minutes }} minutes</div>
+                    <div>Camera: {{ exam.get_camera_required_display }}</div>
                 </div>
             </div>
 
-            <!-- Audit Trail Metadata -->
+            <!-- Prior Review Metadata -->
             {% if incident.reviewed_by %}
-                <div class="bento-card">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; margin-bottom: 0.25rem;">Prior Review Record</div>
-                    <div style="font-size: 0.85rem; color: var(--eps-text-primary);">
+                <div class="card card--attendance" style="padding: var(--space-4);">
+                    <div style="font-size: 11px; text-transform: uppercase; color: var(--pastel-mint-text); font-weight: 700; margin-bottom: 2px;">Prior Review</div>
+                    <div style="font-size: var(--font-size-xs); color: var(--pastel-mint-text);">
                         Evaluated by <strong>{{ incident.reviewed_by.get_full_name|default:incident.reviewed_by.username }}</strong>
                     </div>
                 </div>

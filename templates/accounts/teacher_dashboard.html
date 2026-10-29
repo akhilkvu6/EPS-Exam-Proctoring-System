@@ -1,307 +1,387 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Faculty Console — EPS{% endblock %}
+{% block title %}Faculty Dashboard — EPS School Portal{% endblock %}
 
 {% block content %}
-<div style="max-width: 1400px; margin: 0 auto;">
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-    <!-- =========================================================================
-         1. FACULTY HEADER & QUICK ACTIONS
-         ========================================================================= -->
-    <div class="bento-page-header">
-        <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-                <span class="bento-badge bento-badge--mint">Faculty Console</span>
-                <span style="font-size: 0.8rem; color: var(--eps-text-muted);">&bull; Academic Term 2024–2026</span>
+    <!-- Faculty Header & Quick Actions -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div class="profile-card__avatar profile-card__avatar--teacher" style="width: 58px; height: 58px; font-size: 20px;">
+                    {{ teacher_profile.full_name|default:request.user.username|slice:":1"|upper }}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1); flex-wrap: wrap;">
+                        <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                            Prof. {{ teacher_profile.full_name|default:request.user.username }}
+                        </h1>
+                        <span class="badge badge--teacher">Faculty</span>
+                        <span class="badge badge--mint">
+                            <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                            <span>Verified</span>
+                        </span>
+                    </div>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: 0;">
+                        Department of {{ teacher_profile.department|default:"General Academics" }} &bull; Staff ID: {{ teacher_profile.employee_id|default:"FAC-00" }}
+                    </p>
+                </div>
             </div>
-            <h1 class="bento-page-title">
-                Prof. {{ teacher_profile.full_name|default:request.user.username }}
-            </h1>
-            <p class="bento-page-subtitle">
-                Department of {{ teacher_profile.department }} &bull; Institutional Examination Authority
-            </p>
-        </div>
 
-        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-            <a href="{% url 'teacher_students' %}" class="bento-btn bento-btn--outline">
-                <span>👥</span>
-                <span>My Students</span>
-            </a>
-            <a href="{% url 'question_bank' %}" class="bento-btn bento-btn--outline">
-                <span>📚</span>
-                <span>Question Bank</span>
-            </a>
-            <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary">
-                <span>+ Create Examination</span>
-            </a>
+            <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'teacher_students' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="users" class="lucide-icon icon-sm"></i>
+                    <span>My Students</span>
+                </a>
+                <a href="{% url 'question_bank' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="help-circle" class="lucide-icon icon-sm"></i>
+                    <span>Question Bank</span>
+                </a>
+                <a href="{% url 'create_exam' %}" class="btn btn-primary btn-sm">
+                    <i data-lucide="plus" class="lucide-icon icon-sm"></i>
+                    <span>Create Exam</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- =========================================================================
-         2. FOUR BENTO METRIC STAT CARDS
-         ========================================================================= -->
-    <div class="bento-grid">
-        <!-- Card 1: Active Sessions -->
-        <div class="bento-card {% if active_count > 0 %}bento-card--primary{% else %}bento-card--mint{% endif %}" style="justify-content: space-between;">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value" style="{% if active_count > 0 %}color: #FFFFFF;{% endif %}">{{ active_count }}</div>
-                    <div class="bento-stat__label" style="{% if active_count > 0 %}color: var(--eps-mint);{% endif %}">Active Sessions</div>
-                </div>
-                <div class="bento-stat__icon" style="{% if active_count > 0 %}background: rgba(255,255,255,0.2); color: #FFFFFF;{% endif %}">
-                    ⚡
+    <!-- 4 Pastel Stat Cards -->
+    <div class="grid grid-cols-4">
+        <!-- 1. Active Sessions: Mint Green -->
+        <div class="stat-card card--attendance">
+            <div class="stat-card__top">
+                <span class="stat-card__label">Active Sessions</span>
+                <div class="stat-card__icon">
+                    <i data-lucide="video" class="lucide-icon icon-md"></i>
                 </div>
             </div>
-            <div style="margin-top: 1rem; font-size: 0.8rem; {% if active_count > 0 %}color: rgba(255,255,255,0.9);{% else %}color: var(--eps-text-secondary);{% endif %}">
+            <div class="stat-card__value">{{ active_count }}</div>
+            <div class="stat-card__sub">
                 {% if active_count > 0 %}
-                    Live proctoring telemetry stream active
+                    <span>Live exams running now</span>
                 {% else %}
-                    No active testing window right now
+                    <span>No live tests currently</span>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Card 2: Upcoming Exams -->
-        <div class="bento-card" style="justify-content: space-between;">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value">{{ scheduled_count }}</div>
-                    <div class="bento-stat__label">Upcoming Scheduled</div>
-                </div>
-                <div class="bento-stat__icon">
-                    📅
+        <!-- 2. Upcoming Scheduled: Soft Peach -->
+        <div class="stat-card card--exam">
+            <div class="stat-card__top">
+                <span class="stat-card__label">Upcoming Scheduled</span>
+                <div class="stat-card__icon">
+                    <i data-lucide="calendar" class="lucide-icon icon-md"></i>
                 </div>
             </div>
-            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--eps-text-secondary);">
+            <div class="stat-card__value">{{ scheduled_count }}</div>
+            <div class="stat-card__sub">
                 {% if next_exam %}
-                    Next: {{ next_exam.title|truncatechars:24 }}
+                    <span>Next: {{ next_exam.title|truncatechars:18 }}</span>
                 {% else %}
-                    No upcoming tests scheduled
+                    <span>No upcoming tests</span>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Card 3: Pending Manual Grading -->
-        <div class="bento-card" style="justify-content: space-between;">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value">{{ pending_grading_count }}</div>
-                    <div class="bento-stat__label">Pending Grading</div>
-                </div>
-                <div class="bento-stat__icon">
-                    ✍️
+        <!-- 3. Needs Grading: Pastel Blue -->
+        <div class="stat-card card--student">
+            <div class="stat-card__top">
+                <span class="stat-card__label">Needs Grading</span>
+                <div class="stat-card__icon">
+                    <i data-lucide="edit-3" class="lucide-icon icon-md"></i>
                 </div>
             </div>
-            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--eps-text-secondary);">
-                Descriptive submissions awaiting review
+            <div class="stat-card__value">{{ pending_grading_count }}</div>
+            <div class="stat-card__sub">
+                <span>Submissions awaiting scoring</span>
             </div>
         </div>
 
-        <!-- Card 4: Proctoring Incidents -->
-        <div class="bento-card" style="justify-content: space-between;">
-            <div class="bento-stat">
-                <div>
-                    <div class="bento-stat__value">{{ flagged_incidents_count }}</div>
-                    <div class="bento-stat__label">Incidents to Review</div>
-                </div>
-                <div class="bento-stat__icon" style="{% if flagged_incidents_count > 0 %}background: var(--eps-danger-bg); color: var(--eps-danger);{% endif %}">
-                    ⚠️
+        <!-- 4. Flagged Incidents: Pale Yellow / Alert -->
+        <div class="stat-card card--alert">
+            <div class="stat-card__top">
+                <span class="stat-card__label">Flagged Incidents</span>
+                <div class="stat-card__icon">
+                    <i data-lucide="alert-triangle" class="lucide-icon icon-md"></i>
                 </div>
             </div>
-            <div style="margin-top: 1rem; font-size: 0.8rem;">
+            <div class="stat-card__value" style="{% if flagged_incidents_count > 0 %}color: var(--danger);{% endif %}">
+                {{ flagged_incidents_count }}
+            </div>
+            <div class="stat-card__sub">
                 {% if flagged_incidents_count > 0 %}
-                    <span class="bento-badge bento-badge--danger" style="font-size: 0.72rem;">Action Required</span>
+                    <span>Attention required</span>
                 {% else %}
-                    <span class="bento-badge bento-badge--success" style="font-size: 0.72rem;">Clean Telemetry</span>
+                    <span>All sessions clear</span>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- =========================================================================
-         3. STUDENT REGISTRATION APPROVAL QUEUE (Bento Card)
-         ========================================================================= -->
-    <div class="bento-card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
-        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
-                        Student Registration Verification Queue
-                    </h2>
-                    <span class="bento-badge {% if pending_count > 0 %}bento-badge--warning{% else %}bento-badge--sage{% endif %}">
-                        {{ pending_count }} Pending
-                    </span>
+    <!-- Main Workspace Layout: Tables on Left, Calendar on Right -->
+    <div style="display: grid; grid-template-columns: 2fr 1.15fr; gap: var(--space-6); align-items: start;">
+        
+        <!-- Left: Queues and Examinations -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+            
+            <!-- Student Registration Approval Queue -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="card__header" style="padding: var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <h2 class="card__title">
+                            <i data-lucide="user-check" class="lucide-icon"></i>
+                            <span>Student Registration Approvals</span>
+                        </h2>
+                        <span class="badge {% if pending_count > 0 %}badge--peach{% else %}badge--mint{% endif %}">
+                            {{ pending_count }} Pending
+                        </span>
+                    </div>
+
+                    <a href="{% url 'teacher_student_approvals' %}" class="btn btn-secondary btn-xs">
+                        View All
+                    </a>
                 </div>
-                <span style="font-size: 0.8rem; color: var(--eps-text-secondary);">Candidates in {{ teacher_profile.department }} requesting portal enrollment</span>
-            </div>
 
-            <a href="{% url 'teacher_student_approvals' %}" class="bento-btn bento-btn--outline bento-btn--sm">
-                Full Approval Queue →
-            </a>
-        </div>
-
-        <div class="bento-table-wrapper" style="border: none; border-radius: 0;">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Candidate Name</th>
-                        <th>Roll Number</th>
-                        <th>Semester / Class</th>
-                        <th>Registration Date</th>
-                        <th>Verification Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if pending_students %}
-                        {% for st in pending_students|slice:":5" %}
+                <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                    <table class="school-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div style="font-weight: 700; color: var(--eps-text-primary);">
-                                        {{ st.full_name|default:st.user.username }}
-                                    </div>
-                                    <div style="font-size: 0.78rem; color: var(--eps-text-muted);">
-                                        @{{ st.user.username }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="bento-badge bento-badge--sage" style="font-family: var(--eps-font-mono);">
-                                        {{ st.roll_number }}
-                                    </span>
-                                </td>
-                                <td style="font-size: 0.88rem;">
-                                    Semester {{ st.semester }} &bull; {{ st.class_group.name|default:"General" }}
-                                </td>
-                                <td style="font-size: 0.82rem; color: var(--eps-text-secondary);">
-                                    {{ st.user.date_joined|date:"M d, Y" }}
-                                </td>
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <form method="POST" action="{% url 'review_student' st.user.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="action" value="approve">
-                                            <button type="submit" class="bento-btn bento-btn--mint bento-btn--sm">
-                                                Approve
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{% url 'review_student' st.user.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="action" value="reject">
-                                            <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" style="color: var(--eps-danger); border-color: var(--eps-danger-border);">
-                                                Reject
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th>Student</th>
+                                <th>Roll Number</th>
+                                <th>Class &amp; Semester</th>
+                                <th>Registered</th>
+                                <th>Action</th>
                             </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="5">
-                                <div class="bento-empty-state" style="padding: 2rem 1rem;">
-                                    <div class="bento-empty-state__icon">✓</div>
-                                    <div class="bento-empty-state__title">Queue All Clear</div>
-                                    <p class="bento-empty-state__text" style="margin-bottom: 0;">No student registration requests are currently awaiting departmental approval.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- =========================================================================
-         4. MANAGED EXAMINATIONS ROSTER (Bento Card)
-         ========================================================================= -->
-    <div class="bento-card" style="padding: 0; overflow: hidden; margin-bottom: 2rem;">
-        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--eps-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-                <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--eps-text-primary); margin: 0;">
-                    Departmental Examinations Catalog
-                </h2>
-                <span style="font-size: 0.8rem; color: var(--eps-text-secondary);">Active, scheduled, and past assessments</span>
+                        </thead>
+                        <tbody>
+                            {% if pending_students %}
+                                {% for st in pending_students|slice:":5" %}
+                                    <tr>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                                <div class="profile-card__avatar profile-card__avatar--student" style="width: 32px; height: 32px; font-size: 11px;">
+                                                    {{ st.full_name|default:st.user.username|slice:":1"|upper }}
+                                                </div>
+                                                <div>
+                                                    <div style="font-weight: 600; color: var(--text-primary);">
+                                                        {{ st.full_name|default:st.user.username }}
+                                                    </div>
+                                                    <div style="font-size: var(--font-size-xs); color: var(--text-muted);">
+                                                        @{{ st.user.username }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge--neutral">{{ st.roll_number }}</span>
+                                        </td>
+                                        <td style="font-size: var(--font-size-xs);">
+                                            Semester {{ st.semester }} &bull; {{ st.class_group.name|default:"General" }}
+                                        </td>
+                                        <td style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+                                            {{ st.user.date_joined|date:"M d, Y" }}
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                                <form method="POST" action="{% url 'review_student' st.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <button type="submit" class="btn btn-approve btn-xs">
+                                                        <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                                        <span>Approve</span>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{% url 'review_student' st.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="reject">
+                                                    <button type="submit" class="btn btn-danger-subtle btn-xs">
+                                                        <i data-lucide="x" class="lucide-icon icon-xs"></i>
+                                                        <span>Reject</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: var(--space-6); color: var(--text-muted);">
+                                        <i data-lucide="check-circle" class="lucide-icon icon-md" style="margin-bottom: var(--space-2); color: var(--success);"></i>
+                                        <div>All department students have been reviewed.</div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <a href="{% url 'manage_exams' %}" class="bento-btn bento-btn--outline bento-btn--sm">
-                Manage All Exams →
-            </a>
-        </div>
+            <!-- Departmental Examinations Catalog -->
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="card__header" style="padding: var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+                    <div>
+                        <h2 class="card__title">
+                            <i data-lucide="clipboard-list" class="lucide-icon"></i>
+                            <span>Department Examinations</span>
+                        </h2>
+                        <p class="card__description">Assessments created for your academic department.</p>
+                    </div>
 
-        <div class="bento-table-wrapper" style="border: none; border-radius: 0;">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Exam Title / Subject</th>
-                        <th>Status</th>
-                        <th>Duration &amp; Marks</th>
-                        <th>Schedule Window</th>
-                        <th>Submissions</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if exams %}
-                        {% for exam in exams|slice:":6" %}
+                    <a href="{% url 'manage_exams' %}" class="btn btn-secondary btn-xs">
+                        Manage Exams
+                    </a>
+                </div>
+
+                <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+                    <table class="school-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <a href="{% url 'exam_detail' exam.id %}" style="font-weight: 700; color: var(--eps-text-primary); text-decoration: none;">
-                                        {{ exam.title }}
-                                    </a>
-                                    <div style="font-size: 0.78rem; color: var(--eps-text-muted);">
-                                        {{ exam.subject.code }} &bull; {{ exam.subject.name }}
-                                    </div>
-                                </td>
-                                <td>
-                                    {% if exam.status == 'published' %}
-                                        <span class="bento-badge bento-badge--success">Published</span>
-                                    {% elif exam.status == 'closed' %}
-                                        <span class="bento-badge bento-badge--sage">Closed</span>
-                                    {% else %}
-                                        <span class="bento-badge bento-badge--warning">Draft</span>
-                                    {% endif %}
-                                </td>
-                                <td style="font-size: 0.88rem;">
-                                    {{ exam.duration_minutes }}m &bull; {{ exam.total_marks }} marks
-                                </td>
-                                <td style="font-size: 0.85rem;">
-                                    <div>{{ exam.start_time|date:"M d, Y" }}</div>
-                                    <div style="font-size: 0.78rem; color: var(--eps-text-muted);">{{ exam.start_time|date:"H:i" }} – {{ exam.end_time|date:"H:i" }}</div>
-                                </td>
-                                <td style="font-size: 0.88rem; font-weight: 600;">
-                                    {{ exam.attempts.count }} attempts
-                                </td>
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        {% if exam.status == 'published' %}
-                                            <a href="{% url 'live_invigilation' exam.id %}" class="bento-btn bento-btn--primary bento-btn--sm" title="Live Invigilation Monitor">
-                                                Invigilate
+                                <th>Exam Title</th>
+                                <th>Status</th>
+                                <th>Schedule</th>
+                                <th>Attempts</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if exams %}
+                                {% for exam in exams|slice:":6" %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'exam_detail' exam.id %}" style="font-weight: 600; color: var(--text-primary);">
+                                                {{ exam.title }}
                                             </a>
-                                        {% endif %}
-                                        <a href="{% url 'teacher_exam_results' exam.id %}" class="bento-btn bento-btn--outline bento-btn--sm" title="Review Results & Grading">
-                                            Results
+                                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">
+                                                {{ exam.subject.code }} &bull; {{ exam.duration_minutes }}m &bull; {{ exam.total_marks }} marks
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if exam.status == 'published' %}
+                                                <span class="badge badge--mint">Published</span>
+                                            {% elif exam.status == 'closed' %}
+                                                <span class="badge badge--neutral">Closed</span>
+                                            {% else %}
+                                                <span class="badge badge--peach">Draft</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="font-size: var(--font-size-xs);">
+                                            <div>{{ exam.start_time|date:"M d, Y" }}</div>
+                                            <div style="color: var(--text-muted);">{{ exam.start_time|date:"H:i" }} – {{ exam.end_time|date:"H:i" }}</div>
+                                        </td>
+                                        <td style="font-size: var(--font-size-xs); font-weight: 600;">
+                                            {{ exam.attempts.count }}
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                                {% if exam.status == 'published' %}
+                                                    <a href="{% url 'live_invigilation' exam.id %}" class="btn btn-primary btn-xs" title="Live Invigilation">
+                                                        <i data-lucide="video" class="lucide-icon icon-xs"></i>
+                                                        <span>Invigilate</span>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'teacher_exam_results' exam.id %}" class="btn btn-secondary btn-xs">
+                                                    <span>Results</span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: var(--space-8); color: var(--text-muted);">
+                                        <i data-lucide="clipboard-list" class="lucide-icon icon-lg" style="margin-bottom: var(--space-2); opacity: 0.6;"></i>
+                                        <div style="margin-bottom: var(--space-3);">No examinations created yet.</div>
+                                        <a href="{% url 'create_exam' %}" class="btn btn-primary btn-sm">
+                                            <i data-lucide="plus" class="lucide-icon icon-xs"></i>
+                                            <span>Create Exam</span>
                                         </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="6">
-                                <div class="bento-empty-state" style="padding: 2.5rem 1rem;">
-                                    <div class="bento-empty-state__icon">📋</div>
-                                    <div class="bento-empty-state__title">No Examinations Created Yet</div>
-                                    <p class="bento-empty-state__text">Get started by creating your first test or configuring your question bank.</p>
-                                    <a href="{% url 'create_exam' %}" class="bento-btn bento-btn--primary bento-btn--sm">
-                                        + Create Exam
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Right: Faculty Calendar & Upcoming Activity -->
+        <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+            
+            <!-- School Calendar Card -->
+            <div class="school-calendar-panel" data-school-calendar data-event-dates="[{% for ex in exams %}{% if ex.status == 'published' %}'{{ ex.start_time|date:'Y-m-d' }}'{% if not forloop.last %},{% endif %}{% endif %}{% endfor %}]">
+                <div class="calendar-header">
+                    <div class="calendar-header__title calendar-month-title">Current Month</div>
+                    <div class="calendar-header__nav">
+                        <button type="button" class="btn btn-ghost btn-xs calendar-prev-btn" aria-label="Previous month">
+                            <i data-lucide="chevron-left" class="lucide-icon icon-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-ghost btn-xs calendar-next-btn" aria-label="Next month">
+                            <i data-lucide="chevron-right" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-grid" style="margin-bottom: var(--space-2);">
+                    <div class="calendar-weekday">Mo</div>
+                    <div class="calendar-weekday">Tu</div>
+                    <div class="calendar-weekday">We</div>
+                    <div class="calendar-weekday">Th</div>
+                    <div class="calendar-weekday">Fr</div>
+                    <div class="calendar-weekday">Sa</div>
+                    <div class="calendar-weekday">Su</div>
+                </div>
+
+                <div class="calendar-grid calendar-days-grid">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-muted);">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--pastel-peach-accent);"></span>
+                        <span>Department Exam</span>
+                    </div>
+                    <span data-selected-date-display style="font-weight: 600; color: var(--text-primary);">Today</span>
+                </div>
+            </div>
+
+            <!-- In-App Notices -->
+            <div class="card" style="padding: var(--space-5);">
+                <div class="card__header" style="margin-bottom: var(--space-3);">
+                    <div>
+                        <h3 class="card__title">
+                            <i data-lucide="bell" class="lucide-icon"></i>
+                            <span>Department Notices</span>
+                        </h3>
+                    </div>
+                    <a href="{% url 'notifications_list' %}" class="btn btn-secondary btn-xs">
+                        All
+                    </a>
+                </div>
+
+                {% if recent_notifications %}
+                    <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                        {% for n in recent_notifications %}
+                            <div class="upcoming-event-item upcoming-event-item--alert" style="padding: var(--space-3);">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600; font-size: var(--font-size-xs); color: var(--text-primary);">{{ n.title }}</div>
+                                    <div style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px;">{{ n.message|truncatechars:70 }}</div>
+                                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">{{ n.created_at|timesince }} ago</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div style="text-align: center; padding: var(--space-4); color: var(--text-muted); font-size: var(--font-size-xs);">
+                        No new notices.
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
     </div>
 
 </div>

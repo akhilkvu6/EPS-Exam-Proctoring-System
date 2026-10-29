@@ -1,161 +1,159 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Institutional Authentication — EPS{% endblock %}
+{% block title %}Sign In — EPS School Management{% endblock %}
 
 {% block content %}
-<div style="max-width: 960px; margin: 2rem auto 3.5rem auto;">
+<div style="max-width: 480px; margin: var(--space-8) auto var(--space-12) auto; padding: 0 var(--space-4);">
     
-    <div class="bento-grid bento-grid--2col" style="gap: 1.75rem; align-items: stretch;">
+    <div class="card" style="padding: var(--space-8); border-radius: var(--radius-card); box-shadow: var(--shadow-sm); border: 1px solid var(--border-subtle); background: #FFFFFF;">
         
-        <!-- Left Feature Bento Card: Institutional Trust & Security -->
-        <div class="bento-card bento-card--primary" style="padding: 2.5rem; justify-content: space-between;">
-            <div>
-                <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.2); padding: 0.35rem 0.85rem; border-radius: var(--eps-radius-full); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1.5rem;">
-                    <span>🌿</span> Official Institutional Portal
-                </div>
-                
-                <h1 style="font-size: 1.85rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; color: #FFFFFF;">
-                    Institutional Single Sign-On
-                </h1>
-                
-                <p style="font-size: 0.95rem; line-height: 1.6; opacity: 0.95; color: #FFFFFF; margin-bottom: 2rem;">
-                    Unified credential access for Students, Faculty, and Institutional Administrators. Enter your verified institutional credentials to continue.
-                </p>
-
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
-                        <div style="font-size: 0.88rem; opacity: 0.95;">
-                            <strong>Role-Based Routing:</strong> Automatic redirection to student, faculty, or executive administrative consoles.
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
-                        <div style="font-size: 0.88rem; opacity: 0.95;">
-                            <strong>Zero-Email Architecture:</strong> All notifications, credential verifications, and approvals are managed 100% in-app.
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
-                        <span style="font-size: 1.15rem; color: var(--eps-mint);">✓</span>
-                        <div style="font-size: 0.88rem; opacity: 0.95;">
-                            <strong>Session Integrity:</strong> Encrypted sessions with HTTP-only cookies and cryptographic CSRF protection.
-                        </div>
-                    </div>
-                </div>
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: var(--space-6);">
+            <div style="width: 48px; height: 48px; border-radius: var(--radius-card); background: var(--text-primary); color: #FFFFFF; font-weight: 800; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--space-3); letter-spacing: 0.05em;">
+                EPS
             </div>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0 0 var(--space-1) 0; letter-spacing: -0.02em;">
+                Welcome Back
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                Sign in with your username, roll number, or institutional ID.
+            </p>
+        </div>
 
-            <div style="padding-top: 1.75rem; margin-top: 2rem; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.82rem; opacity: 0.85;">
-                Protected by Institutional Security &bull; BCA Final-Year Project
+        <!-- Quick Demo Login Accounts Bar -->
+        <div style="margin-bottom: var(--space-5); padding: var(--space-3); background: var(--bg-surface-alt); border: 1px dashed var(--border-subtle); border-radius: var(--radius-card);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; text-align: center; margin-bottom: var(--space-2);">
+                Quick Demo Fill
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2);">
+                <button type="button" 
+                        onclick="fillDemo('student_test_01', 'student123')" 
+                        class="btn btn-ghost btn-xs" 
+                        style="background: var(--pastel-blue); color: var(--pastel-blue-text); border: 1px solid var(--pastel-blue-border); font-size: 11px; font-weight: 700; padding: 6px 4px; justify-content: center;"
+                        title="Auto-fill Student test account">
+                    <i data-lucide="graduation-cap" class="lucide-icon icon-xs"></i>
+                    <span>Student</span>
+                </button>
+
+                <button type="button" 
+                        onclick="fillDemo('teacher_test_01', 'teacher123')" 
+                        class="btn btn-ghost btn-xs" 
+                        style="background: var(--pastel-purple); color: var(--pastel-purple-text); border: 1px solid var(--pastel-purple-border); font-size: 11px; font-weight: 700; padding: 6px 4px; justify-content: center;"
+                        title="Auto-fill Teacher test account">
+                    <i data-lucide="users" class="lucide-icon icon-xs"></i>
+                    <span>Teacher</span>
+                </button>
+
+                <button type="button" 
+                        onclick="fillDemo('admin', 'admin123')" 
+                        class="btn btn-ghost btn-xs" 
+                        style="background: var(--pastel-peach); color: var(--pastel-peach-text); border: 1px solid var(--pastel-peach-border); font-size: 11px; font-weight: 700; padding: 6px 4px; justify-content: center;"
+                        title="Auto-fill Administrator test account">
+                    <i data-lucide="shield" class="lucide-icon icon-xs"></i>
+                    <span>Admin</span>
+                </button>
             </div>
         </div>
 
-        <!-- Right Bento Card: Login Form -->
-        <div class="bento-card" style="padding: 2.25rem; display: flex; flex-direction: column; justify-content: center;">
-            <div style="margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.45rem; font-weight: 700; color: var(--eps-text-primary); margin-bottom: 0.35rem;">
-                    Sign In
-                </h2>
-                <p style="font-size: 0.88rem; color: var(--eps-text-secondary);">
-                    Enter your username or roll number and password
-                </p>
-            </div>
-
-            <!-- Form Non-Field Errors -->
-            {% if form.non_field_errors %}
-                <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span>⚠️</span>
-                        <div>
-                            {% for error in form.non_field_errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        </div>
+        {% if form.non_field_errors %}
+            <div class="alert alert--error" style="margin-bottom: var(--space-4);">
+                <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                    <i data-lucide="alert-circle" class="lucide-icon icon-sm" style="color: var(--danger); margin-top: 2px;"></i>
+                    <div style="font-size: var(--font-size-xs);">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
                     </div>
                 </div>
-            {% endif %}
+            </div>
+        {% endif %}
 
-            <form method="POST" action="{% url 'common_login' %}">
-                {% csrf_token %}
+        <form method="POST" action="{% url 'common_login' %}">
+            {% csrf_token %}
 
-                <!-- Username Field -->
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_username">
-                        Username or Institutional ID <span style="color: var(--eps-danger);">*</span>
-                    </label>
+            <!-- Username Field -->
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="id_username" style="font-size: var(--font-size-xs); font-weight: 600;">
+                    Username or Student Roll Number
+                </label>
+                <div style="position: relative;">
                     <input type="text" 
                            name="username" 
                            id="id_username" 
-                           class="bento-input" 
-                           placeholder="e.g. s_vance, prof_anita, or STU-88241" 
+                           class="form-control" 
+                           placeholder="Enter username or roll number" 
                            value="{{ form.username.value|default:'' }}" 
                            required 
                            autofocus 
-                           autocomplete="username">
-                    {% if form.username.errors %}
-                        <div style="color: var(--eps-danger); font-size: 0.82rem; margin-top: 0.3rem;">
-                            {{ form.username.errors.0 }}
-                        </div>
-                    {% endif %}
+                           autocomplete="username"
+                           style="border-radius: var(--radius-control);">
                 </div>
-
-                <!-- Password Field -->
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_password">
-                        Password <span style="color: var(--eps-danger);">*</span>
-                    </label>
-                    <div style="position: relative;">
-                        <input type="password" 
-                               name="password" 
-                               id="id_password" 
-                               class="bento-input" 
-                               placeholder="••••••••••••" 
-                               required 
-                               autocomplete="current-password"
-                               style="padding-right: 2.75rem;">
-                        <button type="button" 
-                                id="toggle_password_btn" 
-                                title="Toggle password visibility" 
-                                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--eps-text-muted);">
-                            👁️
-                        </button>
+                {% if form.username.errors %}
+                    <div class="form-error" style="font-size: 11px; color: var(--danger); margin-top: 4px;">
+                        {{ form.username.errors.0 }}
                     </div>
-                    {% if form.password.errors %}
-                        <div style="color: var(--eps-danger); font-size: 0.82rem; margin-top: 0.3rem;">
-                            {{ form.password.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
+                {% endif %}
+            </div>
 
-                <!-- Remember Device Option -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--eps-text-secondary); cursor: pointer;">
-                        <input type="checkbox" name="remember_device" id="remember_device" style="accent-color: var(--eps-sage-primary); width: 16px; height: 16px;">
-                        <span>Remember my session on this device</span>
+            <!-- Password Field -->
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-1);">
+                    <label class="form-label" for="id_password" style="font-size: var(--font-size-xs); font-weight: 600; margin-bottom: 0;">
+                        Password
                     </label>
+                    <a href="{% url 'account_status' %}" style="font-size: 11px; color: var(--text-muted); text-decoration: none;">
+                        Pending approval?
+                    </a>
                 </div>
-
-                <!-- Submit Button -->
-                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg" style="width: 100%;">
-                    <span>Sign In to Portal</span>
-                    <span>→</span>
-                </button>
-            </form>
-
-            <!-- Bottom Registration Link -->
-            <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle); text-align: center; font-size: 0.88rem; color: var(--eps-text-secondary);">
-                <span>Don't have an institutional account?</span>
-                <a href="{% url 'register' %}" style="font-weight: 700; color: var(--eps-sage-primary); margin-left: 0.35rem;">
-                    Register here →
-                </a>
+                <div style="position: relative;">
+                    <input type="password" 
+                           name="password" 
+                           id="id_password" 
+                           class="form-control" 
+                           placeholder="Enter your password" 
+                           required 
+                           autocomplete="current-password"
+                           style="padding-right: 2.5rem; border-radius: var(--radius-control);">
+                    <button type="button" 
+                            id="toggle_password_btn" 
+                            onclick="toggleLoginPassword()"
+                            title="Show or hide password" 
+                            aria-label="Show or hide password"
+                            class="btn btn-ghost btn-xs"
+                            style="position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); padding: 4px;">
+                        <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    <div class="form-error" style="font-size: 11px; color: var(--danger); margin-top: 4px;">
+                        {{ form.password.errors.0 }}
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- In-App Support Notice -->
-            <div style="margin-top: 1rem; text-align: center; font-size: 0.78rem; color: var(--eps-text-muted);">
-                🔒 Strictly In-App Authentication &bull; If locked out, contact your department administrator.
+            <!-- Remember Device -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-5);">
+                <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: var(--font-size-xs); color: var(--text-secondary);">
+                    <input type="checkbox" name="remember_device" id="remember_device" style="accent-color: var(--text-primary); width: 16px; height: 16px; border-radius: 4px; cursor: pointer;">
+                    <span>Remember me on this device</span>
+                </label>
             </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px var(--space-4); font-weight: 700; border-radius: var(--radius-control);">
+                <span>Sign In to School Portal</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+            </button>
+        </form>
+
+        <!-- Registration Link -->
+        <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); text-align: center; font-size: var(--font-size-sm); color: var(--text-secondary);">
+            <span>Need a new account?</span>
+            <a href="{% url 'register' %}" style="font-weight: 700; color: var(--text-primary); margin-left: var(--space-1); text-decoration: none;">
+                Create Account
+            </a>
         </div>
-
     </div>
 
 </div>
@@ -163,16 +161,26 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var toggleBtn = document.getElementById('toggle_password_btn');
+    function fillDemo(username, password) {
+        var u = document.getElementById('id_username');
+        var p = document.getElementById('id_password');
+        if (u) u.value = username;
+        if (p) p.value = password;
+        if (p) p.focus();
+    }
+
+    function toggleLoginPassword() {
         var passInput = document.getElementById('id_password');
-        if (toggleBtn && passInput) {
-            toggleBtn.addEventListener('click', function() {
-                var isPassword = passInput.getAttribute('type') === 'password';
-                passInput.setAttribute('type', isPassword ? 'text' : 'password');
-                toggleBtn.textContent = isPassword ? '🔒' : '👁️';
-            });
+        var btn = document.getElementById('toggle_password_btn');
+        if (!passInput || !btn) return;
+        var isPass = passInput.getAttribute('type') === 'password';
+        passInput.setAttribute('type', isPass ? 'text' : 'password');
+        btn.innerHTML = isPass 
+            ? '<i data-lucide="eye-off" class="lucide-icon icon-sm"></i>' 
+            : '<i data-lucide="eye" class="lucide-icon icon-sm"></i>';
+        if (window.lucide) {
+            window.lucide.createIcons();
         }
-    });
+    }
 </script>
 {% endblock %}

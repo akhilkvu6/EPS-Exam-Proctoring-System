@@ -929,3 +929,300 @@ class ProfileAndTeacherRosterTests(TestCase):
         self.assertTrue(AuditLog.objects.filter(action='STUDENT_CLASS_ASSIGNED').exists())
 
 
+class SecurityRemediationStage1Tests(TestCase):
+    """
+    Regression tests verifying Stage 1 Security Remediation:
+    - SEC-03: Teacher cannot change their own department via profile
+    - SEC-02: Strict department scoping for student approvals
+    - SEC-01 & SEC-14: Production configuration hardening (Secret Key, Allowed Hosts, Cookies, HSTS)
+    """
+
+    def setUp(self):
+        self.client = Client()
+
+        # Departments
+        self.dept_cs = Department.objects.create(name='Computer Science', code='CS')
+        self.dept_ce = Department.objects.create(name='Civil Engineering', code='CE')
+
+        # Class groups
+        self.cls_cs = ClassGroup.objects.create(department=self.dept_cs, name='CS-1', semester='1')
+        self.cls_ce = ClassGroup.objects.create(department=self.dept_ce, name='CE-1', semester='1')
+
+        # Admin user
+        self.admin_user = User.objects.create_superuser(
+            username='admin_stage1',
+            email='admin_stage1@eps.edu',
+            password='AdminPassword123!',
+            role='admin'
+        )
+
+        # Teacher - Computer Science
+        self.teacher_cs = User.objects.create_user(
+            username='teacher_cs_user',
+            email='teacher_cs@eps.edu',
+            password='TeacherPass123!',
+            role='teacher',
+            first_name='Prof. CS'
+        )
+        self.teacher_cs_profile = TeacherProfile.objects.create(
+            user=self.teacher_cs,
+            employee_id='EMP_CS_01',
+            department='Computer Science',
+            qualification='M.Tech CS',
+            institution='Main Campus',
+            verification_status='approved'
+        )
+
+        # Teacher - Civil Engineering
+        self.teacher_ce = User.objects.create_user(
+            username='teacher_ce_user',
+            email='teacher_ce@eps.edu',
+            password='TeacherPass123!',
+            role='teacher',
+            first_name='Prof. CE'
+        )
+        self.teacher_ce_profile = TeacherProfile.objects.create(
+            user=self.teacher_ce,
+            employee_id='EMP_CE_01',
+            department='Civil Engineering',
+            qualification='M.Tech CE',
+            institution='North Campus',
+            verification_status='approved'
+        )
+
+        # Teacher - No Department Assigned
+        self.teacher_nodept = User.objects.create_user(
+            username='teacher_nodept_user',
+            email='teacher_nodept@eps.edu',
+            password='TeacherPass123!',
+            role='teacher',
+            first_name='Prof. Unassigned'
+        )
+        self.teacher_nodept_profile = TeacherProfile.objects.create(
+            user=self.teacher_nodept,
+            employee_id='EMP_NONE_01',
+            department='',
+            qualification='M.Sc',
+            institution='Main Campus',
+            verification_status='approved'
+        )
+
+        # Student - Pending in CS
+        self.student_cs_user = User.objects.create_user(
+            username='student_cs_applicant',
+            email='student_cs@eps.edu',
+            password='StudentPass123!',
+            role='student',
+            first_name='CS Applicant'
+        )
+        self.student_cs_profile = StudentProfile.objects.create(
+            user=self.student_cs_user,
+            full_name='CS Applicant',
+            roll_number='ROLL_CS_01',
+            department='Computer Science',
+            semester='1',
+            class_group=self.cls_cs,
+            verification_status='pending'
+        )
+
+        # Student - Pending in CE
+        self.student_ce_user = User.objects.create_user(
+            username='student_ce_applicant',
+            email='student_ce@eps.edu',
+            password='StudentPass123!',
+            role='student',
+            first_name='CE Applicant'
+        )
+        self.student_ce_profile = StudentProfile.objects.create(
+            user=self.student_ce_user,
+            full_name='CE Applicant',
+            roll_number='ROLL_CE_01',
+            department='Civil Engineering',
+            semester='1',
+            class_group=self.cls_ce,
+            verification_status='pending'
+        )
+
+    # ---------------------------------------------------------
+    # SEC-03: Teacher Department Self-Edit Prevention Tests
+    # ---------------------------------------------------------
+
+    def test_sec03_teacher_cannot_change_department_via_profile_post(self):
+        """A teacher attempting to submit a department change via POST has it strictly ignored."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.post(reverse('user_profile'), {
+            'full_name': 'Prof. CS Renamed',
+            'email': 'cs_renamed@eps.edu',
+            'department': 'Civil Engineering',  # Tampering attempt
+            'qualification': 'Ph.D CS Advanced',
+            'institution': 'Engineering Block A',
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        self.teacher_cs_profile.refresh_from_db()
+        self.teacher_cs.refresh_from_db()
+
+        # Legitimate profile fields must update
+        self.assertEqual(self.teacher_cs.first_name, 'Prof. CS Renamed')
+        self.assertEqual(self.teacher_cs_profile.qualification, 'Ph.D CS Advanced')
+        self.assertEqual(self.teacher_cs_profile.institution, 'Engineering Block A')
+
+        # Department must remain Computer Science (NOT Civil Engineering)
+        self.assertEqual(self.teacher_cs_profile.department, 'Computer Science')
+
+    def test_sec03_teacher_profile_form_omits_department_input(self):
+        """The profile form UI displays department as read-only and has no input field."""
+        self.client.force_login(self.teacher_cs)
+        resp = self.client.get(reverse('user_profile'))
+        self.assertEqual(resp.status_code, 200)
+
+        # Check department is shown in read-only info, but no input field for department
+        self.assertContains(resp, 'Computer Science')
+        self.assertNotContains(resp, 'name="department"')
+
+    # ---------------------------------------------------------
+    # SEC-02: Cross-Department Student Approval Prevention Tests
+    # ---------------------------------------------------------
+
+    def test_sec02_teacher_cannot_approve_student_from_other_department(self):
+        """Teacher from CS cannot approve a student registered in Civil Engineering."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.post(
+            reverse('review_student', args=[self.student_ce_profile.id]),
+            {'action': 'approve', 'reason': 'Cross-dept unauthorized approve'}
+        )
+        # Must be rejected with HTTP 403 Forbidden
+        self.assertEqual(resp.status_code, 403)
+
+        # Student status must remain pending
+        self.student_ce_profile.refresh_from_db()
+        self.assertEqual(self.student_ce_profile.verification_status, 'pending')
+
+        # No approval record should have been created
+        self.assertFalse(
+            ApprovalRecord.objects.filter(applicant=self.student_ce_user).exists()
+        )
+
+    def test_sec02_teacher_cannot_reject_student_from_other_department(self):
+        """Teacher from CS cannot reject a student registered in Civil Engineering."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.post(
+            reverse('review_student', args=[self.student_ce_profile.id]),
+            {'action': 'reject', 'reason': 'Cross-dept unauthorized reject'}
+        )
+        self.assertEqual(resp.status_code, 403)
+
+        self.student_ce_profile.refresh_from_db()
+        self.assertEqual(self.student_ce_profile.verification_status, 'pending')
+
+    def test_sec02_teacher_cannot_view_other_department_student_review_page(self):
+        """Teacher from CS cannot view student detail/review page of a CE student."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.get(reverse('review_student', args=[self.student_ce_profile.id]))
+        self.assertEqual(resp.status_code, 403)
+
+    def test_sec02_teacher_approval_queue_is_strictly_scoped(self):
+        """Teacher only sees applicants from their own department in the approval queue."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.get(reverse('teacher_student_approvals'))
+        self.assertEqual(resp.status_code, 200)
+
+        # CS student should be present in the queryset / page
+        pending_students = resp.context['pending_students']
+        self.assertIn(self.student_cs_profile, pending_students)
+        self.assertNotIn(self.student_ce_profile, pending_students)
+
+    def test_sec02_teacher_with_no_department_gets_empty_queue(self):
+        """Teacher without an assigned department cannot see any students or approve any."""
+        self.client.force_login(self.teacher_nodept)
+
+        resp = self.client.get(reverse('teacher_student_approvals'))
+        self.assertEqual(resp.status_code, 200)
+
+        pending_students = resp.context['pending_students']
+        self.assertEqual(pending_students.count(), 0)
+
+        # Attempt to approve CS student must fail with 403
+        resp_post = self.client.post(
+            reverse('review_student', args=[self.student_cs_profile.id]),
+            {'action': 'approve'}
+        )
+        self.assertEqual(resp_post.status_code, 403)
+        self.student_cs_profile.refresh_from_db()
+        self.assertEqual(self.student_cs_profile.verification_status, 'pending')
+
+    def test_sec02_legitimate_same_department_approval_succeeds(self):
+        """Teacher in CS can approve pending students in CS."""
+        self.client.force_login(self.teacher_cs)
+
+        resp = self.client.post(
+            reverse('review_student', args=[self.student_cs_profile.id]),
+            {'action': 'approve', 'reason': 'Valid CS student verified'}
+        )
+        self.assertEqual(resp.status_code, 302)
+
+        self.student_cs_profile.refresh_from_db()
+        self.assertEqual(self.student_cs_profile.verification_status, 'approved')
+        self.assertTrue(
+            ApprovalRecord.objects.filter(applicant=self.student_cs_user, decision='approved').exists()
+        )
+
+    def test_sec02_admin_can_approve_any_department_student(self):
+        """Administrator can review and approve students from any department."""
+        self.client.force_login(self.admin_user)
+
+        resp = self.client.post(
+            reverse('admin_review_student', args=[self.student_ce_profile.id]),
+            {'action': 'approve', 'reason': 'Admin approval for CE'}
+        )
+        self.assertEqual(resp.status_code, 302)
+
+        self.student_ce_profile.refresh_from_db()
+        self.assertEqual(self.student_ce_profile.verification_status, 'approved')
+
+    # ---------------------------------------------------------
+    # SEC-01 & SEC-14: Production Configuration Hardening Tests
+    # ---------------------------------------------------------
+
+    def test_sec01_production_rejects_missing_secret_key(self):
+        """Production deployment strictly rejects startup if DJANGO_SECRET_KEY is missing."""
+        import os, subprocess, sys
+        env = os.environ.copy()
+        env['DJANGO_ENV'] = 'production'
+        env.pop('DJANGO_SECRET_KEY', None)
+
+        p = subprocess.run([sys.executable, 'manage.py', 'check'], env=env, capture_output=True, text=True)
+        self.assertNotEqual(p.returncode, 0)
+        self.assertIn('ImproperlyConfigured', p.stderr)
+        self.assertIn('DJANGO_SECRET_KEY', p.stderr)
+
+    def test_sec01_production_rejects_wildcard_allowed_hosts(self):
+        """Production deployment strictly rejects startup if DJANGO_ALLOWED_HOSTS is wildcard *."""
+        import os, subprocess, sys
+        env = os.environ.copy()
+        env['DJANGO_ENV'] = 'production'
+        env['DJANGO_SECRET_KEY'] = 'test-secret-key-that-is-at-least-fifty-characters-long-12345'
+        env['DJANGO_ALLOWED_HOSTS'] = '*'
+
+        p = subprocess.run([sys.executable, 'manage.py', 'check'], env=env, capture_output=True, text=True)
+        self.assertNotEqual(p.returncode, 0)
+        self.assertIn('ImproperlyConfigured', p.stderr)
+        self.assertIn('wildcard', p.stderr.lower())
+
+    def test_sec14_production_deploy_check_passes_with_safe_config(self):
+        """With production settings, manage.py check --deploy passes with 0 issues."""
+        import os, subprocess, sys
+        env = os.environ.copy()
+        env['DJANGO_ENV'] = 'production'
+        env['DJANGO_SECRET_KEY'] = 'test-secret-key-that-is-at-least-fifty-characters-long-12345'
+        env['DJANGO_ALLOWED_HOSTS'] = 'eps.example.edu,portal.eps.example.edu'
+
+        p = subprocess.run([sys.executable, 'manage.py', 'check', '--deploy'], env=env, capture_output=True, text=True)
+        self.assertEqual(p.returncode, 0)
+        self.assertIn('System check identified no issues', p.stdout)
+

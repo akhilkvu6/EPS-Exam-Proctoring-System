@@ -1,103 +1,151 @@
 {% extends 'base.html' %}
 
-{% block title %}Institutional Reports & Data Exports - EPS{% endblock %}
+{% block title %}Institutional Reports & Data Exports — EPS{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">ACCREDITATION & REPORTING</span>
-        </div>
-        <h1 class="bento-page-title">Institutional Reports & Data Export Center</h1>
-        <p class="bento-page-subtitle">Download verified CSV spreadsheets for academic records, accreditation bodies, security audits, and faculty rosters.</p>
-    </div>
-    <div class="bento-page-actions">
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
+<div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<div class="bento-grid bento-grid--2" style="margin-bottom: 2rem; align-items: stretch;">
-    <!-- Export 1: All Examination Results -->
-    <div class="bento-card bento-card--mint" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); flex-wrap: wrap;">
         <div>
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">📊</div>
-            <h3 class="bento-card__title" style="font-size: 1.15rem; margin-bottom: 0.35rem;">Candidate Results Master CSV</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
-                Complete record of all scored examination attempts: candidate roll numbers, names, subject codes, marks obtained, maximum marks, percentage, and passing status.
-            </p>
-            <div style="font-size: 0.8rem; color: var(--eps-text-muted); margin-bottom: 1rem;">
-                Available Scorecards: <strong>{{ total_results }}</strong> records
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2); flex-wrap: wrap;">
+                <span class="bento-badge" style="background: var(--pastel-purple); color: var(--pastel-purple-text); border: 1px solid var(--pastel-purple-border);">
+                    <i data-lucide="file-spreadsheet" class="lucide-icon icon-xs"></i>
+                    <span>Accreditation &amp; Reports</span>
+                </span>
+                <span class="bento-badge bento-badge--neutral">Verified CSV Downloads</span>
             </div>
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-1) 0; letter-spacing: -0.02em;">
+                Data Export &amp; Reporting Center
+            </h1>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin: 0;">
+                Download complete spreadsheets for official records, external auditors, and administrative reviews.
+            </p>
         </div>
-        <a href="{% url 'admin_results_export' %}?report=results" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%; text-align: center;">
-            📥 Download Results CSV
-        </a>
+
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn-secondary bento-btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Admin Overview</span>
+            </a>
+        </div>
     </div>
 
-    <!-- Export 2: Student Directory -->
-    <div class="bento-card bento-card--sage" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🎓</div>
-            <h3 class="bento-card__title" style="font-size: 1.15rem; margin-bottom: 0.35rem;">Student Enrollment Directory CSV</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
-                Full roster of registered candidates: roll numbers, names, usernames, verified emails, academic departments, semester levels, and verification status.
-            </p>
-            <div style="font-size: 0.8rem; color: var(--eps-text-muted); margin-bottom: 1rem;">
-                Registered Students: <strong>{{ total_students }}</strong> records
+    <!-- 4 Pastel Export Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-5);">
+        
+        <!-- Export 1: Results CSV (Soft Peach) -->
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-card); background: var(--pastel-peach); color: var(--pastel-peach-text); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);">
+                    <i data-lucide="award" class="lucide-icon icon-md"></i>
+                </div>
+                <h2 style="font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-2) 0;">
+                    Exam Results Master CSV
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--space-4) 0;">
+                    Complete record of student exam scores, roll numbers, candidate names, subject codes, percentages, and pass/fail status.
+                </p>
+                <div class="bento-badge bento-badge--neutral" style="margin-bottom: var(--space-4);">
+                    {{ total_results }} Available Scorecards
+                </div>
             </div>
+            <a href="{% url 'admin_results_export' %}?report=results" class="bento-btn bento-btn-primary bento-btn-sm" style="width: 100%; justify-content: center; background: var(--text-primary); color: #FFFFFF;">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Results CSV</span>
+            </a>
         </div>
-        <a href="{% url 'admin_results_export' %}?report=students" class="bento-btn bento-btn--primary bento-btn--sm" style="width: 100%; text-align: center;">
-            📥 Download Student Directory CSV
-        </a>
-    </div>
 
-    <!-- Export 3: Faculty Roster -->
-    <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">👩‍🏫</div>
-            <h3 class="bento-card__title" style="font-size: 1.15rem; margin-bottom: 0.35rem;">Faculty & Staff Directory CSV</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
-                Verified faculty roster: employee identification numbers, names, departments, qualifications, institutional affiliations, and authorization status.
-            </p>
-            <div style="font-size: 0.8rem; color: var(--eps-text-muted); margin-bottom: 1rem;">
-                Registered Faculty: <strong>{{ total_teachers }}</strong> records
+        <!-- Export 2: Student Directory CSV (Pastel Blue) -->
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-card); background: var(--pastel-blue); color: var(--pastel-blue-text); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);">
+                    <i data-lucide="users" class="lucide-icon icon-md"></i>
+                </div>
+                <h2 style="font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-2) 0;">
+                    Student Directory CSV
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--space-4) 0;">
+                    Full roster of registered students including university roll numbers, full names, verified emails, departments, and semesters.
+                </p>
+                <div class="bento-badge bento-badge--neutral" style="margin-bottom: var(--space-4);">
+                    {{ total_students }} Enrolled Students
+                </div>
             </div>
+            <a href="{% url 'admin_results_export' %}?report=students" class="bento-btn bento-btn-secondary bento-btn-sm" style="width: 100%; justify-content: center;">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Student Directory CSV</span>
+            </a>
         </div>
-        <a href="{% url 'admin_results_export' %}?report=teachers" class="bento-btn bento-btn--outline bento-btn--sm" style="width: 100%; text-align: center;">
-            📥 Download Faculty Roster CSV
-        </a>
-    </div>
 
-    <!-- Export 4: Proctoring Incidents -->
-    <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🚨</div>
-            <h3 class="bento-card__title" style="font-size: 1.15rem; margin-bottom: 0.35rem;">Proctoring Telemetry Evidence CSV</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); line-height: 1.5; margin-bottom: 1rem;">
-                Detailed forensic logs: timestamps, candidate usernames, examination titles, violation categories, severity ratings, and detection metadata.
-            </p>
-            <div style="font-size: 0.8rem; color: var(--eps-text-muted); margin-bottom: 1rem;">
-                Audit Records: Real-time Incident Database
+        <!-- Export 3: Faculty Roster CSV (Soft Lavender) -->
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-card); background: var(--pastel-purple); color: var(--pastel-purple-text); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);">
+                    <i data-lucide="graduation-cap" class="lucide-icon icon-md"></i>
+                </div>
+                <h2 style="font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-2) 0;">
+                    Faculty &amp; Staff Directory CSV
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--space-4) 0;">
+                    Official faculty roster containing teacher identification numbers, employee names, departments, qualifications, and account status.
+                </p>
+                <div class="bento-badge bento-badge--neutral" style="margin-bottom: var(--space-4);">
+                    {{ total_teachers }} Faculty Members
+                </div>
             </div>
+            <a href="{% url 'admin_results_export' %}?report=teachers" class="bento-btn bento-btn-secondary bento-btn-sm" style="width: 100%; justify-content: center;">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Faculty Roster CSV</span>
+            </a>
         </div>
-        <a href="{% url 'admin_results_export' %}?report=incidents" class="bento-btn bento-btn--outline bento-btn--sm" style="width: 100%; text-align: center;">
-            📥 Download Incidents CSV
-        </a>
-    </div>
-</div>
 
-<!-- Export 5: Security Audit Ledger -->
-<div class="bento-card bento-card--mint">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">Security & Operations Ledger (AuditLog)</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin: 0;">
-                Export the complete, tamper-evident security audit trail including timestamps, actors, targets, IP addresses, and event descriptions.
-            </p>
+        <!-- Export 4: Proctoring Incidents CSV (Mint Green) -->
+        <div class="bento-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="width: 44px; height: 44px; border-radius: var(--radius-card); background: var(--pastel-green); color: var(--pastel-green-text); display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-4);">
+                    <i data-lucide="shield-alert" class="lucide-icon icon-md"></i>
+                </div>
+                <h2 style="font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-2) 0;">
+                    Proctoring Incidents CSV
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--space-4) 0;">
+                    Itemized AI proctoring flag logs with event timestamps, examinee usernames, violation types, and severity levels.
+                </p>
+                <div class="bento-badge bento-badge--neutral" style="margin-bottom: var(--space-4);">
+                    Forensic Incident Archive
+                </div>
+            </div>
+            <a href="{% url 'admin_results_export' %}?report=incidents" class="bento-btn bento-btn-secondary bento-btn-sm" style="width: 100%; justify-content: center;">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Incidents CSV</span>
+            </a>
         </div>
-        <a href="{% url 'admin_results_export' %}?report=audit" class="bento-btn bento-btn--primary bento-btn--sm">
-            📥 Download Full Audit Log CSV
-        </a>
+
     </div>
+
+    <!-- Export 5: Security Audit Ledger Card -->
+    <div class="bento-card" style="padding: var(--space-6);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+            <div style="max-width: 750px;">
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                    <div style="width: 32px; height: 32px; border-radius: var(--radius-card); background: #FAF9F6; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--border-subtle);">
+                        <i data-lucide="lock" class="lucide-icon icon-xs"></i>
+                    </div>
+                    <h2 style="font-size: var(--font-size-base); font-weight: 700; color: var(--text-primary); margin: 0;">
+                        Security &amp; System Audit Ledger (AuditLog)
+                    </h2>
+                </div>
+                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: 0; line-height: 1.5;">
+                    Download the complete, tamper-evident security audit trail including timestamps, users, actions, target objects, and IP addresses.
+                </p>
+            </div>
+            <a href="{% url 'admin_results_export' %}?report=audit" class="bento-btn bento-btn-primary bento-btn-sm" style="background: var(--text-primary); color: #FFFFFF;">
+                <i data-lucide="download" class="lucide-icon icon-sm"></i>
+                <span>Download Audit Log CSV</span>
+            </a>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

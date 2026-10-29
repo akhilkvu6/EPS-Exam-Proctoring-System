@@ -1,0 +1,830 @@
+/* ==========================================================================
+   EPS School Management Platform — Component Library
+   Warm Pastel Functional Cards | Student & Teacher Profiles | Calendar & Schedule
+   ========================================================================== */
+
+/* --- Base Reset & Typography --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-app);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+/* Lucide Icon Alignment */
+.lucide-icon, svg.lucide {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.85px;
+  vertical-align: middle;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.icon-xs { width: 14px; height: 14px; }
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 24px; height: 24px; }
+.icon-xl { width: 32px; height: 32px; }
+
+/* --- Containers & Grids --- */
+.container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 1100px) {
+  .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
+  .container { padding: 0 var(--space-4); }
+}
+
+/* ==========================================================================
+   School Functional Cards & Bento System
+   ========================================================================== */
+
+.card, .bento-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover, .bento-card:hover {
+  border-color: var(--border-default);
+}
+
+.card--interactive:hover, .bento-card--interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--border-strong);
+}
+
+.card--compact, .bento-card--compact {
+  padding: var(--space-4);
+  border-radius: var(--radius);
+}
+
+.card__header, .bento-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.card__title, .bento-card__title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.card__description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* --- Pastel Functional Cards (School Management Palette) --- */
+
+/* 1. Student Cards (Pastel Blue) */
+.card--student, .bento-card--student {
+  background-color: var(--pastel-blue-bg);
+  border-color: var(--pastel-blue-border);
+  color: var(--pastel-blue-text);
+}
+.card--student .card__title, .bento-card--student .bento-card__title {
+  color: var(--pastel-blue-text);
+}
+.card--student:hover, .bento-card--student:hover {
+  border-color: var(--pastel-blue-accent);
+}
+
+/* 2. Teacher Cards (Soft Lavender) */
+.card--teacher, .bento-card--teacher {
+  background-color: var(--pastel-lavender-bg);
+  border-color: var(--pastel-lavender-border);
+  color: var(--pastel-lavender-text);
+}
+.card--teacher .card__title, .bento-card--teacher .bento-card__title {
+  color: var(--pastel-lavender-text);
+}
+.card--teacher:hover, .bento-card--teacher:hover {
+  border-color: var(--pastel-lavender-accent);
+}
+
+/* 3. Attendance Cards & Participation (Mint Green) */
+.card--attendance, .bento-card--attendance {
+  background-color: var(--pastel-mint-bg);
+  border-color: var(--pastel-mint-border);
+  color: var(--pastel-mint-text);
+}
+.card--attendance .card__title, .bento-card--attendance .bento-card__title {
+  color: var(--pastel-mint-text);
+}
+.card--attendance:hover, .bento-card--attendance:hover {
+  border-color: var(--pastel-mint-accent);
+}
+
+/* 4. Assignment & Exam Cards (Soft Peach) */
+.card--exam, .card--assignment, .bento-card--exam {
+  background-color: var(--pastel-peach-bg);
+  border-color: var(--pastel-peach-border);
+  color: var(--pastel-peach-text);
+}
+.card--exam .card__title, .card--assignment .card__title {
+  color: var(--pastel-peach-text);
+}
+.card--exam:hover, .card--assignment:hover {
+  border-color: var(--pastel-peach-accent);
+}
+
+/* 5. Alerts & Upcoming Events (Pale Yellow) */
+.card--alert, .card--event, .bento-card--alert {
+  background-color: var(--pastel-yellow-bg);
+  border-color: var(--pastel-yellow-border);
+  color: var(--pastel-yellow-text);
+}
+.card--alert .card__title, .card--event .card__title {
+  color: var(--pastel-yellow-text);
+}
+.card--alert:hover, .card--event:hover {
+  border-color: var(--pastel-yellow-accent);
+}
+
+/* --- Summary Stat Counter Cards --- */
+.stat-card {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 116px;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stat-card__label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+.stat-card__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+[data-theme="dark"] .stat-card__icon {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+.stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.stat-card__sub {
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* ==========================================================================
+   Student & Teacher Profile Cards
+   ========================================================================== */
+
+.profile-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--border-default);
+}
+
+.profile-card--student {
+  border-top: 4px solid var(--pastel-blue-accent);
+}
+.profile-card--teacher {
+  border-top: 4px solid var(--pastel-lavender-accent);
+}
+
+.profile-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.profile-card__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--font-size-md);
+  flex-shrink: 0;
+  border: 2px solid #FFFFFF;
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+.profile-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.profile-card__avatar--student {
+  background-color: var(--pastel-blue-bg);
+  color: var(--pastel-blue-text);
+}
+.profile-card__avatar--teacher {
+  background-color: var(--pastel-lavender-bg);
+  color: var(--pastel-lavender-text);
+}
+
+.profile-card__meta {
+  flex: 1;
+  min-width: 0;
+}
+.profile-card__name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-card__id {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.profile-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.profile-card__info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.profile-card__info-row:last-child {
+  border-bottom: none;
+}
+
+.profile-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   School Calendar & Activity Schedule Components
+   ========================================================================== */
+
+.school-calendar-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+.calendar-header__title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.calendar-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.calendar-weekday {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 6px 0;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+.calendar-day:hover {
+  background-color: var(--bg-surface-hover);
+}
+.calendar-day.is-other-month {
+  color: var(--text-muted);
+  opacity: 0.35;
+}
+.calendar-day.is-today {
+  border: 1px solid var(--border-strong);
+  font-weight: 700;
+}
+.calendar-day.is-selected {
+  background-color: var(--text-primary);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+.calendar-day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background-color: var(--pastel-peach-accent);
+}
+.calendar-day.is-selected.has-event::after {
+  background-color: #FFFFFF;
+}
+
+/* Event Timeline Item */
+.upcoming-event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.upcoming-event-item:hover {
+  transform: translateX(2px);
+  border-color: var(--border-default);
+}
+.upcoming-event-item--exam {
+  border-left: 3px solid var(--pastel-peach-accent);
+  background-color: rgba(251, 225, 212, 0.25);
+}
+.upcoming-event-item--alert {
+  border-left: 3px solid var(--pastel-yellow-accent);
+  background-color: rgba(255, 240, 189, 0.25);
+}
+.upcoming-event-item--attendance {
+  border-left: 3px solid var(--pastel-mint-accent);
+  background-color: rgba(217, 242, 228, 0.25);
+}
+
+.event-date-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-subtle);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+.event-date-badge__day {
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   Semantic Buttons (Approvals, Deletions, Routine Actions)
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-control);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  outline: none;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled, .btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sizes */
+.btn-xs {
+  padding: 0.3rem 0.55rem;
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+}
+.btn-sm {
+  padding: 0.45rem 0.75rem;
+  font-size: var(--font-size-xs);
+  border-radius: var(--radius-sm);
+}
+.btn-md {
+  padding: 0.6rem 1.15rem;
+  font-size: var(--font-size-sm);
+}
+.btn-lg {
+  padding: 0.75rem 1.4rem;
+  font-size: var(--font-size-md);
+  border-radius: var(--radius);
+}
+
+/* Variants */
+/* Primary Dark */
+.btn-primary {
+  background-color: var(--text-primary);
+  color: var(--text-inverse);
+  border-color: var(--text-primary);
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Routine Neutral (Default) */
+.btn-secondary, .btn-neutral, .btn-outline {
+  background-color: var(--neutral-btn-bg);
+  color: var(--neutral-btn-text);
+  border-color: var(--neutral-btn-border);
+}
+.btn-secondary:hover, .btn-neutral:hover, .btn-outline:hover {
+  background-color: var(--neutral-btn-hover);
+  border-color: var(--border-strong);
+}
+
+/* Success & Approvals (Green) */
+.btn-success, .btn-approve {
+  background-color: var(--success);
+  color: #FFFFFF;
+  border-color: var(--success);
+}
+.btn-success:hover, .btn-approve:hover {
+  background-color: var(--success-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Success Subtle */
+.btn-success-subtle {
+  background-color: var(--pastel-mint-bg);
+  color: var(--pastel-mint-text);
+  border-color: var(--pastel-mint-border);
+}
+.btn-success-subtle:hover {
+  background-color: var(--pastel-mint-border);
+}
+
+/* Destructive & Deletions (Red) */
+.btn-danger, .btn-delete {
+  background-color: var(--danger);
+  color: #FFFFFF;
+  border-color: var(--danger);
+}
+.btn-danger:hover, .btn-delete:hover {
+  background-color: var(--danger-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Danger Subtle */
+.btn-danger-subtle {
+  background-color: var(--danger-surface);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+.btn-danger-subtle:hover {
+  background-color: var(--danger-border);
+}
+
+/* Ghost */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background-color: var(--bg-subtle);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   Badges, Pills & Status Indicators
+   ========================================================================== */
+
+.badge, .bento-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.badge--blue, .badge--student {
+  background-color: var(--pastel-blue-bg);
+  color: var(--pastel-blue-text);
+  border-color: var(--pastel-blue-border);
+}
+.badge--lavender, .badge--teacher {
+  background-color: var(--pastel-lavender-bg);
+  color: var(--pastel-lavender-text);
+  border-color: var(--pastel-lavender-border);
+}
+.badge--mint, .badge--attendance, .badge--success {
+  background-color: var(--pastel-mint-bg);
+  color: var(--pastel-mint-text);
+  border-color: var(--pastel-mint-border);
+}
+.badge--peach, .badge--exam {
+  background-color: var(--pastel-peach-bg);
+  color: var(--pastel-peach-text);
+  border-color: var(--pastel-peach-border);
+}
+.badge--yellow, .badge--alert, .badge--warning {
+  background-color: var(--pastel-yellow-bg);
+  color: var(--pastel-yellow-text);
+  border-color: var(--pastel-yellow-border);
+}
+.badge--danger {
+  background-color: var(--danger-surface);
+  color: var(--danger-text);
+  border-color: var(--danger-border);
+}
+.badge--neutral {
+  background-color: var(--bg-subtle);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+/* ==========================================================================
+   School Tables & Data Grids
+   ========================================================================== */
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.table, .school-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+
+.table th, .school-table th {
+  padding: 0.75rem 1rem;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background-color: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.table td, .school-table td {
+  padding: 0.85rem 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.table tbody tr, .school-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+.table tbody tr:hover, .school-table tbody tr:hover {
+  background-color: var(--bg-surface-hover);
+}
+.table tbody tr:last-child td, .school-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   Form Controls & Inputs
+   ========================================================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.form-input, .form-select, .form-textarea,
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.form-input:hover, .form-select:hover, .form-textarea:hover,
+input:hover, select:hover, textarea:hover {
+  border-color: var(--border-strong);
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus,
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(28, 25, 23, 0.08);
+}
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] input:focus {
+  box-shadow: 0 0 0 3px rgba(245, 245, 243, 0.15);
+}
+
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Alerts & Notifications
+   ========================================================================== */
+
+.alert, .bento-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-4);
+  border: 1px solid transparent;
+  gap: var(--space-3);
+}
+
+.alert--success {
+  background-color: var(--pastel-mint-bg);
+  border-color: var(--pastel-mint-border);
+  color: var(--pastel-mint-text);
+}
+.alert--error {
+  background-color: var(--danger-surface);
+  border-color: var(--danger-border);
+  color: var(--danger-text);
+}
+.alert--warning {
+  background-color: var(--pastel-yellow-bg);
+  border-color: var(--pastel-yellow-border);
+  color: var(--pastel-yellow-text);
+}
+.alert--info {
+  background-color: var(--pastel-blue-bg);
+  border-color: var(--pastel-blue-border);
+  color: var(--pastel-blue-text);
+}
+
+.alert-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition-fast);
+}
+.alert-close-btn:hover {
+  opacity: 1;
+}

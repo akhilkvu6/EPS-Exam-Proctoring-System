@@ -1,202 +1,269 @@
 {% extends 'base.html' %}
 
-{% block title %}Live Proctoring Fleet - Institutional Administration - EPS{% endblock %}
+{% block title %}Live Proctoring Fleet — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">PROCTORING TELEMETRY</span>
-            <span class="bento-badge bento-badge--warning">Live Fleet Operations</span>
-        </div>
-        <h1 class="bento-page-title">Institutional Proctoring Fleet Overview</h1>
-        <p class="bento-page-subtitle">Real-time surveillance monitoring, active candidate sessions, and high-priority violation alarms.</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_proctoring_incidents' %}" class="bento-btn bento-btn--danger bento-btn--sm">Flagged Incidents Ledger &rarr;</a>
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
-    </div>
-</div>
+<div style="max-width: 1200px; margin: 0 auto var(--space-12) auto;">
 
-<!-- Proctoring KPIs Bento Grid -->
-<div class="bento-grid bento-grid--4" style="margin-bottom: 1.5rem;">
-    <div class="bento-card bento-stat">
-        <div class="bento-stat__icon" style="background: rgba(92, 112, 87, 0.12); color: var(--eps-primary-sage);">📡</div>
+    <!-- Page Header -->
+    <div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
         <div>
-            <div class="bento-stat__value" style="color: var(--eps-primary-sage);">{{ active_attempts.count }}</div>
-            <div class="bento-stat__label">Active Candidate Sessions</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Currently in test room</div>
+            <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+                <span>Administration</span>
+                <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                <span style="color: var(--text-primary); font-weight: 500;">Proctoring Fleet</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+                <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                    Institutional Proctoring Fleet
+                </h1>
+                <span class="badge badge-approved">Live Surveillance Operations</span>
+            </div>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+                Real-time workstation monitoring, active candidate sessions, and high-priority violation alarms.
+            </p>
+        </div>
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+            <a href="{% url 'admin_proctoring_incidents' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="shield-alert" class="lucide-icon icon-sm"></i>
+                <span>Flagged Incidents</span>
+            </a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-ghost btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Dashboard</span>
+            </a>
         </div>
     </div>
 
-    <div class="bento-card bento-stat">
-        <div class="bento-card__icon" style="background: rgba(180, 35, 24, 0.1); color: var(--eps-status-danger);">🚨</div>
-        <div>
-            <div class="bento-stat__value" style="color: var(--eps-status-danger);">{{ flagged_attempts.count }}</div>
-            <div class="bento-stat__label">Flagged Sessions</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Integrity thresholds breached</div>
+    <!-- KPIs Metric Grid (4 Pastel Stat Cards) -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="card card--attendance" style="padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: var(--font-size-xs); color: var(--pastel-mint-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Active Sessions</span>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--pastel-mint-text); margin-top: 4px; line-height: 1;">{{ active_attempts.count }}</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-mint-text); box-shadow: var(--shadow-sm);">
+                    <i data-lucide="radio" class="lucide-icon icon-sm"></i>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-mint-text); opacity: 0.9;">
+                In examination rooms now
+            </div>
+        </div>
+
+        <div class="card card--exam" style="padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: var(--font-size-xs); color: var(--pastel-peach-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Flagged Sessions</span>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--danger); margin-top: 4px; line-height: 1;">{{ flagged_attempts.count }}</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--danger); box-shadow: var(--shadow-sm);">
+                    <i data-lucide="alert-triangle" class="lucide-icon icon-sm"></i>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--danger); font-weight: 600;">
+                Integrity thresholds breached
+            </div>
+        </div>
+
+        <div class="card card--alert" style="padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: var(--font-size-xs); color: var(--pastel-yellow-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">High Violations</span>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--pastel-yellow-text); margin-top: 4px; line-height: 1;">{{ severity_counts.high }}</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--pastel-yellow-text); box-shadow: var(--shadow-sm);">
+                    <i data-lucide="shield-alert" class="lucide-icon icon-sm"></i>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--pastel-yellow-text); opacity: 0.9;">
+                Tab switch, multi-face alerts
+            </div>
+        </div>
+
+        <div class="card" style="padding: var(--space-5); background: var(--bg-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <span style="font-size: var(--font-size-xs); color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Total Incidents</span>
+                    <div style="font-size: 32px; font-weight: 800; color: var(--text-primary); margin-top: 4px; line-height: 1;">{{ severity_counts.total }}</div>
+                </div>
+                <div style="width: 40px; height: 40px; border-radius: var(--radius-full); background: #ffffff; display: flex; align-items: center; justify-content: center; color: var(--text-muted); box-shadow: var(--shadow-sm);">
+                    <i data-lucide="activity" class="lucide-icon icon-sm"></i>
+                </div>
+            </div>
+            <div style="margin-top: var(--space-3); font-size: var(--font-size-xs); color: var(--text-muted);">
+                Automated telemetry logs
+            </div>
         </div>
     </div>
 
-    <div class="bento-card bento-stat">
-        <div class="bento-card__icon" style="background: rgba(247, 144, 9, 0.1); color: var(--eps-status-warning);">⚠️</div>
-        <div>
-            <div class="bento-stat__value" style="color: var(--eps-status-warning);">{{ severity_counts.high }}</div>
-            <div class="bento-stat__label">High Severity Incidents</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Tab switches, dual faces</div>
+    <!-- Active Sessions & Flagged Sessions (2 Cols) -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); margin-bottom: var(--space-6); align-items: start;">
+        
+        <!-- Live Candidate Sessions (In-Progress) -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Live Candidate Sessions</h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Candidates currently connected to examination rooms</p>
+                </div>
+                <span class="badge badge-mint">{{ active_attempts.count }} Active</span>
+            </div>
+
+            {% if active_attempts %}
+                <div class="table-wrapper">
+                    <table class="school-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Exam</th>
+                                <th>Started</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for att in active_attempts %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">{{ att.student.username }}</div>
+                                        {% if att.student.student_profile %}
+                                            <div style="font-size: 11px; color: var(--text-muted);">Roll: {{ att.student.student_profile.roll_number }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--font-size-xs);" title="{{ att.exam.title }}">{{ att.exam.title|truncatechars:24 }}</span>
+                                    </td>
+                                    <td style="color: var(--text-secondary); white-space: nowrap; font-size: var(--font-size-xs);">{{ att.started_at|date:"H:i:s" }}</td>
+                                    <td>
+                                        {% if att.proctoring_flagged %}
+                                            <span class="badge badge-rejected">Flagged</span>
+                                        {% else %}
+                                            <span class="badge badge-approved">Normal</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="padding: var(--space-8); text-align: center; color: var(--text-muted); font-size: var(--font-size-sm);">
+                    No active live exam sessions running at this moment.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Flagged Sessions Awaiting Audit -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px; color: var(--danger);">Flagged Test Sessions</h2>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Sessions where automated violation threshold was exceeded</p>
+                </div>
+                <span class="badge badge-peach">{{ flagged_attempts.count }} Flagged</span>
+            </div>
+
+            {% if flagged_attempts %}
+                <div class="table-wrapper">
+                    <table class="school-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Exam</th>
+                                <th>Session Date</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for att in flagged_attempts %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm);">{{ att.student.username }}</div>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: var(--font-size-xs);" title="{{ att.exam.title }}">{{ att.exam.title|truncatechars:24 }}</span>
+                                    </td>
+                                    <td style="color: var(--text-secondary); white-space: nowrap; font-size: var(--font-size-xs);">{{ att.started_at|date:"M d, Y" }}</td>
+                                    <td style="text-align: right;">
+                                        <a href="{% url 'admin_student_detail' att.student.student_profile.id %}" class="btn btn-secondary btn-xs">
+                                            <span>Inspect</span>
+                                            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="padding: var(--space-8); text-align: center; color: var(--text-muted); font-size: var(--font-size-sm);">
+                    No flagged candidate sessions requiring urgent intervention.
+                </div>
+            {% endif %}
         </div>
     </div>
 
-    <div class="bento-card bento-stat">
-        <div class="bento-card__icon" style="background: rgba(137, 164, 130, 0.15); color: var(--eps-secondary-sage);">📊</div>
-        <div>
-            <div class="bento-stat__value" style="color: var(--eps-secondary-sage);">{{ severity_counts.total }}</div>
-            <div class="bento-stat__label">Total Recorded Events</div>
-            <div class="bento-stat__sub" style="color: var(--eps-text-muted);">Automated detections</div>
-        </div>
-    </div>
-</div>
-
-<div class="bento-grid bento-grid--2" style="margin-bottom: 1.5rem; align-items: start;">
-    <!-- Active In-Progress Sessions -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Live Candidate Sessions (In-Progress)</h3>
-            <p class="bento-card__subtitle">Candidates currently connected to examination rooms.</p>
+    <!-- Recent Incident Telemetry Feed -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Recent Proctoring Incident Feed</h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Live environmental detections captured across candidate workstations</p>
+            </div>
+            <a href="{% url 'admin_proctoring_incidents' %}" class="btn btn-ghost btn-sm">
+                <span>View Full Ledger</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+            </a>
         </div>
 
-        {% if active_attempts %}
-            <div class="bento-table-wrapper">
-                <table class="bento-table" style="font-size: 0.85rem;">
+        {% if recent_incidents %}
+            <div class="table-wrapper">
+                <table class="school-table">
                     <thead>
                         <tr>
+                            <th>Timestamp</th>
                             <th>Candidate</th>
                             <th>Exam</th>
-                            <th>Started</th>
-                            <th>Violations</th>
+                            <th>Category</th>
+                            <th>Severity</th>
+                            <th>Evidence Details</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for att in active_attempts %}
+                        {% for inc in recent_incidents %}
                             <tr>
-                                <td>
-                                    <strong>{{ att.student.username }}</strong>
-                                    {% if att.student.student_profile %}
-                                        <div style="font-size: 0.75rem; color: var(--eps-text-muted);">Roll: {{ att.student.student_profile.roll_number }}</div>
-                                    {% endif %}
+                                <td style="font-family: var(--font-mono); font-size: 11px; white-space: nowrap; color: var(--text-secondary);">
+                                    {{ inc.timestamp|date:"Y-m-d H:i:s" }}
                                 </td>
-                                <td>{{ att.exam.title|truncatechars:25 }}</td>
-                                <td>{{ att.started_at|date:"H:i:s" }}</td>
                                 <td>
-                                    {% if att.proctoring_flagged %}
-                                        <span class="bento-badge bento-badge--danger">FLAGGED</span>
+                                    <span style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-xs);">{{ inc.attempt.student.username }}</span>
+                                </td>
+                                <td style="font-size: var(--font-size-xs);">{{ inc.attempt.exam.title }}</td>
+                                <td>
+                                    <span class="badge badge-secondary" style="font-size: 11px;">{{ inc.get_event_type_display }}</span>
+                                </td>
+                                <td>
+                                    {% if inc.severity == 'high' %}
+                                        <span class="badge badge-peach" style="font-weight: 700;">HIGH</span>
+                                    {% elif inc.severity == 'medium' %}
+                                        <span class="badge badge-yellow" style="font-weight: 700;">MEDIUM</span>
                                     {% else %}
-                                        <span class="bento-badge bento-badge--success">Normal</span>
+                                        <span class="badge badge-secondary">LOW</span>
                                     {% endif %}
                                 </td>
+                                <td style="color: var(--text-secondary); max-width: 320px; font-size: var(--font-size-xs);">{{ inc.details }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         {% else %}
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 1.5rem; text-align: center;">No active live exam sessions running at this moment.</p>
-        {% endif %}
-    </div>
-
-    <!-- Flagged Sessions Awaiting Formal Audit -->
-    <div class="bento-card bento-card--mint">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title" style="color: var(--eps-status-danger);">Flagged Test Sessions (Breach Detected)</h3>
-            <p class="bento-card__subtitle">Sessions where automated violation threshold was exceeded.</p>
-        </div>
-
-        {% if flagged_attempts %}
-            <div class="bento-table-wrapper">
-                <table class="bento-table" style="font-size: 0.85rem;">
-                    <thead>
-                        <tr>
-                            <th>Candidate</th>
-                            <th>Exam</th>
-                            <th>Session Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for att in flagged_attempts %}
-                            <tr>
-                                <td>
-                                    <strong style="color: var(--eps-status-danger);">{{ att.student.username }}</strong>
-                                </td>
-                                <td>{{ att.exam.title|truncatechars:25 }}</td>
-                                <td>{{ att.started_at|date:"M d, Y" }}</td>
-                                <td>
-                                    <a href="{% url 'admin_student_detail' att.student.student_profile.id %}" class="bento-btn bento-btn--ghost bento-btn--sm" style="padding: 0.2rem 0.5rem;">
-                                        Inspect Candidate &rarr;
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div style="padding: var(--space-8); text-align: center; color: var(--text-muted); font-size: var(--font-size-sm);">
+                No proctoring incidents logged yet.
             </div>
-        {% else %}
-            <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 1.5rem; text-align: center;">No flagged candidate sessions requiring urgent intervention.</p>
         {% endif %}
     </div>
-</div>
 
-<!-- Recent Proctoring Telemetry Feed Bento Card -->
-<div class="bento-card">
-    <div class="bento-card__header">
-        <div>
-            <h3 class="bento-card__title">Recent Real-time Proctoring Incident Feed</h3>
-            <p class="bento-card__subtitle">Live environmental detections captured across candidates.</p>
-        </div>
-        <a href="{% url 'admin_proctoring_incidents' %}" class="bento-btn bento-btn--ghost bento-btn--sm">View All &rarr;</a>
-    </div>
-
-    {% if recent_incidents %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Candidate</th>
-                        <th>Exam</th>
-                        <th>Incident Category</th>
-                        <th>Severity</th>
-                        <th>Telemetry Evidence</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for inc in recent_incidents %}
-                        <tr>
-                            <td style="font-family: monospace; font-size: 0.82rem; white-space: nowrap; color: var(--eps-text-secondary);">
-                                {{ inc.timestamp|date:"Y-m-d H:i:s" }}
-                            </td>
-                            <td><strong>{{ inc.attempt.student.username }}</strong></td>
-                            <td>{{ inc.attempt.exam.title }}</td>
-                            <td>
-                                <span class="bento-badge bento-badge--sage">{{ inc.get_event_type_display }}</span>
-                            </td>
-                            <td>
-                                {% if inc.severity == 'high' %}
-                                    <span class="bento-badge bento-badge--danger">HIGH</span>
-                                {% elif inc.severity == 'medium' %}
-                                    <span class="bento-badge bento-badge--warning">MEDIUM</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--neutral">LOW</span>
-                                {% endif %}
-                            </td>
-                            <td style="font-size: 0.85rem; color: var(--eps-text-secondary);">{{ inc.details }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No proctoring incidents logged yet.</p>
-    {% endif %}
 </div>
 {% endblock %}

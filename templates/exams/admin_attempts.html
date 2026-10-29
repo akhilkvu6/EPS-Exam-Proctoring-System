@@ -1,35 +1,52 @@
 {% extends 'base.html' %}
 
-{% block title %}Candidate Attempts Log - Institutional Administration - EPS{% endblock %}
+{% block title %}Candidate Attempts Log — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-4); margin-bottom: var(--space-6); flex-wrap: wrap;">
     <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">TEST SESSIONS</span>
-            <span class="bento-badge bento-badge--sage">Total Recorded: {{ total_attempts }}</span>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <span>Administration</span>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Attempts Audit</span>
         </div>
-        <h1 class="bento-page-title">Candidate Examination Attempts Log</h1>
-        <p class="bento-page-subtitle">Inspect active, submitted, timed out, and proctoring-flagged candidate test sessions across all assessments.</p>
+        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: 2px;">
+            <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+                Candidate Exam Attempts
+            </h1>
+            <span class="badge badge-lavender">{{ total_attempts }} sessions</span>
+        </div>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 2px;">
+            Active, submitted, timed out, and flagged candidate test sessions across all departments.
+        </p>
     </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_proctoring_overview' %}" class="bento-btn bento-btn--warning bento-btn--sm">Live Fleet &rarr;</a>
-        <a href="{% url 'admin_all_exams' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Examinations Catalog</a>
-        <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Admin Overview</a>
+    <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+        <a href="{% url 'admin_proctoring_overview' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="shield" class="lucide-icon icon-sm"></i>
+            <span>Proctoring Fleet</span>
+        </a>
+        <a href="{% url 'admin_all_exams' %}" class="btn btn-secondary btn-sm">
+            <i data-lucide="file-text" class="lucide-icon icon-sm"></i>
+            <span>Exams Catalog</span>
+        </a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-ghost btn-sm">
+            <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+            <span>Back to Dashboard</span>
+        </a>
     </div>
 </div>
 
-<!-- Filters -->
-<div class="bento-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; align-items: end;">
+<!-- Filters Card -->
+<div class="card" style="margin-bottom: var(--space-5); padding: var(--space-4);">
+    <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); align-items: end;">
         <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Search Student / Exam</label>
-            <input type="text" name="q" value="{{ q }}" placeholder="Candidate name, roll, or test..." class="bento-input" style="font-size: 0.85rem;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Search Student / Exam</label>
+            <input type="text" name="q" value="{{ q }}" placeholder="Candidate name, roll, or test..." class="form-control" style="font-size: var(--font-size-xs);">
         </div>
 
         <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Session Status</label>
-            <select name="status" class="bento-select" style="font-size: 0.85rem;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Session Status</label>
+            <select name="status" class="form-control" style="font-size: var(--font-size-xs);">
                 <option value="">All Session States</option>
                 <option value="in_progress" {% if status == 'in_progress' %}selected{% endif %}>In Progress / Active</option>
                 <option value="submitted" {% if status == 'submitted' %}selected{% endif %}>Submitted</option>
@@ -38,48 +55,48 @@
         </div>
 
         <div>
-            <label class="bento-label" style="font-size: 0.75rem;">Proctoring Flag</label>
-            <select name="flagged" class="bento-select" style="font-size: 0.85rem;">
+            <label class="form-label" style="font-size: var(--font-size-xs);">Proctoring Flag</label>
+            <select name="flagged" class="form-control" style="font-size: var(--font-size-xs);">
                 <option value="">All Sessions</option>
                 <option value="yes" {% if flagged == 'yes' %}selected{% endif %}>Flagged for Violations</option>
             </select>
         </div>
 
-        <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="bento-btn bento-btn--primary bento-btn--sm" style="flex: 1;">Filter</button>
-            <a href="{% url 'admin_exam_attempts' %}" class="bento-btn bento-btn--ghost bento-btn--sm">Reset</a>
+        <div style="display: flex; gap: var(--space-2);">
+            <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">Filter</button>
+            <a href="{% url 'admin_exam_attempts' %}" class="btn btn-secondary btn-sm">Reset</a>
         </div>
     </form>
 </div>
 
-<!-- Attempts Table -->
-<div class="bento-card">
-    <div class="bento-card__header">
+<!-- Attempts Table Card -->
+<div class="card" style="padding: 0; overflow: hidden; margin-bottom: var(--space-8);">
+    <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface-header); display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h2 class="bento-card__title">Test Session Ledger</h2>
-            <p class="bento-card__subtitle">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_attempts }} sessions.</p>
+            <h2 class="card__title" style="font-size: var(--font-size-md); margin-bottom: 2px;">Test Session Ledger</h2>
+            <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin: 0;">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_attempts }} sessions</p>
         </div>
     </div>
 
     {% if page_obj %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
+        <div class="table-wrapper">
+            <table class="school-table">
                 <thead>
                     <tr>
-                        <th>Candidate</th>
+                        <th>Candidate Profile</th>
                         <th>Examination Title</th>
-                        <th>Session Start</th>
-                        <th>Submission Time</th>
-                        <th>Status</th>
+                        <th>Started</th>
+                        <th>Submitted</th>
+                        <th>Session State</th>
                         <th>Proctoring State</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for att in page_obj %}
-                        <tr>
+                        <tr {% if att.proctoring_flagged %}style="background-color: var(--pastel-peach-bg);"{% endif %}>
                             <td>
-                                <strong>{{ att.student.get_full_name|default:att.student.username }}</strong>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-muted);">
+                                <strong style="color: var(--text-primary); font-size: var(--font-size-sm);">{{ att.student.get_full_name|default:att.student.username }}</strong>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
                                     <code>{{ att.student.username }}</code>
                                     {% if att.student.student_profile %}
                                         &bull; Roll: {{ att.student.student_profile.roll_number }}
@@ -87,29 +104,29 @@
                                 </div>
                             </td>
                             <td>
-                                <strong>{{ att.exam.title }}</strong>
-                                <div style="font-size: 0.75rem; color: var(--eps-text-secondary);">{{ att.exam.subject.code }}</div>
+                                <strong style="color: var(--text-primary); font-size: var(--font-size-sm);">{{ att.exam.title }}</strong>
+                                <div style="font-size: 11px; color: var(--text-muted);">{{ att.exam.subject.code }}</div>
                             </td>
-                            <td style="font-size: 0.82rem; color: var(--eps-text-secondary);">
-                                {{ att.started_at|date:"M d, Y H:i:s" }}
+                            <td style="font-size: var(--font-size-xs); color: var(--text-muted); white-space: nowrap;">
+                                {{ att.started_at|date:"M d, Y · H:i:s" }}
                             </td>
-                            <td style="font-size: 0.82rem; color: var(--eps-text-secondary);">
-                                {{ att.submitted_at|date:"M d, Y H:i:s"|default:"Active / Unsubmitted" }}
+                            <td style="font-size: var(--font-size-xs); color: var(--text-muted); white-space: nowrap;">
+                                {{ att.submitted_at|date:"M d, Y · H:i:s"|default:"Active Now" }}
                             </td>
                             <td>
                                 {% if att.status == 'submitted' %}
-                                    <span class="bento-badge bento-badge--success">Submitted</span>
+                                    <span class="badge badge-approved">Submitted</span>
                                 {% elif att.status == 'in_progress' %}
-                                    <span class="bento-badge bento-badge--warning">In Progress</span>
+                                    <span class="badge badge-yellow">In Progress</span>
                                 {% else %}
-                                    <span class="bento-badge bento-badge--neutral">{{ att.status|title }}</span>
+                                    <span class="badge badge-secondary">{{ att.status|title }}</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if att.proctoring_flagged %}
-                                    <span class="bento-badge bento-badge--danger" style="font-weight: 700;">🚨 Violations Flagged</span>
+                                    <span class="badge badge-rejected">Violations Flagged</span>
                                 {% else %}
-                                    <span class="bento-badge bento-badge--success">✓ Normal</span>
+                                    <span class="badge badge-mint">Clean</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -119,22 +136,24 @@
         </div>
 
         {% if page_obj.has_other_pages %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-top: 1px solid var(--eps-border);">
-                <div style="font-size: 0.85rem; color: var(--eps-text-muted);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); border-top: 1px solid var(--border-subtle);">
+                <div style="font-size: var(--font-size-xs); color: var(--text-muted);">
                     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                 </div>
-                <div style="display: flex; gap: 0.35rem;">
+                <div style="display: flex; gap: var(--space-2);">
                     {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Prev</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="btn btn-secondary btn-xs">&larr; Previous</a>
                     {% endif %}
                     {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="bento-btn bento-btn--ghost bento-btn--sm">Next &rarr;</a>
+                        <a href="?page={{ page_obj.next_page_number }}{% if preserved_params %}&{{ preserved_params }}{% endif %}" class="btn btn-secondary btn-xs">Next &rarr;</a>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
     {% else %}
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 2rem; text-align: center;">No examination attempts recorded matching your filter parameters.</p>
+        <div style="padding: var(--space-10) var(--space-4); text-align: center; color: var(--text-muted); font-size: var(--font-size-xs);">
+            No examination attempts recorded matching your filter parameters.
+        </div>
     {% endif %}
 </div>
 {% endblock %}

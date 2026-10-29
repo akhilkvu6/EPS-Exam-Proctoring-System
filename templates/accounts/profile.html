@@ -1,43 +1,70 @@
 {% extends 'base.html' %}
 
-{% block title %}My Profile — EPS Platform{% endblock %}
+{% block title %}My Profile — EPS School Management{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="school-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3);">
     <div>
-        <h1 class="page-title">Institutional User Profile</h1>
-        <p class="page-subtitle">Review and manage your institutional credentials, academic affiliation, and identity records.</p>
+        <div class="breadcrumb" style="font-size: var(--font-size-xs); color: var(--text-muted); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);">
+            <span>Account</span>
+            <i data-lucide="chevron-right" class="lucide-icon icon-xs"></i>
+            <span style="color: var(--text-primary); font-weight: 500;">Profile Settings</span>
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.02em;">
+            My Profile
+        </h1>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: var(--space-1);">
+            Review and update your personal details and academic credentials.
+        </p>
     </div>
-    <div style="display: flex; gap: 0.75rem; align-items: center;">
+    <div>
         {% if role == 'student' %}
-            <a href="{% url 'student_dashboard' %}" class="bento-btn bento-btn--outline">← Back to Dashboard</a>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Dashboard</span>
+            </a>
         {% elif role == 'teacher' %}
-            <a href="{% url 'teacher_dashboard' %}" class="bento-btn bento-btn--outline">← Back to Dashboard</a>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Dashboard</span>
+            </a>
         {% else %}
-            <a href="{% url 'admin_dashboard' %}" class="bento-btn bento-btn--outline">← Back to Dashboard</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                <span>Back to Dashboard</span>
+            </a>
         {% endif %}
     </div>
 </div>
 
-<div class="bento-grid bento-grid--3col" style="gap: 1.5rem; align-items: stretch;">
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-6); align-items: start;">
     
-    <!-- Left Column (Wide): Profile Edit Form -->
-    <div class="bento-card bento-card--wide" style="padding: 2.25rem;">
-        <div class="bento-card__header">
+    <!-- Profile Edit Form Card -->
+    <div class="card" style="padding: var(--space-6);">
+        <div class="card__header" style="margin-bottom: var(--space-5);">
             <div>
-                <span class="bento-badge bento-badge--mint" style="margin-bottom: 0.4rem;">Institutional Identity</span>
-                <h2 class="bento-card__title">Profile Information</h2>
-                <p class="bento-card__subtitle">Your profile information is verified for proctored examination identity checks.</p>
+                <h2 class="card__title" style="display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="user-check" class="lucide-icon" style="color: var(--text-primary);"></i>
+                    <span>Profile Details</span>
+                </h2>
+                <p style="font-size: var(--font-size-xs); color: var(--text-muted); margin-top: 2px;">
+                    Keep your contact information accurate for campus records.
+                </p>
             </div>
-            <span style="font-size: 1.75rem;">👤</span>
+            <span class="badge {% if role == 'student' %}badge-blue{% elif role == 'teacher' %}badge-lavender{% else %}badge-mint{% endif %}">
+                {{ user.get_role_display }}
+            </span>
         </div>
 
         {% if form.non_field_errors %}
-            <div class="bento-alert bento-alert--error" style="margin-bottom: 1.25rem;">
-                <div>
-                    {% for err in form.non_field_errors %}
-                        <div>{{ err }}</div>
-                    {% endfor %}
+            <div class="alert alert--error" style="margin-bottom: var(--space-4);">
+                <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                    <i data-lucide="alert-circle" class="lucide-icon icon-sm" style="color: var(--danger); margin-top: 2px;"></i>
+                    <div>
+                        {% for err in form.non_field_errors %}
+                            <div>{{ err }}</div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         {% endif %}
@@ -45,160 +72,161 @@
         <form method="POST">
             {% csrf_token %}
 
-            <!-- Read-Only Institutional Identifiers Row -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: var(--eps-card-bg-subtle, #f3f6f3); border-radius: 8px; border: 1px solid var(--eps-border-subtle);">
-                <div>
-                    <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Username</div>
-                    <div style="font-weight: 700; color: var(--eps-text-primary); font-family: var(--font-mono, monospace); margin-top: 0.2rem;">{{ user.username }}</div>
+            <!-- Read-Only Academic Credentials Box -->
+            <div style="background-color: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); padding: var(--space-4); margin-bottom: var(--space-5);">
+                <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="lock" class="lucide-icon icon-xs"></i>
+                    <span>Verified Institutional Identifiers (Managed by Office)</span>
                 </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-4);">
+                    <div>
+                        <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Username</div>
+                        <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ user.username }}</div>
+                    </div>
 
-                {% if role == 'student' and profile %}
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Roll / Register Number</div>
-                        <div style="font-weight: 700; color: var(--eps-text-primary); font-family: var(--font-mono, monospace); margin-top: 0.2rem;">{{ profile.roll_number }}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Department</div>
-                        <div style="font-weight: 600; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ profile.department }}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Assigned Class</div>
-                        <div style="font-weight: 600; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ profile.class_group.name|default:"Unassigned" }}</div>
-                    </div>
-                {% elif role == 'teacher' and profile %}
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Employee ID</div>
-                        <div style="font-weight: 700; color: var(--eps-text-primary); font-family: var(--font-mono, monospace); margin-top: 0.2rem;">{{ profile.employee_id }}</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Assigned Classes</div>
-                        <div style="font-weight: 600; color: var(--eps-text-primary); margin-top: 0.2rem;">{{ profile.assigned_classes.count }} Class Group(s)</div>
-                    </div>
-                {% else %}
-                    <div>
-                        <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--eps-text-muted); font-weight: 700; letter-spacing: 0.05em;">Role</div>
-                        <div style="font-weight: 700; color: var(--eps-primary); margin-top: 0.2rem;">{{ user.get_role_display }}</div>
-                    </div>
-                {% endif %}
+                    {% if role == 'student' and profile %}
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Roll Number</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ profile.roll_number }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Department</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ profile.department }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Class Cohort</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ profile.class_group.name|default:"Not assigned" }}</div>
+                        </div>
+                    {% elif role == 'teacher' and profile %}
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Employee ID</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ profile.employee_id }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Assigned Department</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">
+                                <span class="badge badge-lavender">{{ profile.department|default:"Not assigned" }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Class Cohorts</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ profile.assigned_classes.count }} Classes</div>
+                        </div>
+                    {% else %}
+                        <div>
+                            <div style="font-size: var(--font-size-xs); color: var(--text-muted);">Role</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-top: 2px;">{{ user.get_role_display }}</div>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- Editable Fields -->
-            <div class="bento-form-group">
-                <label class="bento-form-label" for="id_full_name">Full Legal Name *</label>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="id_full_name">Full Name *</label>
                 {{ form.full_name }}
                 {% if form.full_name.errors %}
-                    <ul class="form-errors">{% for error in form.full_name.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    <div class="form-error">{{ form.full_name.errors.0 }}</div>
                 {% endif %}
             </div>
 
-            <div class="bento-form-group">
-                <label class="bento-form-label" for="id_email">Institutional Email</label>
+            <div class="form-group" style="margin-bottom: var(--space-4);">
+                <label class="form-label" for="id_email">Email Address</label>
                 {{ form.email }}
-                <span class="bento-form-hint">{{ form.email.help_text|default:"Used for institutional audit and record purposes only." }}</span>
+                <span class="form-hint">Used for administrative records. Notifications are delivered directly inside the system.</span>
                 {% if form.email.errors %}
-                    <ul class="form-errors">{% for error in form.email.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                    <div class="form-error">{{ form.email.errors.0 }}</div>
                 {% endif %}
             </div>
 
             {% if role == 'student' %}
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_semester">Current Academic Semester *</label>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="id_semester">Current Semester *</label>
                     {{ form.semester }}
-                    <span class="bento-form-hint">Enter your active enrolled semester (e.g., 1 through 8).</span>
                     {% if form.semester.errors %}
-                        <ul class="form-errors">{% for error in form.semester.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        <div class="form-error">{{ form.semester.errors.0 }}</div>
                     {% endif %}
                 </div>
             {% elif role == 'teacher' %}
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_department">Academic Department *</label>
-                    {{ form.department }}
-                    {% if form.department.errors %}
-                        <ul class="form-errors">{% for error in form.department.errors %}<li>{{ error }}</li>{% endfor %}</ul>
-                    {% endif %}
-                </div>
-
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_qualification">Highest Qualification *</label>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="id_qualification">Highest Qualification *</label>
                     {{ form.qualification }}
                     {% if form.qualification.errors %}
-                        <ul class="form-errors">{% for error in form.qualification.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        <div class="form-error">{{ form.qualification.errors.0 }}</div>
                     {% endif %}
                 </div>
 
-                <div class="bento-form-group">
-                    <label class="bento-form-label" for="id_institution">Institution / Campus</label>
+                <div class="form-group" style="margin-bottom: var(--space-4);">
+                    <label class="form-label" for="id_institution">College / Institution</label>
                     {{ form.institution }}
                     {% if form.institution.errors %}
-                        <ul class="form-errors">{% for error in form.institution.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                        <div class="form-error">{{ form.institution.errors.0 }}</div>
                     {% endif %}
                 </div>
             {% endif %}
 
-            <div style="margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--eps-border-subtle); display: flex; justify-content: flex-end; gap: 0.75rem;">
-                <button type="submit" class="bento-btn bento-btn--primary bento-btn--lg">
-                    💾 Save Profile Changes
+            <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end;">
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                    <span>Save Profile Changes</span>
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Right Column: Status & Security Meta Bento Cards -->
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <!-- Right Column: Profile Dossier & Security -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
         
-        <!-- Account Status Card -->
-        <div class="bento-card bento-card--mint-subtle">
-            <div class="bento-card__header" style="margin-bottom: 0.5rem;">
-                <span class="bento-badge {% if user.get_status == 'approved' %}bento-badge--mint{% elif user.get_status == 'pending' %}bento-badge--warning{% else %}bento-badge--danger{% endif %}">
-                    {{ user.get_status|title }}
-                </span>
-                <span style="font-size: 1.35rem;">🛡️</span>
+        <!-- Profile Card with Avatar -->
+        <div class="card {% if role == 'student' %}card--student{% elif role == 'teacher' %}card--teacher{% else %}card--attendance{% endif %}" style="padding: var(--space-5); text-align: center;">
+            <div style="width: 72px; height: 72px; border-radius: var(--radius-full); background: #ffffff; border: 2px solid {% if role == 'student' %}var(--pastel-blue-border){% elif role == 'teacher' %}var(--pastel-lavender-border){% else %}var(--pastel-mint-border){% endif %}; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 0 auto var(--space-3) auto; box-shadow: var(--shadow-sm);">
+                {{ user.get_full_name|first|default:user.username|first|upper }}
             </div>
-            <div style="font-weight: 700; font-size: 1.15rem; color: var(--eps-text-primary);">
+            <h3 style="font-size: var(--font-size-md); font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
                 {{ user.get_full_name|default:user.username }}
-            </div>
-            <div style="font-size: 0.85rem; color: var(--eps-text-secondary); margin-top: 0.25rem;">
-                Role: <strong>{{ user.get_role_display }}</strong>
+            </h3>
+            <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-3);">
+                {{ user.get_role_display }}
+            </p>
+            <div>
+                <span class="badge {% if user.get_status == 'approved' %}badge-approved{% elif user.get_status == 'pending' %}badge-pending{% else %}badge-rejected{% endif %}">
+                    {{ user.get_status|title }} Account
+                </span>
             </div>
 
-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(0,0,0,0.06); font-size: 0.8rem; color: var(--eps-text-secondary); display: flex; flex-direction: column; gap: 0.35rem;">
-                <div>Enrolled: <strong>{{ user.date_joined|date:"M d, Y" }}</strong></div>
-                <div>Last Login: <strong>{{ user.last_login|date:"M d, Y H:i"|default:"Active Session" }}</strong></div>
+            <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px dashed rgba(0,0,0,0.1); font-size: var(--font-size-xs); color: var(--text-secondary); display: flex; flex-direction: column; gap: var(--space-2); text-align: left;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Joined</span>
+                    <strong style="color: var(--text-primary);">{{ user.date_joined|date:"M d, Y" }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Last Active</span>
+                    <strong style="color: var(--text-primary);">{{ user.last_login|date:"M d, Y H:i"|default:"Active Now" }}</strong>
+                </div>
                 {% if profile and profile.reviewed_by %}
-                    <div>Verified by: <strong>{{ profile.reviewed_by.get_full_name|default:profile.reviewed_by.username }}</strong></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Approved By</span>
+                        <strong style="color: var(--text-primary);">{{ profile.reviewed_by.get_full_name|default:profile.reviewed_by.username }}</strong>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Security & Password Card -->
-        <div class="bento-card">
-            <div class="bento-card__header">
-                <div>
-                    <h3 class="bento-card__title" style="font-size: 1rem;">Authentication</h3>
-                    <p class="bento-card__subtitle" style="font-size: 0.8rem;">Credential management</p>
-                </div>
-                <span style="font-size: 1.3rem;">🔑</span>
+        <!-- Security Card -->
+        <div class="card" style="padding: var(--space-5);">
+            <div class="card__header" style="margin-bottom: var(--space-3);">
+                <h3 class="card__title" style="font-size: var(--font-size-sm); display: flex; align-items: center; gap: var(--space-2);">
+                    <i data-lucide="key" class="lucide-icon icon-sm" style="color: var(--text-primary);"></i>
+                    <span>Password & Security</span>
+                </h3>
             </div>
-            <p style="font-size: 0.85rem; color: var(--eps-text-secondary); margin-bottom: 1rem;">
-                To update your password, use our secure in-app credential rotation form.
+            <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5; margin-bottom: var(--space-4);">
+                Keep your login password private. We recommend choosing a strong phrase with at least 8 characters.
             </p>
-            <a href="{% url 'change_password' %}" class="bento-btn bento-btn--outline" style="width: 100%; justify-content: center;">
-                Change Password
+            <a href="{% url 'change_password' %}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center;">
+                <i data-lucide="lock" class="lucide-icon icon-xs"></i>
+                <span>Change Password</span>
             </a>
-        </div>
-
-        <!-- Zero-Email Policy Notice -->
-        <div class="bento-card">
-            <div class="bento-card__header">
-                <div>
-                    <h3 class="bento-card__title" style="font-size: 1rem;">Institutional Policy</h3>
-                    <p class="bento-card__subtitle" style="font-size: 0.8rem;">Zero External Transmission</p>
-                </div>
-                <span style="font-size: 1.3rem;">🌿</span>
-            </div>
-            <p style="font-size: 0.82rem; color: var(--eps-text-secondary); line-height: 1.45;">
-                EPS operates on a strict zero-email policy. All notifications, test alerts, and approval statuses are delivered exclusively through the In-App Notification Center.
-            </p>
         </div>
 
     </div>

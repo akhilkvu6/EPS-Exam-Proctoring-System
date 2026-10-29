@@ -1,213 +1,254 @@
 {% extends 'base.html' %}
 
-{% block title %}Prof. {{ teacher.user.first_name|default:teacher.user.username }} - Faculty Dossier - EPS{% endblock %}
+{% block title %}Prof. {{ teacher.user.first_name|default:teacher.user.username }} — Faculty Profile — EPS{% endblock %}
 
 {% block content %}
-<div class="bento-page-header">
-    <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-            <span class="bento-badge bento-badge--primary" style="font-weight: 700;">FACULTY PROFILE DOSSIER</span>
-            {% if teacher.verification_status == 'approved' %}
-                <span class="bento-badge bento-badge--success">Verified & Active</span>
-            {% elif teacher.verification_status == 'pending' %}
-                <span class="bento-badge bento-badge--warning">Pending Verification</span>
-            {% elif teacher.verification_status == 'suspended' %}
-                <span class="bento-badge bento-badge--danger">Account Suspended</span>
-            {% else %}
-                <span class="bento-badge bento-badge--neutral">{{ teacher.verification_status|title }}</span>
-            {% endif %}
-        </div>
-        <h1 class="bento-page-title">Prof. {{ teacher.user.first_name|default:teacher.user.username }} {{ teacher.user.last_name }}</h1>
-        <p class="bento-page-subtitle">Employee ID: <strong>{{ teacher.employee_id }}</strong> &bull; Department: {{ teacher.department }} &bull; Qualification: {{ teacher.qualification|default:"Not specified" }}</p>
-    </div>
-    <div class="bento-page-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-        <a href="{% url 'admin_teachers' %}" class="bento-btn bento-btn--ghost bento-btn--sm">&larr; Faculty Directory</a>
-        {% if teacher.verification_status == 'suspended' %}
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="activate">
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm">Reactivate Account</button>
-            </form>
-        {% else %}
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="suspend">
-                <button type="submit" class="bento-btn bento-btn--outline bento-btn--sm" style="color: var(--eps-status-danger); border-color: rgba(180, 35, 24, 0.3);" onclick="return confirm('Suspend faculty member?');">Suspend Faculty</button>
-            </form>
-        {% endif %}
-    </div>
-</div>
+<div style="max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-6);">
 
-<!-- Pending Review Alert Bento Card -->
-{% if teacher.verification_status == 'pending' %}
-<div class="bento-card bento-card--mint" style="margin-bottom: 1.5rem; border-left: 4px solid var(--eps-primary-sage);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--eps-primary-sage); margin-bottom: 0.25rem;">Awaiting Institutional Verification</h3>
-            <p style="font-size: 0.88rem; color: var(--eps-text-secondary); margin: 0;">Verify this faculty member's institutional credentials before granting exam authoring access.</p>
-        </div>
-        <div style="display: flex; gap: 0.5rem;">
-            <form method="POST" style="display: inline;">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="approve">
-                <button type="submit" class="bento-btn bento-btn--success bento-btn--sm">✓ Approve Faculty</button>
-            </form>
-            <button type="button" class="bento-btn bento-btn--danger bento-btn--sm" onclick="document.getElementById('reject-teacher-modal').style.display='flex'">✕ Reject Application</button>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="bento-grid bento-grid--3" style="margin-bottom: 1.5rem; align-items: start;">
-    <!-- Faculty Particulars -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Faculty Information</h3>
-        </div>
-        <table class="bento-table" style="font-size: 0.88rem;">
-            <tbody>
-                <tr>
-                    <td style="color: var(--eps-text-muted); width: 40%;">Username</td>
-                    <td><code>{{ teacher.user.username }}</code></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Email</td>
-                    <td>{{ teacher.user.email }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Employee ID</td>
-                    <td><strong style="color: var(--eps-secondary-sage);">{{ teacher.employee_id }}</strong></td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Department</td>
-                    <td>{{ teacher.department }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Qualification</td>
-                    <td>{{ teacher.qualification|default:"—" }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Institution</td>
-                    <td>{{ teacher.institution|default:"N/A" }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Registration Date</td>
-                    <td>{{ teacher.user.date_joined|date:"M d, Y H:i" }}</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--eps-text-muted);">Last Active</td>
-                    <td>{{ teacher.user.last_login|date:"M d, Y H:i"|default:"Never logged in" }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Authoring Stats -->
-    <div class="bento-card bento-card--sage">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Activity & Oversight</h3>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(92,112,87,0.15);">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Exams Authored:</span>
-                <strong style="font-size: 1.25rem; color: var(--eps-primary-sage);">{{ created_exams.count }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(92,112,87,0.15);">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Assigned Classes:</span>
-                <strong style="font-size: 1.25rem; color: var(--eps-primary-sage);">{{ teacher.assigned_classes.count }}</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.9rem; color: var(--eps-text-secondary);">Account Status:</span>
-                <span class="bento-badge bento-badge--sage">{{ teacher.verification_status|upper }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Review Memo / Audit Note -->
-    <div class="bento-card">
-        <div class="bento-card__header">
-            <h3 class="bento-card__title">Verification Ledger</h3>
-            <p class="bento-card__subtitle">Administrative decisions log.</p>
-        </div>
-        {% if teacher.reviewed_by %}
-            <div style="font-size: 0.88rem; color: var(--eps-text-primary); margin-bottom: 0.5rem;">
-                Verified by <strong>{{ teacher.reviewed_by.username }}</strong> on {{ teacher.reviewed_at|date:"M d, Y H:i" }}
-            </div>
-            {% if teacher.rejection_reason %}
-                <div style="font-size: 0.85rem; color: var(--eps-status-danger); background: rgba(180,35,24,0.08); padding: 0.75rem; border-radius: var(--eps-radius-sm);">
-                    <strong>Memo:</strong> {{ teacher.rejection_reason }}
+    <!-- Page Header & Actions -->
+    <div class="card" style="padding: var(--space-6); background: linear-gradient(135deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-4); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: var(--space-4);">
+                <div class="profile-card__avatar profile-card__avatar--teacher" style="width: 58px; height: 58px; font-size: 22px;">
+                    {{ teacher.user.first_name|default:teacher.user.username|slice:":1"|upper }}
                 </div>
-            {% endif %}
-        {% else %}
-            <div style="font-size: 0.88rem; color: var(--eps-text-muted);">
-                No administrative review action has been taken on this faculty record yet.
+                <div>
+                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1); flex-wrap: wrap;">
+                        <span class="badge badge--teacher">Faculty Record</span>
+                        {% if teacher.verification_status == 'approved' %}
+                            <span class="badge badge--mint">Active</span>
+                        {% elif teacher.verification_status == 'pending' %}
+                            <span class="badge badge--peach">Pending Verification</span>
+                        {% elif teacher.verification_status == 'suspended' %}
+                            <span class="badge badge--danger">Suspended</span>
+                        {% else %}
+                            <span class="badge badge--neutral">{{ teacher.verification_status|title }}</span>
+                        {% endif %}
+                    </div>
+                    <h1 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin: 0;">
+                        Prof. {{ teacher.user.first_name|default:teacher.user.username }} {{ teacher.user.last_name }}
+                    </h1>
+                    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: var(--space-1) 0 0 0;">
+                        Staff ID: <strong>{{ teacher.employee_id }}</strong> &bull; Department of {{ teacher.department }} &bull; {{ teacher.qualification|default:"Faculty Member" }}
+                    </p>
+                </div>
             </div>
-        {% endif %}
-    </div>
-</div>
 
-<!-- Created Exams Table Bento Card -->
-<div class="bento-card" style="margin-bottom: 1.5rem;">
-    <div class="bento-card__header">
-        <h3 class="bento-card__title">Examinations Authored by Faculty Member</h3>
-        <p class="bento-card__subtitle">Assessment papers and tests created by {{ teacher.user.first_name|default:teacher.user.username }}.</p>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="{% url 'admin_teachers' %}" class="btn btn-secondary btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-sm"></i>
+                    <span>Back to Faculty</span>
+                </a>
+                {% if teacher.verification_status == 'suspended' %}
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="activate">
+                        <button type="submit" class="btn btn-approve btn-sm">Reactivate Faculty</button>
+                    </form>
+                {% else %}
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="suspend">
+                        <button type="submit" class="btn btn-danger-subtle btn-sm" onclick="return confirm('Suspend this faculty account?');">
+                            Suspend Faculty
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    {% if created_exams %}
-        <div class="bento-table-wrapper">
-            <table class="bento-table">
+    <!-- Pending Verification Alert -->
+    {% if teacher.verification_status == 'pending' %}
+        <div class="card card--exam" style="padding: var(--space-5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+                <div>
+                    <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: 2px;">Application Awaiting Verification</h3>
+                    <p style="font-size: var(--font-size-xs); opacity: 0.9; margin: 0;">Review employee credentials before granting examination authoring rights.</p>
+                </div>
+                <div style="display: flex; gap: var(--space-2);">
+                    <form method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-approve btn-sm">
+                            <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                            <span>Approve Faculty</span>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="document.getElementById('reject-teacher-modal').style.display='flex'">
+                        <i data-lucide="x" class="lucide-icon icon-sm"></i>
+                        <span>Reject</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- 3-Column Particulars Grid -->
+    <div class="grid grid-cols-3">
+        <!-- Card 1: Faculty Particulars -->
+        <div class="card">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="briefcase" class="lucide-icon"></i>
+                <span>Faculty Information</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Username</span>
+                    <span style="font-family: var(--font-mono); font-weight: 600;">{{ teacher.user.username }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Email</span>
+                    <span>{{ teacher.user.email }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Staff ID</span>
+                    <span style="font-family: var(--font-mono); font-weight: 700;">{{ teacher.employee_id }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Department</span>
+                    <span>{{ teacher.department }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Qualification</span>
+                    <span>{{ teacher.qualification|default:"Not specified" }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Institution</span>
+                    <span>{{ teacher.institution|default:"Main Campus" }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Date Joined</span>
+                    <span>{{ teacher.user.date_joined|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Verification Audit Trail -->
+        <div class="card">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="shield-check" class="lucide-icon"></i>
+                <span>Verification Trail</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Current Status</span>
+                    <span>{{ teacher.verification_status|title }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Reviewed By</span>
+                    <span>{{ teacher.reviewed_by.get_full_name|default:teacher.reviewed_by.username|default:"Pending" }}</span>
+                </div>
+                <div class="profile-card__info-row">
+                    <span style="color: var(--text-muted);">Reviewed At</span>
+                    <span>{{ teacher.reviewed_at|date:"M d, Y, H:i"|default:"Not reviewed yet" }}</span>
+                </div>
+                {% if teacher.rejection_reason %}
+                    <div style="margin-top: var(--space-2); padding: var(--space-3); border-radius: var(--radius-sm); background-color: var(--danger-surface); color: var(--danger-text);">
+                        <strong>Rejection Reason:</strong> {{ teacher.rejection_reason }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Card 3: Academic Scope Summary -->
+        <div class="card card--teacher">
+            <h2 class="card__title" style="margin-bottom: var(--space-4);">
+                <i data-lucide="book-open" class="lucide-icon"></i>
+                <span>Academic Scope</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-xs);">
+                <div class="profile-card__info-row">
+                    <span>Assigned Classes</span>
+                    <strong>{{ teacher.assigned_classes.count }} cohorts</strong>
+                </div>
+                <div class="profile-card__info-row">
+                    <span>Exams Created</span>
+                    <strong style="font-size: var(--font-size-sm);">{{ teacher.user.created_exams.count }}</strong>
+                </div>
+                <div class="profile-card__info-row">
+                    <span>Questions Authored</span>
+                    <strong style="font-size: var(--font-size-sm);">{{ teacher.user.created_questions.count }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Examinations Created -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="card__header" style="padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--border-subtle);">
+            <div>
+                <h2 class="card__title">
+                    <i data-lucide="clipboard-list" class="lucide-icon"></i>
+                    <span>Authored Examinations</span>
+                </h2>
+                <p class="card__description">Assessments authored and supervised by this faculty member.</p>
+            </div>
+        </div>
+
+        <div class="table-container" style="border: none; border-radius: 0; box-shadow: none;">
+            <table class="school-table">
                 <thead>
                     <tr>
                         <th>Exam Title</th>
                         <th>Subject</th>
                         <th>Duration</th>
-                        <th>Total Marks</th>
                         <th>Status</th>
-                        <th>Created Date</th>
+                        <th>Attempts</th>
+                        <th>Schedule</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for exam in created_exams %}
+                    {% if teacher.user.created_exams.exists %}
+                        {% for ex in teacher.user.created_exams.all %}
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary);">{{ ex.title }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--student">{{ ex.subject.code }}</span>
+                                </td>
+                                <td style="font-size: var(--font-size-xs);">{{ ex.duration_minutes }}m</td>
+                                <td>
+                                    <span class="badge {% if ex.status == 'published' %}badge--mint{% elif ex.status == 'closed' %}badge--neutral{% else %}badge--peach{% endif %}">
+                                        {{ ex.status|title }}
+                                    </span>
+                                </td>
+                                <td style="font-weight: 600; font-size: var(--font-size-xs);">{{ ex.attempts.count }}</td>
+                                <td style="font-size: var(--font-size-xs);">{{ ex.start_time|date:"M d, Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                         <tr>
-                            <td><strong>{{ exam.title }}</strong></td>
-                            <td><span class="bento-badge bento-badge--sage">{{ exam.subject.code }}</span> {{ exam.subject.name }}</td>
-                            <td>{{ exam.duration_minutes }} mins</td>
-                            <td>{{ exam.total_marks }}</td>
-                            <td>
-                                {% if exam.status == 'published' %}
-                                    <span class="bento-badge bento-badge--success">Published</span>
-                                {% elif exam.status == 'draft' %}
-                                    <span class="bento-badge bento-badge--neutral">Draft</span>
-                                {% else %}
-                                    <span class="bento-badge bento-badge--warning">{{ exam.status|title }}</span>
-                                {% endif %}
+                            <td colspan="6" style="text-align: center; padding: var(--space-6); color: var(--text-muted);">
+                                No examinations created yet.
                             </td>
-                            <td>{{ exam.created_at|date:"M d, Y" }}</td>
                         </tr>
-                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
-    {% else %}
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); padding: 1.5rem; text-align: center;">No examinations authored by this faculty member yet.</p>
-    {% endif %}
+    </div>
+
 </div>
 
-<!-- Rejection Modal -->
-<div id="reject-teacher-modal" style="display: none; position: fixed; inset: 0; background: rgba(38, 48, 38, 0.6); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="bento-card" style="width: 100%; max-width: 480px; margin: 1rem; padding: 2rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--eps-status-danger); margin-bottom: 0.5rem;">Reject Faculty Application</h3>
-        <p style="font-size: 0.88rem; color: var(--eps-text-muted); margin-bottom: 1.25rem;">Provide an institutional memo explaining why this faculty registration is rejected.</p>
+<!-- Reject Modal -->
+<div id="reject-teacher-modal" class="modal-backdrop" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.5); z-index: 100; backdrop-filter: blur(3px); align-items: center; justify-content: center;">
+    <div class="card" style="width: 100%; max-width: 440px; margin: var(--space-4); padding: var(--space-6); background: var(--bg-surface);">
+        <h3 style="font-size: var(--font-size-md); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-2);">Reject Faculty Application</h3>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
+            Please state the institutional reason for rejecting this faculty member.
+        </p>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="action" value="reject">
-            <div class="bento-form-group">
-                <label class="bento-label">Rejection Reason</label>
-                <textarea name="reason" class="bento-input" rows="3" placeholder="e.g. Employee ID verification failed..." required style="resize: none;"></textarea>
+            <div class="form-group">
+                <label class="form-label">Rejection Reason</label>
+                <textarea name="reason" class="form-textarea" rows="3" placeholder="e.g. Employee ID not found in HR records..." required></textarea>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                <button type="button" class="bento-btn bento-btn--ghost" onclick="document.getElementById('reject-teacher-modal').style.display='none'">Cancel</button>
-                <button type="submit" class="bento-btn bento-btn--danger">Confirm Rejection</button>
+            <div style="display: flex; justify-content: flex-end; gap: var(--space-2);">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('reject-teacher-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Rejection</button>
             </div>
         </form>
     </div>
