@@ -10,6 +10,7 @@ from django.db import transaction
 from apps.accounts.decorators import teacher_required
 from apps.accounts.models import UserStatus
 from apps.student.models import StudentProfile, AdmissionApplicationStatus
+from apps.admissions.services.roll_allocator import allocate_roll_number_atomic
 from .models import TeacherProfile, AdmissionReviewRecord, AdmissionReviewAction
 from .forms import TeacherProfileEditForm, AdmissionReviewForm
 import logging
@@ -129,25 +130,24 @@ def admission_detail_view(request, application_id):
                 if action == AdmissionReviewAction.APPROVE:
                     application.admission_status = AdmissionApplicationStatus.APPROVED
                     application.admission_approved_at = timezone.now()
-                    # Assign roll number
-                    if custom_roll:
-                        application.roll_number = custom_roll
-                    elif not application.roll_number:
-                        # Auto sequential fallback format
-                        year = timezone.now().year
-                        count = StudentProfile.objects.filter(roll_number__isnull=False).count() + 1
-                        application.roll_number = f"EP-{year}-{count:04d}"
+                    application.save(update_fields=["admission_status", "admission_approved_at", "updated_at"])
+
+                    # Concurrency-safe atomic roll allocation
+                    roll_str = allocate_roll_number_atomic(
+                        application,
+                        allocated_by=request.user,
+                        custom_override=custom_roll or None,
+                    )
 
                     # Activate student account
                     student_user = application.user
                     student_user.status = UserStatus.ACTIVE
                     student_user.is_verified = True
                     student_user.save()
-                    application.save()
 
                     messages.success(
                         request,
-                        f"Application approved! Allocated Roll Number: {application.roll_number}",
+                        f"Application approved! Allocated Roll Number: {roll_str}",
                     )
 
                 elif action == AdmissionReviewAction.REJECT:

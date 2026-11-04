@@ -13,6 +13,7 @@ urlpatterns = [
     path("student/", include("apps.student.urls", namespace="student")),
     path("teacher/", include("apps.teacher.urls", namespace="teacher")),
     path("administration/", include("apps.administration.urls", namespace="administration")),
+    path("admissions/", include("apps.admissions.urls", namespace="admissions")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

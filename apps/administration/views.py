@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 from apps.accounts.decorators import admin_required
 from apps.accounts.models import User, UserRole, UserStatus
 from apps.student.models import StudentProfile, AdmissionApplicationStatus
+from apps.admissions.services.roll_allocator import allocate_roll_number_atomic
 from apps.teacher.models import TeacherProfile, AdmissionReviewRecord, AdmissionReviewAction
 from .models import InstitutionSetting, SystemAuditLog
 from .forms import InstitutionSettingsForm, TeacherCreateForm, AdminEscalationDecisionForm
@@ -108,19 +109,18 @@ def escalation_detail_view(request, application_id):
                 if action == "APPROVE":
                     application.admission_status = AdmissionApplicationStatus.APPROVED
                     application.admission_approved_at = timezone.now()
-                    if custom_roll:
-                        application.roll_number = custom_roll
-                    elif not application.roll_number:
-                        year = timezone.now().year
-                        prefix = settings_obj.roll_number_prefix or "EP"
-                        count = StudentProfile.objects.filter(roll_number__isnull=False).count() + 1
-                        application.roll_number = f"{prefix}-{year}-{count:04d}"
+                    application.save(update_fields=["admission_status", "admission_approved_at", "updated_at"])
+
+                    roll_str = allocate_roll_number_atomic(
+                        application,
+                        allocated_by=request.user,
+                        custom_override=custom_roll or None,
+                    )
 
                     student_user = application.user
                     student_user.status = UserStatus.ACTIVE
                     student_user.is_verified = True
                     student_user.save()
-                    application.save()
 
                     # Record faculty history and central audit log
                     AdmissionReviewRecord.objects.create(
