@@ -55,6 +55,7 @@ LOCAL_APPS = [
     "apps.incidents",
     "apps.evaluation",
     "apps.results",
+    "apps.notifications",
 ]
 
 INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -84,6 +85,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.institution_context",
+                "apps.notifications.context_processors.notifications_context",
             ],
         },
     },

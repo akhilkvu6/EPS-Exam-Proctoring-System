@@ -22,6 +22,7 @@ urlpatterns = [
     path("incidents/", include("apps.incidents.urls", namespace="incidents")),
     path("evaluation/", include("apps.evaluation.urls", namespace="evaluation")),
     path("results/", include("apps.results.urls", namespace="results")),
+    path("notifications/", include("apps.notifications.urls", namespace="notifications")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

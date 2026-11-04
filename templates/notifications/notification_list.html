@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+
+{% block title %}Notifications | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        🔔 Notifications & Activity Feed
+      </h1>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+        Stay informed on admissions, examination schedules, result releases, and academic alerts.
+      </p>
+    </div>
+    {% if unread_notifications_count > 0 %}
+      <form method="post" action="{% url 'notifications:mark_all_read' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary" style="font-size: 12px;">
+          ✓ Mark All as Read
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Filter Buttons -->
+  <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
+    <a href="{% url 'notifications:list' %}" class="btn {% if not filter_unread %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+      All Activity
+    </a>
+    <a href="{% url 'notifications:list' %}?unread=1" class="btn {% if filter_unread %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+      Unread Only
+    </a>
+  </div>
+
+  <!-- Notifications List -->
+  {% if notifications %}
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+      {% for n in notifications %}
+        <div class="card" style="padding: var(--space-4); display: flex; justify-content: space-between; align-items: flex-start; background-color: {% if not n.is_read %}rgba(59, 130, 246, 0.05){% else %}var(--bg-surface-primary){% endif %}; border-left: 4px solid {% if n.level == 'SUCCESS' %}#22c55e{% elif n.level == 'WARNING' %}#eab308{% elif n.level == 'CRITICAL' %}#ef4444{% else %}var(--color-accent){% endif %};">
+          <div>
+            <div style="display: flex; gap: var(--space-2); align-items: center; margin-bottom: var(--space-1);">
+              <span class="badge" style="font-size: 10px;">{{ n.get_level_display }}</span>
+              <span style="font-size: 11px; color: var(--text-secondary);">{{ n.created_at|timesince }} ago</span>
+              {% if not n.is_read %}
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); display: inline-block;"></span>
+              {% endif %}
+            </div>
+            <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--space-1);">
+              {{ n.title }}
+            </h3>
+            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-2);">
+              {{ n.message }}
+            </p>
+          </div>
+          <div style="white-space: nowrap; margin-left: var(--space-4);">
+            {% if n.action_url %}
+              <a href="{% url 'notifications:mark_read' n.id %}" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;">
+                View →
+              </a>
+            {% elif not n.is_read %}
+              <a href="{% url 'notifications:mark_read' n.id %}" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;">
+                Mark Read
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: var(--space-12);">
+      <div style="font-size: 48px; margin-bottom: var(--space-2);">🔔</div>
+      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Notifications
+      </h3>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
+        You're completely caught up! New institutional updates, examination notices, and scores will appear here.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
