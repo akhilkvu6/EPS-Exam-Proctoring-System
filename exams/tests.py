@@ -1,6 +1,8 @@
+import json
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
+from exams.views import finalize_submission
 from accounts.models import User, Department, ClassGroup, StudentProfile, TeacherProfile, Notification
 from exams.models import (
     Subject, Question, AnswerOption, Exam, ExamQuestion,
@@ -745,3 +747,158 @@ class NewFeaturesAndHardeningWorkflowsTests(TestCase):
         self.assertIn('Verified incidental notification popup', incident.review_notes)
 
 
+
+    def test_face_detection_incident_telemetry(self):
+        """Verifies that face absence and multiple face events are correctly logged and increment warnings."""
+        self.client.force_login(self.student)
+        self.client.get(reverse('start_exam', args=[self.exam.id]))
+        attempt = ExamAttempt.objects.get(exam=self.exam, student=self.student)
+
+        log_url = reverse('log_proctoring_event', args=[attempt.id])
+
+        # 1. Log face_not_detected
+        resp1 = self.client.post(
+            log_url,
+            data=json.dumps({
+                'event_type': 'face_not_detected',
+                'severity': 'high',
+                'details': 'Candidate face not detected in camera frame'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp1.json()['warning_count'], 1)
+        self.assertFalse(resp1.json()['flagged'])
+
+        # 2. Log multiple_faces
+        resp2 = self.client.post(
+            log_url,
+            data=json.dumps({
+                'event_type': 'multiple_faces',
+                'severity': 'high',
+                'details': '2 faces detected in camera frame'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(resp2.status_code, 200)
+        self.assertEqual(resp2.json()['warning_count'], 2)
+
+        # 3. Third high severity event flags attempt (max_warning_count = 3)
+        resp3 = self.client.post(
+            log_url,
+            data=json.dumps({
+                'event_type': 'face_not_detected',
+                'severity': 'high',
+                'details': 'Candidate absent again'
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(resp3.status_code, 200)
+        self.assertEqual(resp3.json()['warning_count'], 3)
+        self.assertTrue(resp3.json()['flagged'])
+
+        attempt.refresh_from_db()
+        self.assertTrue(attempt.proctoring_flagged)
+        self.assertEqual(attempt.proctoring_incidents.count(), 3)
+
+    def test_duplicate_submission_protection_and_locking(self):
+        """Submitting an attempt multiple times executes atomically without duplicate results or corrupt scores."""
+        self.client.force_login(self.student)
+        self.client.get(reverse('start_exam', args=[self.exam.id]))
+        attempt = ExamAttempt.objects.get(exam=self.exam, student=self.student)
+
+        # First submission
+        finalized1 = finalize_submission(attempt, mode='submitted')
+        self.assertEqual(finalized1.status, 'submitted')
+        first_submitted_at = finalized1.submitted_at
+
+        # Second submission immediately after
+        finalized2 = finalize_submission(attempt, mode='submitted')
+        self.assertEqual(finalized2.status, 'submitted')
+        self.assertEqual(finalized2.submitted_at, first_submitted_at)
+
+        # Result is cleanly mapped and unique per student/exam
+        from results.models import Result
+        results_count = Result.objects.filter(exam=self.exam, student=self.student).count()
+        self.assertEqual(results_count, 1)
+
+    def test_teacher_isolated_examination_management(self):
+        """Teachers only manage their own examinations; Admin oversees all examinations."""
+        # Create second teacher
+        teacher2 = User.objects.create_user(
+            username='teacher_beta',
+            password='BetaPass123!',
+            role='teacher'
+        )
+        TeacherProfile.objects.create(
+            user=teacher2,
+            employee_id='T-BETA-02',
+            department='Computer Science',
+            verification_status='approved'
+        )
+
+        # Exam 1 is created by self.teacher
+        # Create Exam 2 created by teacher2
+        exam2 = Exam.objects.create(
+            title='Compiler Design Final',
+            subject=self.subject,
+            created_by=teacher2,
+            start_time=timezone.now() - timezone.timedelta(hours=1),
+            end_time=timezone.now() + timezone.timedelta(hours=2),
+            duration_minutes=90,
+            status='draft'
+        )
+
+        # Teacher 1 views manage_exams
+        self.client.force_login(self.teacher)
+        resp1 = self.client.get(reverse('manage_exams'))
+        self.assertEqual(resp1.status_code, 200)
+        self.assertContains(resp1, self.exam.title)
+        self.assertNotContains(resp1, exam2.title)
+
+        # Teacher 1 blocked from editing Exam 2
+        edit_resp = self.client.get(reverse('edit_exam', args=[exam2.id]))
+        self.assertEqual(edit_resp.status_code, 302)
+        self.assertRedirects(edit_resp, reverse('manage_exams'))
+
+        # Teacher 2 views manage_exams
+        self.client.force_login(teacher2)
+        resp2 = self.client.get(reverse('manage_exams'))
+        self.assertEqual(resp2.status_code, 200)
+        self.assertContains(resp2, exam2.title)
+        self.assertNotContains(resp2, self.exam.title)
+
+        # Admin views manage_exams and sees both
+        admin_user = User.objects.create_superuser(
+            username='eps_super_admin',
+            email='admin@eps.edu',
+            password='SuperAdminPass123!'
+        )
+        self.client.force_login(admin_user)
+        admin_resp = self.client.get(reverse('manage_exams'))
+        self.assertEqual(admin_resp.status_code, 200)
+        self.assertContains(admin_resp, self.exam.title)
+        self.assertContains(admin_resp, exam2.title)
+
+    def test_database_level_uniqueness_enforcement(self):
+        """Student roll number and Teacher employee ID enforce DB-level UNIQUE constraint."""
+        from django.db import IntegrityError, transaction
+        # Duplicate roll number
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                StudentProfile.objects.create(
+                    user=User.objects.create_user(username='stu_dup_test', password='Password123!'),
+                    roll_number=self.student_prof.roll_number, # Existing roll number from setUp
+                    department='Computer Science',
+                    verification_status='approved'
+                )
+
+        # Duplicate employee ID
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                TeacherProfile.objects.create(
+                    user=User.objects.create_user(username='teach_dup_test', password='Password123!'),
+                    employee_id=self.teacher_prof.employee_id, # Existing employee_id from setUp
+                    department='Computer Science',
+                    verification_status='approved'
+                )

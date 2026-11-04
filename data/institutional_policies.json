@@ -1,19 +1,19 @@
 {
   "attempt_allowance": "dual",
-  "audio_monitor": "threshold",
-  "audit_retention_years": "7y",
+  "audio_monitor": "continuous",
+  "audit_retention_years": "10y",
   "clipboard_neutralization_enabled": true,
   "distractor_shuffling_enabled": true,
-  "early_entry_enabled": false,
+  "early_entry_enabled": true,
   "focus_trap_enabled": true,
   "item_randomization_enabled": true,
   "late_entry_enabled": true,
-  "late_entry_mins": 15,
-  "negative_marking_scheme": "mild",
+  "late_entry_mins": 25,
+  "negative_marking_scheme": "strict",
   "os_lockdown_enabled": true,
   "score_embargo_enabled": true,
   "server_submission_enabled": true,
-  "telemetry_retention_days": "90",
-  "timing_accommodation": "1.0",
-  "video_ingestion": "dual"
+  "telemetry_retention_days": "180",
+  "timing_accommodation": "1.5",
+  "video_ingestion": "single"
 }

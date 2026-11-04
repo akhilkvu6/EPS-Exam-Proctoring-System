@@ -7,7 +7,7 @@ from decimal import Decimal
 import csv
 
 from .models import Result
-from exams.models import Exam, ExamAttempt, StudentAnswer
+from exams.models import Exam, ExamAttempt, StudentAnswer, ProctoringIncident
 from accounts.models import User
 from accounts.decorators import (
     student_required, teacher_required, admin_required,
@@ -345,7 +345,6 @@ def admin_results_export(request):
         return response
 
     elif report_type == 'incidents':
-        from exams.models import ProctoringIncident
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="eps_proctoring_incidents.csv"'
         writer = csv.writer(response)
@@ -383,5 +382,5 @@ def admin_results_export(request):
         'total_results': Result.objects.count(),
         'total_students': User.objects.filter(role='student').count(),
         'total_teachers': User.objects.filter(role='teacher').count(),
-        'total_incidents': Exam.objects.count(),
+        'total_incidents': ProctoringIncident.objects.count(),
     })

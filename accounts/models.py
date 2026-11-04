@@ -80,7 +80,7 @@ class TeacherProfile(models.Model):
         on_delete=models.CASCADE,
         related_name='teacher_profile'
     )
-    employee_id = models.CharField(max_length=50)
+    employee_id = models.CharField(max_length=50, unique=True)
     department = models.CharField(max_length=100)
     qualification = models.CharField(max_length=150)
     institution = models.CharField(max_length=150, blank=True, default='')
@@ -124,7 +124,7 @@ class StudentProfile(models.Model):
         related_name='student_profile'
     )
     full_name = models.CharField(max_length=150, blank=True, default='')
-    roll_number = models.CharField(max_length=50)
+    roll_number = models.CharField(max_length=50, unique=True)
     department = models.CharField(max_length=100)
     semester = models.CharField(max_length=20)
 

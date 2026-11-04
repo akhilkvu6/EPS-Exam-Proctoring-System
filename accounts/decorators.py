@@ -67,12 +67,14 @@ def teacher_required(view_func):
         if not request.user.is_authenticated:
             return redirect('common_login')
         
+        # Admin and superusers possess global oversight across teacher endpoints
+        if request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff:
+            return view_func(request, *args, **kwargs)
+
         if request.user.role != 'teacher':
             messages.error(request, 'Access restricted to teacher accounts.')
             if request.user.role == 'student':
                 return redirect('student_dashboard')
-            elif request.user.is_admin_user:
-                return redirect('admin_dashboard')
             return redirect('common_login')
         
         # Check approval status
@@ -110,8 +112,7 @@ def check_teacher_exam_access(user, exam):
     Verifies that the authenticated user has authorization to access/modify/grade the exam.
     Rules:
     - Superuser or role == 'admin': Allowed
-    - Exam creator (exam.created_by == user): Allowed
-    - Teacher whose department matches exam.subject.department (name or code): Allowed
+    - Exam creator (exam.created_by_id == user.id): Allowed
     - Otherwise: Denied (False)
     """
     if hasattr(exam, 'is_accessible_by_teacher'):
@@ -122,11 +123,4 @@ def check_teacher_exam_access(user, exam):
         return True
     if user.role != 'teacher':
         return False
-    if exam.created_by_id == user.id:
-        return True
-    if hasattr(user, 'teacher_profile') and getattr(exam, 'subject', None) and getattr(exam.subject, 'department', None):
-        teacher_dept = (user.teacher_profile.department or '').strip().lower()
-        dept_name = exam.subject.department.name.strip().lower()
-        dept_code = exam.subject.department.code.strip().lower()
-        return bool(teacher_dept and (teacher_dept == dept_name or teacher_dept == dept_code))
-    return False
+    return exam.created_by_id == user.id

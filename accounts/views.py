@@ -2,6 +2,7 @@ import csv
 import io
 import os
 from datetime import timedelta
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
@@ -55,6 +56,15 @@ def common_login(request):
         elif request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff:
             return redirect('admin_dashboard')
 
+    is_dev_mode = getattr(settings, 'DEBUG', False)
+    initial_mode = request.GET.get('mode', 'login')
+    active_role = request.GET.get('role', 'student')
+    if active_role not in ('student', 'teacher'):
+        active_role = 'student'
+
+    student_form = StudentRegistrationForm()
+    teacher_form = TeacherRegistrationForm()
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -70,13 +80,27 @@ def common_login(request):
             if user is not None:
                 if not user.is_active:
                     form.add_error(None, 'This account has been deactivated by administration.')
-                    return render(request, 'accounts/login.html', {'form': form})
+                    return render(request, 'accounts/login.html', {
+                        'form': form,
+                        'student_form': student_form,
+                        'teacher_form': teacher_form,
+                        'initial_mode': 'login',
+                        'active_role': active_role,
+                        'is_dev_mode': is_dev_mode,
+                    })
 
                 # Check suspension / approval status
                 status = user.get_status()
                 if status == 'suspended':
                     form.add_error(None, 'Your account has been suspended. Please contact the administrator.')
-                    return render(request, 'accounts/login.html', {'form': form})
+                    return render(request, 'accounts/login.html', {
+                        'form': form,
+                        'student_form': student_form,
+                        'teacher_form': teacher_form,
+                        'initial_mode': 'login',
+                        'active_role': active_role,
+                        'is_dev_mode': is_dev_mode,
+                    })
 
                 login(request, user)
                 if request.POST.get('remember_device'):
@@ -108,7 +132,14 @@ def common_login(request):
     else:
         form = LoginForm()
 
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'student_form': student_form,
+        'teacher_form': teacher_form,
+        'initial_mode': initial_mode,
+        'active_role': active_role,
+        'is_dev_mode': is_dev_mode,
+    })
 
 
 def student_login(request):
@@ -138,10 +169,13 @@ def central_register(request):
     if request.user.is_authenticated:
         return redirect('home')
 
+    is_dev_mode = getattr(settings, 'DEBUG', False)
     active_role = request.POST.get('role') or request.GET.get('role', 'student')
     if active_role not in ('student', 'teacher'):
         active_role = 'student'
 
+    initial_mode = request.GET.get('mode', 'register')
+    login_form = LoginForm()
     student_form = StudentRegistrationForm()
     teacher_form = TeacherRegistrationForm()
 
@@ -195,9 +229,12 @@ def central_register(request):
                 })
 
     return render(request, 'accounts/register.html', {
+        'form': login_form,
         'student_form': student_form,
         'teacher_form': teacher_form,
         'active_role': active_role,
+        'initial_mode': initial_mode,
+        'is_dev_mode': is_dev_mode,
     })
 
 

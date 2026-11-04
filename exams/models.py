@@ -181,7 +181,7 @@ class Exam(models.Model):
         Check if teacher or admin user has permission to manage/grade this exam.
         - Admin or superuser has full access.
         - The creator of the exam has full access.
-        - A teacher in the same department as the exam's subject has access.
+        - Other teachers are strictly denied access.
         """
         if not user or not user.is_authenticated:
             return False
@@ -189,15 +189,7 @@ class Exam(models.Model):
             return True
         if user.role != 'teacher':
             return False
-        if self.created_by_id == user.id:
-            return True
-        if hasattr(user, 'teacher_profile') and self.subject and self.subject.department:
-            teacher_dept = (user.teacher_profile.department or '').strip().lower()
-            dept_name = self.subject.department.name.strip().lower()
-            dept_code = self.subject.department.code.strip().lower()
-            if teacher_dept and (teacher_dept == dept_name or teacher_dept == dept_code):
-                return True
-        return False
+        return self.created_by_id == user.id
 
     def get_live_status(self):
         now = timezone.now()

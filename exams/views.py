@@ -32,9 +32,10 @@ from accounts.decorators import (
 def manage_exams(request):
     """List examinations created by the teacher or department."""
     teacher = request.user
-    exams = Exam.objects.filter(
-        Q(created_by=teacher) | Q(subject__department__name__iexact=teacher.teacher_profile.department)
-    ).select_related('subject', 'created_by').prefetch_related('assigned_classes')
+    if teacher.role == 'admin' or teacher.is_superuser:
+        exams = Exam.objects.all().select_related('subject', 'created_by').prefetch_related('assigned_classes')
+    else:
+        exams = Exam.objects.filter(created_by=teacher).select_related('subject', 'created_by').prefetch_related('assigned_classes')
 
     now = timezone.now()
     context = {
@@ -883,82 +884,84 @@ def student_exam_list(request):
 # ==========================================
 
 def finalize_submission(attempt, request=None, mode='submitted'):
-    """Evaluates objective questions and finalizes exam attempt."""
-    if attempt.status in ['submitted', 'auto_submitted']:
-        return attempt
+    """Evaluates objective questions and finalizes exam attempt safely with row-level locking."""
+    with transaction.atomic():
+        locked_attempt = ExamAttempt.objects.select_for_update().get(id=attempt.id)
+        if locked_attempt.status in ['submitted', 'auto_submitted']:
+            return locked_attempt
 
-    attempt.status = mode
-    attempt.submitted_at = timezone.now()
+        locked_attempt.status = mode
+        locked_attempt.submitted_at = timezone.now()
 
-    total_score = Decimal('0.0')
-    exam = attempt.exam
-    exam_questions = {eq.question_id: eq for eq in exam.exam_questions.all()}
+        total_score = Decimal('0.0')
+        exam = locked_attempt.exam
+        exam_questions = {eq.question_id: eq for eq in exam.exam_questions.all()}
 
-    for ans in attempt.answers.select_related('question', 'selected_option').all():
-        q = ans.question
-        eq = exam_questions.get(q.id)
-        effective_marks = eq.effective_marks() if eq else q.marks
-        effective_negative = eq.effective_negative_marks() if eq else q.negative_marks
+        for ans in locked_attempt.answers.select_related('question', 'selected_option').all():
+            q = ans.question
+            eq = exam_questions.get(q.id)
+            effective_marks = eq.effective_marks() if eq else q.marks
+            effective_negative = eq.effective_negative_marks() if eq else q.negative_marks
 
-        if q.question_type in ['mcq', 'true_false']:
-            if ans.selected_option is not None:
-                if ans.selected_option.is_correct:
-                    ans.marks_awarded = effective_marks
-                else:
-                    if exam.negative_marking:
-                        ans.marks_awarded = -Decimal(str(effective_negative))
+            if q.question_type in ['mcq', 'true_false']:
+                if ans.selected_option is not None:
+                    if ans.selected_option.is_correct:
+                        ans.marks_awarded = effective_marks
                     else:
-                        ans.marks_awarded = Decimal('0.0')
+                        if exam.negative_marking:
+                            ans.marks_awarded = -Decimal(str(effective_negative))
+                        else:
+                            ans.marks_awarded = Decimal('0.0')
+                else:
+                    ans.marks_awarded = Decimal('0.0')
+                ans.is_evaluated = True
+                ans.save()
+                total_score += ans.marks_awarded
             else:
-                ans.marks_awarded = Decimal('0.0')
-            ans.is_evaluated = True
-            ans.save()
-            total_score += ans.marks_awarded
-        else:
-            ans.marks_awarded = None
-            ans.is_evaluated = False
-            ans.save()
+                ans.marks_awarded = None
+                ans.is_evaluated = False
+                ans.save()
 
-    attempt.total_score = max(Decimal('0.0'), total_score)
-    attempt.save()
+        locked_attempt.total_score = max(Decimal('0.0'), total_score)
+        locked_attempt.save()
 
-    # Link with Result model in results app
-    try:
-        from results.models import Result
-        result = Result.objects.filter(exam=exam, student=attempt.student).first()
-        if result:
-            result.attempt = attempt
-            result.maximum_marks = exam.total_marks
-            result.save()
-        else:
-            result = Result.objects.create(
-                attempt=attempt,
-                exam=exam,
-                student=attempt.student,
-                maximum_marks=exam.total_marks
-            )
-        result.recalculate()
-    except Exception as e:
-        import logging
-        logging.getLogger(__name__).error(f"Error persisting result for attempt {attempt.id}: {e}")
+        # Link with Result model in results app
+        try:
+            from results.models import Result
+            result = Result.objects.filter(exam=exam, student=locked_attempt.student).first()
+            if result:
+                result.attempt = locked_attempt
+                result.maximum_marks = exam.total_marks
+                result.save()
+            else:
+                result = Result.objects.create(
+                    attempt=locked_attempt,
+                    exam=exam,
+                    student=locked_attempt.student,
+                    maximum_marks=exam.total_marks
+                )
+            result.recalculate()
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Error persisting result for attempt {locked_attempt.id}: {e}")
 
-    log_audit(
-        attempt.student,
-        'EXAM_SUBMITTED',
-        attempt.student,
-        request,
-        f"Submitted exam: {exam.title} ({mode}) - Auto-score: {attempt.total_score}"
-    )
+        log_audit(
+            locked_attempt.student,
+            'EXAM_SUBMITTED',
+            locked_attempt.student,
+            request,
+            f"Submitted exam: {exam.title} ({mode}) - Auto-score: {locked_attempt.total_score}"
+        )
 
-    send_notification(
-        recipient=attempt.student,
-        title=f"Submission Recorded: {exam.title}",
-        message=f"Your responses for '{exam.title}' have been safely recorded ({mode.replace('_', ' ').title()}).",
-        notification_type="exam",
-        link="/exams/my-exams/"
-    )
+        send_notification(
+            recipient=locked_attempt.student,
+            title=f"Submission Recorded: {exam.title}",
+            message=f"Your responses for '{exam.title}' have been safely recorded ({mode.replace('_', ' ').title()}).",
+            notification_type="exam",
+            link="/exams/my-exams/"
+        )
 
-    return attempt
+        return locked_attempt
 
 
 @student_required

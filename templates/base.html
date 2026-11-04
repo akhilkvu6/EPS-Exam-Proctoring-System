@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}EPS — School Management & Exam System{% endblock %}</title>
+    <title>{% block title %}EPS — Examination Proctoring System{% endblock %}</title>
     
     <!-- Prevent Theme Flash -->
     <script>
@@ -43,7 +43,7 @@
                 <div class="app-sidebar__header">
                     <a href="{% url 'home' %}" class="app-sidebar__brand">
                         <span class="brand-badge">EPS</span>
-                        <span class="app-sidebar__brand-text">School Portal</span>
+                        <span class="app-sidebar__brand-text">Exam Proctoring</span>
                     </a>
                     <button type="button" id="sidebar-toggle" title="Collapse Sidebar" class="app-sidebar__toggle-btn" aria-label="Toggle Sidebar">
                         <i data-lucide="chevrons-left" class="lucide-icon"></i>
@@ -135,7 +135,7 @@
                             <span class="nav-item__label">Audit Logs</span>
                         </a>
 
-                        <div class="nav-section-title">School People</div>
+                        <div class="nav-section-title">User Directory</div>
                         <a href="{% url 'admin_students' %}" data-tooltip="All Students" class="nav-item {% if request.resolver_match.url_name == 'admin_students' or request.resolver_match.url_name == 'admin_student_detail' %}is-active{% endif %}">
                             <span class="nav-item__icon"><i data-lucide="graduation-cap" class="lucide-icon"></i></span>
                             <span class="nav-item__label">All Students</span>
@@ -295,20 +295,25 @@
                 </header>
     {% else %}
         <!-- Public Guest Header -->
-        <header class="public-header">
-            <div class="public-header__container">
-                <a href="{% url 'home' %}" class="nav-brand">
-                    <span class="brand-badge">EPS</span>
-                    <span>School Portal</span>
+        <header class="public-header" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+            <div class="public-header__container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); height: 64px; display: flex; align-items: center; justify-content: space-between;">
+                <a href="{% url 'home' %}" class="nav-brand" style="display: flex; align-items: center; gap: var(--space-3); text-decoration: none;">
+                    <span class="brand-badge" style="width: 34px; height: 34px; border-radius: 9px; background: var(--text-primary); color: var(--text-inverse); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; letter-spacing: 0.04em; box-shadow: 0 2px 8px rgba(0,0,0,0.12);">EPS</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 700; font-size: var(--font-size-base); color: var(--text-primary); letter-spacing: -0.01em;">Examination Portal</span>
+                        <span style="font-size: 10px; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); padding: 2px 7px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; background: #10B981;"></span>
+                            Online
+                        </span>
+                    </div>
                 </a>
 
                 <nav style="display: flex; align-items: center; gap: var(--space-3);">
-                    <button type="button" class="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
-                        <i data-lucide="sun-moon" class="lucide-icon"></i>
+                    <button type="button" class="theme-toggle-btn btn btn-ghost btn-sm" title="Toggle Theme" aria-label="Toggle light/dark theme" style="padding: 7px 10px; border-radius: var(--radius-control); display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="sun-moon" class="lucide-icon icon-sm"></i>
                     </button>
-                    <a href="{% url 'home' %}" class="btn btn-ghost btn-sm">Home</a>
-                    <a href="{% url 'register' %}" class="btn btn-secondary btn-sm">Register</a>
-                    <a href="{% url 'common_login' %}" class="btn btn-primary btn-sm">Sign In</a>
+                    <a href="{% url 'common_login' %}" class="btn btn-secondary btn-sm" style="padding: 0.45rem 1rem; font-weight: 600; border-radius: var(--radius-control);">Sign In</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm" style="padding: 0.45rem 1.1rem; font-weight: 600; border-radius: var(--radius-control); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Get Started</a>
                 </nav>
             </div>
         </header>
@@ -341,9 +346,9 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2026 EPS School Management & Examination System. All rights reserved.</p>
+    <!-- Minimal Public Footer -->
+    <footer class="footer" style="padding: var(--space-6) var(--space-4); text-align: center; border-top: 1px solid var(--border-subtle); background-color: var(--bg-surface); color: var(--text-muted); font-size: var(--font-size-xs); transition: background-color var(--transition-normal);">
+        <p style="margin: 0; line-height: 1.5;">EPS &mdash; Examination Proctoring System &bull; &copy; 2026 All rights reserved.</p>
     </footer>
 
     {% if request.user.is_authenticated %}

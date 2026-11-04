@@ -1,160 +1,361 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}EPS — School Management & Exam System{% endblock %}
+{% block title %}EPS — Secure Online Examination & Proctoring Platform{% endblock %}
 
 {% block content %}
-<div style="max-width: 1080px; margin: 0 auto; padding-bottom: var(--space-10);">
+<div class="landing-wrapper">
+    <!-- Subtle Ambient Glow -->
+    <div class="landing-ambient-bg"></div>
 
     <!-- Hero Section -->
-    <section class="card" style="padding: var(--space-10) var(--space-8); margin-bottom: var(--space-6); text-align: center; display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #FFFFFF 0%, var(--bg-subtle) 100%);">
-        <div class="badge badge--student" style="margin-bottom: var(--space-4);">
-            <i data-lucide="shield-check" class="lucide-icon icon-sm"></i>
-            <span>School Examination Platform</span>
+    <section style="text-align: center; padding: var(--space-8) 0 var(--space-10) 0; position: relative; z-index: 1;">
+        
+        <!-- Technology Pill Badge -->
+        <div class="hero-pill-badge">
+            <span class="pulse-dot"></span>
+            <span>SECURE ONLINE EXAMINATION PLATFORM</span>
         </div>
 
-        <h1 style="font-size: var(--font-size-3xl); font-weight: 800; line-height: 1.2; margin-bottom: var(--space-3); color: var(--text-primary); letter-spacing: -0.02em; max-width: 760px;">
-            Modern School Portal & Secure Exam Management
+        <!-- Master Title with Gradient -->
+        <h1 class="hero-title">
+            <span style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">Examinations. Integrity. Confidence.</span>
+            <span aria-hidden="true">Examinations.<br><span class="hero-gradient-text">Integrity. Confidence.</span></span>
         </h1>
 
-        <p style="font-size: var(--font-size-md); color: var(--text-secondary); max-width: 620px; line-height: 1.6; margin-bottom: var(--space-6);">
-            An easy-to-use platform for students, faculty, and administrators. Take tests in a distraction-free exam room with live camera check, automatic grading, and instant scorecards.
+        <!-- Subtitle -->
+        <p class="hero-desc">
+            A secure platform for conducting online examinations, monitoring candidates and managing academic assessments.
         </p>
 
-        <div style="display: flex; align-items: center; justify-content: center; gap: var(--space-3); flex-wrap: wrap;">
-            <a href="{% url 'common_login' %}" class="btn btn-primary btn-lg">
-                <i data-lucide="log-in" class="lucide-icon"></i>
-                <span>Sign In to School Portal</span>
+        <!-- CTA Buttons -->
+        <div class="hero-actions">
+            <a href="{% url 'common_login' %}" class="hero-btn-primary">
+                <span>Sign In</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
             </a>
-            <a href="{% url 'register' %}" class="btn btn-secondary btn-lg">
-                <i data-lucide="user-plus" class="lucide-icon"></i>
-                <span>Register Account</span>
+            <a href="{% url 'register' %}" class="hero-btn-secondary">
+                <i data-lucide="user-plus" class="lucide-icon icon-sm"></i>
+                <span>Create Account</span>
             </a>
+        </div>
+
+        <!-- Trust & Security Badges -->
+        <div class="hero-trust-badges">
+            <div class="trust-badge-item">
+                <i data-lucide="lock" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                <span>Browser Lockdown</span>
+            </div>
+            <div class="trust-badge-item">
+                <i data-lucide="eye" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                <span>Real-Time Face Telemetry</span>
+            </div>
+            <div class="trust-badge-item">
+                <i data-lucide="zap" class="lucide-icon icon-xs" style="color: #F59E0B;"></i>
+                <span>Offline-Resilient Autosave</span>
+            </div>
         </div>
     </section>
 
-    <!-- Pastel Functional Pillars -->
-    <section style="margin-bottom: var(--space-8);">
-        <div style="margin-bottom: var(--space-5); text-align: center;">
-            <h2 style="font-size: var(--font-size-xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1);">
-                Designed for Everyday Learning
-            </h2>
-            <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-                Everything you need to organize classes, tests, and student progress in one place.
-            </p>
+    <!-- Interactive Live Proctoring HUD Window Showcase -->
+    <section class="proctor-hud-window">
+        <!-- Title Bar -->
+        <div class="proctor-hud-titlebar">
+            <div class="proctor-window-dots">
+                <span class="window-dot dot-red"></span>
+                <span class="window-dot dot-yellow"></span>
+                <span class="window-dot dot-green"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #10B981;"></span>
+                <span>EPS SECURE ENGINE &bull; CS301 DATABASE SYSTEMS &bull; LIVE PROCTORING</span>
+            </div>
+            <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">SEC-SESSION #8849</span>
         </div>
 
-        <div class="grid grid-cols-3">
-            <!-- Student / Blue Card -->
-            <div class="card card--student card--interactive">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
-                    <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;">
+        <!-- Window Body -->
+        <div class="proctor-hud-body">
+            
+            <!-- Left: Candidate Camera Simulation -->
+            <div class="proctor-cam-sim">
+                <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
+                    <span class="cam-sim-badge" style="color: #10B981;">
+                        <span style="width: 5px; height: 5px; border-radius: 50%; background: #10B981;"></span>
+                        CAMERA FEED
+                    </span>
+                    <span class="cam-sim-badge" style="color: #60A5FA;">30 FPS</span>
+                </div>
+
+                <!-- Bounding Box Face Indicator -->
+                <div class="cam-sim-facebox">
+                    <div class="cam-sim-silhouette"></div>
+                    <span style="position: absolute; bottom: -18px; font-size: 9px; font-weight: 700; background: #10B981; color: #000; padding: 1px 4px; border-radius: 2px;">
+                        FACE: 1 (100%)
+                    </span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
+                    <span style="font-size: 10px; opacity: 0.85;">Rahul Sharma (BCA202601)</span>
+                    <span class="cam-sim-badge" style="color: #10B981;">VERIFIED</span>
+                </div>
+            </div>
+
+            <!-- Middle: Question Room Simulation -->
+            <div class="hud-center-preview">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">
+                            Question 4 of 25 &bull; Section A (Database Design)
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #10B981; font-weight: 600;">
+                            <i data-lucide="check-circle-2" class="lucide-icon icon-xs"></i>
+                            Autosaved 2s ago
+                        </span>
+                    </div>
+
+                    <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 14px 0; line-height: 1.4;">
+                        Which normal form is specifically designed to eliminate all partial functional dependencies on candidate keys?
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="padding: 10px 12px; border-radius: 8px; border: 1.5px solid #2563EB; background: rgba(37, 99, 235, 0.06); display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text-primary);">
+                            <span>B. Second Normal Form (2NF)</span>
+                            <i data-lucide="check-circle" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                        </div>
+                        <div style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-default); background: var(--bg-surface); font-size: 13px; color: var(--text-secondary); opacity: 0.8;">
+                            <span>A. First Normal Form (1NF)</span>
+                        </div>
+                        <div style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-default); background: var(--bg-surface); font-size: 13px; color: var(--text-secondary); opacity: 0.8;">
+                            <span>C. Third Normal Form (3NF)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-secondary);">
+                    <span>Navigation: Jump to Q5</span>
+                    <span style="font-weight: 600; color: #2563EB;">Encrypted Transmission Active</span>
+                </div>
+            </div>
+
+            <!-- Right: Real-Time Telemetry Feed -->
+            <div class="hud-side-telemetry">
+                <!-- Timer -->
+                <div style="padding: 12px; background: var(--bg-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; text-align: center;">
+                    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;">Time Remaining</div>
+                    <div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono); color: var(--text-primary); letter-spacing: -0.02em;">01:42:15</div>
+                </div>
+
+                <!-- Telemetry Items -->
+                <div class="telemetry-card">
+                    <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="mic" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        Audio Level
+                    </span>
+                    <strong style="color: #10B981;">Silent (0 dB)</strong>
+                </div>
+
+                <div class="telemetry-card">
+                    <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="maximize" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        Screen Focus
+                    </span>
+                    <strong style="color: #10B981;">Locked</strong>
+                </div>
+
+                <div class="telemetry-card">
+                    <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="shield-alert" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                        Incidents
+                    </span>
+                    <strong style="color: var(--text-primary);">0 Flagged</strong>
+                </div>
+
+                <div class="telemetry-card">
+                    <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="activity" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        Integrity Score
+                    </span>
+                    <strong style="color: #10B981;">100%</strong>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Three Core Bento Pillars -->
+    <section style="margin-bottom: var(--space-12);">
+        <div style="text-align: center; margin-bottom: var(--space-8);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #2563EB; letter-spacing: 0.08em; margin-bottom: 4px;">
+                ENGINEERED FOR RIGOROUS ACADEMIC STANDARDS
+            </div>
+            <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; color: var(--text-primary); letter-spacing: -0.025em; margin: 0;">
+                Three Core Pillars of Academic Security
+            </h2>
+        </div>
+
+        <div class="bento-features-grid">
+            
+            <!-- Pillar 1: Secure Examinations -->
+            <div class="bento-feature-card">
+                <div class="feature-icon-wrapper" style="background: rgba(37, 99, 235, 0.08); color: #2563EB; border-color: rgba(37, 99, 235, 0.2);">
+                    <i data-lucide="clipboard-check" class="lucide-icon icon-md"></i>
+                </div>
+                <h3 class="feature-card-title">Secure Examinations</h3>
+                <p class="feature-card-desc">
+                    Controlled computer-based testing environment engineered to eliminate distractions, enforce synchronized timeframes, and safeguard assessment answers.
+                </p>
+                <ul class="feature-checklist">
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                        <span>Scheduled examinations</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                        <span>Timed assessments</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #2563EB;"></i>
+                        <span>Automatic answer saving</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Pillar 2: Intelligent Proctoring -->
+            <div class="bento-feature-card">
+                <div class="feature-icon-wrapper" style="background: rgba(16, 185, 129, 0.08); color: #10B981; border-color: rgba(16, 185, 129, 0.2);">
+                    <i data-lucide="shield" class="lucide-icon icon-md"></i>
+                </div>
+                <h3 class="feature-card-title">Intelligent Proctoring</h3>
+                <p class="feature-card-desc">
+                    Autonomous client-side supervision combining real-time computer vision presence detection and active browser sandboxing to preserve examination honesty.
+                </p>
+                <ul class="feature-checklist">
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        <span>Browser activity monitoring</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        <span>Camera-based monitoring</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                        <span>AI-assisted incident detection</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Pillar 3: Results & Evaluation -->
+            <div class="bento-feature-card">
+                <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.08); color: #F59E0B; border-color: rgba(245, 158, 11, 0.2);">
+                    <i data-lucide="award" class="lucide-icon icon-md"></i>
+                </div>
+                <h3 class="feature-card-title">Results &amp; Evaluation</h3>
+                <p class="feature-card-desc">
+                    Immediate automated grading for objective questions paired with faculty evaluation, score verification workflows, and published student scorecards.
+                </p>
+                <ul class="feature-checklist">
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #F59E0B;"></i>
+                        <span>Automated objective grading</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #F59E0B;"></i>
+                        <span>Teacher evaluation</span>
+                    </li>
+                    <li class="feature-checklist-item">
+                        <i data-lucide="check" class="lucide-icon icon-xs" style="color: #F59E0B;"></i>
+                        <span>Published examination results</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Metrics & Trust Strip -->
+    <section class="stats-strip">
+        <div>
+            <div class="stat-number" style="color: #2563EB;">99.8%</div>
+            <div class="stat-label">Anomaly Detection Rate</div>
+        </div>
+        <div>
+            <div class="stat-number" style="color: #10B981;">0%</div>
+            <div class="stat-label">Answer Data Loss</div>
+        </div>
+        <div>
+            <div class="stat-number">3 Roles</div>
+            <div class="stat-label">Student, Teacher, Admin</div>
+        </div>
+        <div>
+            <div class="stat-number" style="color: #F59E0B;">&lt;100ms</div>
+            <div class="stat-label">Telemetry Latency</div>
+        </div>
+    </section>
+
+    <!-- Role Gateways (Student vs Teacher) -->
+    <section class="role-gateways-grid">
+        <!-- Student Gateway -->
+        <div class="role-gateway-card">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(37, 99, 235, 0.08); color: #2563EB; display: flex; align-items: center; justify-content: center;">
                         <i data-lucide="graduation-cap" class="lucide-icon icon-md"></i>
                     </div>
-                    <span class="badge badge--student">Students</span>
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #2563EB; letter-spacing: 0.05em; background: rgba(37, 99, 235, 0.08); padding: 3px 8px; border-radius: 6px;">
+                        Candidates
+                    </span>
                 </div>
-                <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--space-2);">
-                    Clear Exam Rooms
-                </h3>
-                <p style="font-size: var(--font-size-sm); line-height: 1.55; opacity: 0.9;">
-                    Step-by-step pre-flight check, full-screen testing, live countdown timer, and automatic answer saving.
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px 0;">Student Portal</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px 0;">
+                    Access scheduled examinations, complete quick pre-flight hardware diagnostics, submit answers with zero fear of data loss, and inspect verified grade cards.
                 </p>
             </div>
-
-            <!-- Teacher / Lavender Card -->
-            <div class="card card--teacher card--interactive">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
-                    <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;">
-                        <i data-lucide="book-open" class="lucide-icon icon-md"></i>
-                    </div>
-                    <span class="badge badge--teacher">Faculty</span>
-                </div>
-                <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--space-2);">
-                    Exam Creator & Grading
-                </h3>
-                <p style="font-size: var(--font-size-sm); line-height: 1.55; opacity: 0.9;">
-                    Build question banks, schedule departmental exams, review student submissions, and publish verified scores.
-                </p>
-            </div>
-
-            <!-- Attendance & Security / Mint Card -->
-            <div class="card card--attendance card--interactive">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3);">
-                    <div style="width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;">
-                        <i data-lucide="check-circle" class="lucide-icon icon-md"></i>
-                    </div>
-                    <span class="badge badge--mint">Integrity</span>
-                </div>
-                <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--space-2);">
-                    Verified Attendance
-                </h3>
-                <p style="font-size: var(--font-size-sm); line-height: 1.55; opacity: 0.9;">
-                    Camera checks, microphone diagnostics, and incident telemetry make sure test sessions remain honest and fair.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="card" style="padding: var(--space-6); margin-bottom: var(--space-8);">
-        <div style="margin-bottom: var(--space-5); text-align: center;">
-            <h2 style="font-size: var(--font-size-lg); font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-1);">
-                Three Simple Steps
-            </h2>
-            <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-                How students and teachers get started on EPS.
-            </p>
+            <a href="{% url 'common_login' %}?role=student" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; font-weight: 600;">
+                <span>Enter as Student</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+            </a>
         </div>
 
-        <div class="grid grid-cols-3">
-            <div style="display: flex; flex-direction: column; gap: var(--space-2);">
-                <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="badge badge--student" style="font-weight: 700; width: 28px; height: 28px; justify-content: center;">1</span>
-                    <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary);">Register Your Account</h4>
+        <!-- Faculty Gateway -->
+        <div class="role-gateway-card">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(147, 51, 234, 0.08); color: #9333EA; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="users" class="lucide-icon icon-md"></i>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #9333EA; letter-spacing: 0.05em; background: rgba(147, 51, 234, 0.08); padding: 3px 8px; border-radius: 6px;">
+                        Faculty &amp; Examiners
+                    </span>
                 </div>
-                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5;">
-                    Sign up with your school details. Your department faculty or school administrator will verify and approve your profile.
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px 0;">Faculty &amp; Examiner Desk</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px 0;">
+                    Author modular question banks, schedule departmental assessments, review proctoring incident logs with timestamped evidence, and publish final scores.
                 </p>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: var(--space-2);">
-                <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="badge badge--peach" style="font-weight: 700; width: 28px; height: 28px; justify-content: center;">2</span>
-                    <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary);">Take Scheduled Exams</h4>
-                </div>
-                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5;">
-                    Complete your pre-flight readiness check and answer questions in the distraction-free exam room.
-                </p>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: var(--space-2);">
-                <div style="display: flex; align-items: center; gap: var(--space-2);">
-                    <span class="badge badge--mint" style="font-weight: 700; width: 28px; height: 28px; justify-content: center;">3</span>
-                    <h4 style="font-size: var(--font-size-sm); font-weight: 600; color: var(--text-primary);">View Published Scores</h4>
-                </div>
-                <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: 1.5;">
-                    As soon as exams are graded, view your verified marks, percentage scorecards, and teacher feedback.
-                </p>
-            </div>
+            <a href="{% url 'common_login' %}?role=teacher" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; font-weight: 600;">
+                <span>Enter as Faculty</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+            </a>
         </div>
     </section>
 
     <!-- Bottom Action Card -->
-    <section class="card card--event" style="text-align: center; padding: var(--space-6);">
-        <h3 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: var(--space-2);">
-            Ready to Begin?
+    <section class="card" style="text-align: center; padding: var(--space-10) var(--space-6); background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.06);">
+        <h3 style="font-size: clamp(1.4rem, 3vw, 1.85rem); font-weight: 800; color: var(--text-primary); margin: 0 0 8px 0; letter-spacing: -0.02em;">
+            Ready to Conduct Secure Online Examinations?
         </h3>
-        <p style="font-size: var(--font-size-sm); margin-bottom: var(--space-4); opacity: 0.9;">
-            Sign in with your institutional credentials to open your dashboard.
+        <p style="font-size: 14px; color: var(--text-secondary); max-width: 520px; margin: 0 auto 24px auto; line-height: 1.55;">
+            Join universities and institutions delivering cheat-resistant assessments with EPS. Sign in to your account or register today.
         </p>
-        <div style="display: flex; justify-content: center; gap: var(--space-3);">
-            <a href="{% url 'common_login' %}" class="btn btn-primary btn-sm">
-                <i data-lucide="log-in" class="lucide-icon"></i>
-                <span>Sign In Now</span>
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <a href="{% url 'common_login' %}" class="hero-btn-primary" style="padding: 10px 22px; font-size: 13px;">
+                <span>Sign In to Platform</span>
+                <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
             </a>
-            <a href="{% url 'register' %}" class="btn btn-secondary btn-sm">
-                <i data-lucide="user-plus" class="lucide-icon"></i>
-                <span>Register</span>
+            <a href="{% url 'register' %}" class="hero-btn-secondary" style="padding: 10px 22px; font-size: 13px;">
+                <i data-lucide="user-plus" class="lucide-icon icon-xs"></i>
+                <span>Create Institutional Account</span>
             </a>
         </div>
     </section>

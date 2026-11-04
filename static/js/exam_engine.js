@@ -1,7 +1,7 @@
 /**
  * EPS Examination Engine Client Controller
- * Manages question navigation, real-time autosave, server timer synchronization,
- * and duplicate-submission protection.
+ * Manages question navigation, real-time autosave with offline queueing,
+ * server timer synchronization, and duplicate-submission protection.
  */
 
 class ExamEngine {
@@ -19,6 +19,10 @@ class ExamEngine {
         this.saveTimeout = null;
         this.isSubmitting = false;
 
+        // Offline resilience queue
+        this.unsavedQueue = {};
+        this.isFlushingQueue = false;
+
         this.init();
     }
 
@@ -26,6 +30,7 @@ class ExamEngine {
         this.startTimer();
         this.showQuestion(1);
         this.bindEvents();
+        this.bindNetworkRecovery();
     }
 
     startTimer() {
@@ -154,6 +159,19 @@ class ExamEngine {
         });
     }
 
+    bindNetworkRecovery() {
+        window.addEventListener('online', () => {
+            this.flushUnsavedQueue();
+        });
+
+        // Periodic flush of any pending offline responses
+        setInterval(() => {
+            if (Object.keys(this.unsavedQueue).length > 0 && !this.isFlushingQueue) {
+                this.flushUnsavedQueue();
+            }
+        }, 8000);
+    }
+
     triggerAutosave(questionId, selectedOptionId, textAnswer, isMarkedForReview, questionNumber) {
         this.setSaveStatus('saving');
 
@@ -161,8 +179,12 @@ class ExamEngine {
             question_id: questionId,
             selected_option_id: selectedOptionId,
             text_answer: textAnswer,
-            is_marked_for_review: isMarkedForReview
+            is_marked_for_review: isMarkedForReview,
+            question_number: questionNumber
         };
+
+        // Cache into queue before dispatching
+        this.unsavedQueue[questionId] = payload;
 
         fetch(this.saveUrl, {
             method: 'POST',
@@ -182,6 +204,7 @@ class ExamEngine {
             return response.json();
         })
         .then(data => {
+            delete this.unsavedQueue[questionId];
             this.setSaveStatus('saved');
             if (questionNumber) {
                 const pBtn = document.getElementById(`palette-btn-${questionNumber}`);
@@ -193,6 +216,47 @@ class ExamEngine {
         });
     }
 
+    async flushUnsavedQueue() {
+        const pendingKeys = Object.keys(this.unsavedQueue);
+        if (pendingKeys.length === 0) return;
+
+        this.isFlushingQueue = true;
+        this.setSaveStatus('saving');
+
+        for (const qId of pendingKeys) {
+            const payload = this.unsavedQueue[qId];
+            if (!payload) continue;
+
+            try {
+                const response = await fetch(this.saveUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': this.csrfToken
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    delete this.unsavedQueue[qId];
+                    if (payload.question_number) {
+                        const pBtn = document.getElementById(`palette-btn-${payload.question_number}`);
+                        if (pBtn) pBtn.classList.add('palette-answered');
+                    }
+                }
+            } catch (e) {
+                break;
+            }
+        }
+
+        if (Object.keys(this.unsavedQueue).length === 0) {
+            this.setSaveStatus('saved');
+        } else {
+            this.setSaveStatus('error');
+        }
+        this.isFlushingQueue = false;
+    }
+
     setSaveStatus(state) {
         if (!this.statusIndicator) return;
         if (state === 'saving') {
@@ -202,7 +266,7 @@ class ExamEngine {
             this.statusIndicator.innerHTML = '<i data-lucide="check" class="lucide-icon icon-sm"></i> Saved';
             this.statusIndicator.style.color = 'var(--success)';
         } else {
-            this.statusIndicator.innerHTML = '<i data-lucide="wifi-off" class="lucide-icon icon-sm"></i> Offline / Retrying';
+            this.statusIndicator.innerHTML = '<i data-lucide="wifi-off" class="lucide-icon icon-sm"></i> Offline (Responses Buffered)';
             this.statusIndicator.style.color = 'var(--danger)';
         }
         if (window.lucide) {
@@ -219,12 +283,22 @@ class ExamEngine {
     autoSubmitAtDeadline() {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
-        alert('Your exam time has ended. Your answers are now submitted automatically.');
+        alert('Your exam time has ended. Your responses are being submitted automatically.');
         this.submitForm();
     }
 
     submitForm() {
+        if (this.isSubmitting) return;
         this.isSubmitting = true;
+
+        // Duplicate submission prevention: disable UI buttons immediately
+        const submitBtns = document.querySelectorAll('button[type="submit"], #btn-submit-exam');
+        submitBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.textContent = 'Submitting Examination...';
+        });
+
         const form = document.getElementById('exam-submission-form');
         if (form) {
             form.submit();
