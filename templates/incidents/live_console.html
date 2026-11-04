@@ -1,0 +1,179 @@
+{% extends "base/base.html" %}
+
+{% block title %}Invigilator Live Console | {{ exam.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top Nav -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to {{ exam.code }} Configuration
+    </a>
+    <div style="display: flex; gap: var(--space-2); align-items: center;">
+      <span class="badge" style="background-color: rgba(34, 197, 94, 0.15); color: #22c55e;">
+        ● Live Metadata Feed
+      </span>
+      <button type="button" class="btn btn-secondary" onclick="window.location.reload()" style="font-size: 12px; padding: 4px 8px;">
+        🔄 Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Header Card -->
+  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+      <div>
+        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
+          <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 6px; border-radius: 4px;">
+            {{ exam.code }}
+          </span>
+          <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+            {{ exam.subject.code }} - {{ exam.subject.name }}
+          </span>
+          <span class="badge">Cohort: {{ exam.batch.name }}</span>
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+          👁️ Invigilator Live Console & Incident Review
+        </h1>
+      </div>
+      <div style="display: flex; gap: var(--space-4); text-align: right;">
+        <div>
+          <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+            {{ total_active }}
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary);">Active In-Room</div>
+        </div>
+        <div>
+          <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: {% if total_flagged > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+            {{ total_flagged }}
+          </div>
+          <div style="font-size: 11px; color: var(--text-secondary);">Requiring Review</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Toggle -->
+    <div style="display: flex; gap: var(--space-3); border-top: 1px solid var(--border-color); padding-top: var(--space-3);">
+      <a href="{% url 'incidents:live_console' exam.pk %}" class="btn {% if not filter_suspicious %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+        All Candidates ({{ attempts|length }})
+      </a>
+      <a href="{% url 'incidents:live_console' exam.pk %}?suspicious=1" class="btn {% if filter_suspicious %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+        ⚠️ Suspicious / Review Required Only
+      </a>
+    </div>
+  </div>
+
+  <!-- Candidates Stream Table -->
+  {% if attempts %}
+    <div class="card" style="overflow: hidden; padding: 0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+          <tr>
+            <th style="padding: var(--space-3) var(--space-4);">Candidate</th>
+            <th style="padding: var(--space-3) var(--space-4);">Session Status</th>
+            <th style="padding: var(--space-3) var(--space-4);">Trust Score</th>
+            <th style="padding: var(--space-3) var(--space-4);">Integrity Anomalies</th>
+            <th style="padding: var(--space-3) var(--space-4);">Timer Authority</th>
+            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Invigilator Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in attempts %}
+            <tr style="border-bottom: 1px solid var(--border-color); background-color: {% if a.proctoring_summary and a.proctoring_summary.requires_human_review %}rgba(239, 68, 68, 0.04){% else %}transparent{% endif %};">
+              <td style="padding: var(--space-3) var(--space-4);">
+                <div style="font-weight: var(--font-weight-bold); color: var(--text-primary);">
+                  {{ a.student.get_full_name|default:a.student.username }}
+                </div>
+                <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">
+                  Roll: {{ a.student.student_profile.roll_number|default:"PENDING" }}
+                </div>
+              </td>
+
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
+                <span class="badge" style="font-size: 11px;">{{ a.get_status_display }}</span>
+              </td>
+
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
+                {% if a.proctoring_summary %}
+                  <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: {% if a.proctoring_summary.trust_score >= 90 %}#22c55e{% elif a.proctoring_summary.trust_score >= 75 %}#eab308{% else %}#ef4444{% endif %};">
+                    {{ a.proctoring_summary.trust_score }}%
+                  </div>
+                  {% if a.proctoring_summary.requires_human_review %}
+                    <span style="font-size: 10px; color: #ef4444; font-weight: var(--font-weight-bold);">⚠️ Review Flag</span>
+                  {% endif %}
+                {% else %}
+                  <span style="color: var(--text-secondary); font-size: 11px;">100%</span>
+                {% endif %}
+              </td>
+
+              <td style="padding: var(--space-3) var(--space-4); font-size: 11px; color: var(--text-secondary);">
+                {% if a.proctoring_summary %}
+                  <div>FS Exits: <strong>{{ a.proctoring_summary.fullscreen_exit_count }}</strong> | Tab Blur: <strong>{{ a.proctoring_summary.tab_switch_count }}</strong></div>
+                  <div>Out-of-Focus: <strong>{{ a.proctoring_summary.total_out_of_focus_seconds|floatformat:1 }}s</strong> | AI: <strong>{{ a.proctoring_summary.ai_anomaly_count }}</strong></div>
+                {% else %}
+                  <div>No anomalies logged</div>
+                {% endif %}
+              </td>
+
+              <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); white-space: nowrap;">
+                <div>Expires: {{ a.expires_at|date:"H:i:s" }}</div>
+                <div style="color: var(--text-secondary);">Remaining: {{ a.get_remaining_seconds }}s</div>
+              </td>
+
+              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
+                <!-- Intervention Actions -->
+                <div style="display: inline-flex; gap: 4px;">
+                  <!-- Warning Trigger -->
+                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="warning">
+                    <input type="hidden" name="message" value="Official Warning: Please remain centered on your examination screen.">
+                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;" title="Send in-room warning alert">
+                      ⚠️ Warn
+                    </button>
+                  </form>
+
+                  <!-- Time Extension Trigger (+5 mins) -->
+                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="extend_time">
+                    <input type="hidden" name="minutes" value="5">
+                    <input type="hidden" name="notes" value="Invigilator granted +5m network accommodation">
+                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;" title="Grant +5 mins extra time">
+                      ⏱️ +5m
+                    </button>
+                  </form>
+
+                  <!-- Terminate Trigger -->
+                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;" onsubmit="return confirm('Authorize security termination for {{ a.student.username }}? This will instantly expel the candidate.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="terminate">
+                    <input type="hidden" name="notes" value="Authorized invigilator security termination">
+                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Terminate exam immediately">
+                      🛑 Expel
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: var(--space-12);">
+      <div style="font-size: 48px; margin-bottom: var(--space-2);">🛡️</div>
+      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Active Examinees
+      </h3>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
+        {% if filter_suspicious %}
+          No candidates currently trigger security or review thresholds!
+        {% else %}
+          No candidates have initiated attempts for this examination yet.
+        {% endif %}
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

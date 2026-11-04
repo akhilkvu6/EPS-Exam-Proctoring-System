@@ -10,6 +10,9 @@
       ← Back to Examination List
     </a>
     <div style="display: flex; gap: var(--space-2);">
+      <a href="{% url 'incidents:live_console' exam.pk %}" class="btn btn-secondary" style="font-size: var(--font-size-xs); background-color: var(--color-accent-subtle); color: var(--color-accent); font-weight: var(--font-weight-bold);">
+        👁️ Invigilator Console
+      </a>
       <a href="{% url 'examinations:exam_roster' exam.pk %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">
         👥 Candidate Roster ({{ candidates_count }})
       </a>

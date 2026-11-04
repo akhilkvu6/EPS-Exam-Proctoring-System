@@ -19,6 +19,7 @@ urlpatterns = [
     path("examinations/", include("apps.examinations.urls", namespace="examinations")),
     path("exam/", include("apps.exam_engine.urls", namespace="exam_engine")),
     path("proctoring/", include("apps.proctoring.urls", namespace="proctoring")),
+    path("incidents/", include("apps.incidents.urls", namespace="incidents")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

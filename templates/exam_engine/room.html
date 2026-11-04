@@ -377,8 +377,33 @@
     }
   }
 
+  // Periodic invigilator intervention / alert polling
+  async function pollInvigilatorAlerts() {
+    try {
+      const resp = await fetch(`/incidents/api/alerts/${ATTEMPT_ID}/`);
+      const data = await resp.json();
+      if (data.is_terminated) {
+        alert("CRITICAL: Your examination session has been officially terminated by the proctor.");
+        window.location.href = `/exam/receipt/${ATTEMPT_ID}/`;
+        return;
+      }
+      if (data.alerts && data.alerts.length > 0) {
+        data.alerts.forEach(alt => {
+          alert(`📢 INVIGILATOR NOTICE:\n\n${alt.message}`);
+        });
+        if (data.remaining_seconds !== undefined) {
+          remainingSeconds = data.remaining_seconds;
+          updateTimerDisplay();
+        }
+      }
+    } catch (e) {
+      console.warn("Alert poll failed:", e);
+    }
+  }
+
   setInterval(updateTimerDisplay, 1000);
   setInterval(syncServerTimer, 30000);
+  setInterval(pollInvigilatorAlerts, 10000);
   updateTimerDisplay();
 
   // Question navigation
