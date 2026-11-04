@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} — {{ INSTITUTION_NAME }}</title>
+
+  <!-- Early Theme Bootstrapper to prevent FOUC -->
+  <script src="{% static 'js/theme.js' %}"></script>
+
+  <!-- Enterprise Design Tokens and Core Layout -->
+  <link rel="stylesheet" href="{% static 'css/design-tokens.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="brand-container">
+      <div class="brand-logo-badge" aria-hidden="true">P</div>
+      <div class="brand-text">
+        <a href="{% url 'core:index' %}" class="brand-title">{{ PLATFORM_NAME }}</a>
+        <span class="brand-subtitle">{{ INSTITUTION_NAME }}</span>
+      </div>
+    </div>
+
+    <nav aria-label="Main Navigation">
+      <ul class="nav-links">
+        {% block header_nav %}
+          <li><a href="{% url 'core:index' %}" class="nav-link">Home</a></li>
+          <li><a href="{% url 'core:health_check' %}" class="nav-link">System Health</a></li>
+        {% endblock %}
+      </ul>
+    </nav>
+
+    <div style="display: flex; align-items: center; gap: var(--space-3);">
+      <!-- Quick Theme Switcher (System / Light / Dark) -->
+      <button 
+        id="theme-toggle-btn" 
+        class="btn btn-secondary" 
+        style="padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);"
+        title="Toggle Appearance Theme"
+        onclick="toggleThemeCycle()">
+        🌓 Theme
+      </button>
+
+      {% if user.is_authenticated %}
+        <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+          {{ user.get_full_name|default:user.username }}
+        </span>
+        <a href="/accounts/logout/" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Sign Out</a>
+      {% else %}
+        <a href="/accounts/login/" class="btn btn-primary" style="font-size: var(--font-size-xs);">Sign In</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Messages / Flash Alerts -->
+  {% if messages %}
+    <div class="container" style="padding-bottom: 0;">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Main Content Block -->
+  <main class="main-content" id="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="app-footer">
+    <div>
+      <strong>{{ PLATFORM_NAME }} v{{ PLATFORM_VERSION }}</strong> — Production Examination & Intelligent Proctoring Engine
+    </div>
+    <div>
+      &copy; {% now "Y" %} {{ INSTITUTION_NAME }}. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    function toggleThemeCycle() {
+      const current = window.EPSAppearance.getTheme();
+      let next = "light";
+      if (current === "light") next = "dark";
+      else if (current === "dark") next = "system";
+      else next = "light";
+
+      window.EPSAppearance.setTheme(next);
+      const btn = document.getElementById("theme-toggle-btn");
+      if (btn) btn.textContent = (next === "dark" ? "🌙 Dark" : (next === "light" ? "☀️ Light" : "🌓 System"));
+    }
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
