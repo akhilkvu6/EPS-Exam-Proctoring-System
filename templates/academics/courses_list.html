@@ -1,0 +1,101 @@
+{% extends "base/base.html" %}
+
+{% block title %}Degree Programs — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
+    <div class="card">
+      <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+          Degree Programs & Courses
+        </h1>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+          Curriculum frameworks defining program duration, total semester levels, and departmental ownership.
+        </p>
+      </div>
+
+      {% if courses %}
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+                <th style="padding: var(--space-3);">Code</th>
+                <th style="padding: var(--space-3);">Degree Program</th>
+                <th style="padding: var(--space-3);">Department</th>
+                <th style="padding: var(--space-3);">Duration</th>
+                <th style="padding: var(--space-3); text-align: right;">Semesters</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in courses %}
+                <tr style="border-bottom: 1px solid var(--border-default);">
+                  <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+                    {{ c.code }}
+                  </td>
+                  <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                    {{ c.name }}
+                  </td>
+                  <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                    {{ c.department.code }}
+                  </td>
+                  <td style="padding: var(--space-3); font-size: var(--font-size-xs);">
+                    {{ c.duration_years }} Years
+                  </td>
+                  <td style="padding: var(--space-3); text-align: right; font-weight: var(--font-weight-semibold); color: var(--color-accent);">
+                    {{ c.total_semesters }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
+          No courses defined yet.
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Create Course Panel (Staff Only) -->
+    {% if user.is_staff %}
+      <div class="card">
+        <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
+          Add Course Program
+        </h2>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="{{ form.department.id_for_label }}" class="form-label">Department *</label>
+            {{ form.department }}
+            {% if form.department.errors %}<div class="form-error">{{ form.department.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.code.id_for_label }}" class="form-label">Course Code *</label>
+            {{ form.code }}
+            {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Program Name *</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+            <div class="form-group">
+              <label for="{{ form.duration_years.id_for_label }}" class="form-label">Years</label>
+              {{ form.duration_years }}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.total_semesters.id_for_label }}" class="form-label">Total Sems</label>
+              {{ form.total_semesters }}
+            </div>
+          </div>
+          <div style="margin-top: var(--space-6);">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Course &rarr;</button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

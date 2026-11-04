@@ -1,0 +1,101 @@
+{% extends "base/base.html" %}
+
+{% block title %}Curriculum Subjects — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
+    <div class="card">
+      <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+          Curriculum Subjects & Papers
+        </h1>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+          Academic modules mapped to degree programs and semester levels for examination scheduling.
+        </p>
+      </div>
+
+      {% if subjects %}
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+                <th style="padding: var(--space-3);">Code</th>
+                <th style="padding: var(--space-3);">Subject Name</th>
+                <th style="padding: var(--space-3);">Course Program</th>
+                <th style="padding: var(--space-3);">Semester</th>
+                <th style="padding: var(--space-3); text-align: right;">Credits</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in subjects %}
+                <tr style="border-bottom: 1px solid var(--border-default);">
+                  <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+                    {{ s.code }}
+                  </td>
+                  <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                    {{ s.name }}
+                  </td>
+                  <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                    {{ s.course.code }}
+                  </td>
+                  <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--color-accent);">
+                    Sem {{ s.semester_number }}
+                  </td>
+                  <td style="padding: var(--space-3); text-align: right; font-weight: var(--font-weight-bold);">
+                    {{ s.credits }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
+          No curriculum subjects registered yet.
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Create Subject Panel (Staff Only) -->
+    {% if user.is_staff %}
+      <div class="card">
+        <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
+          Add Curriculum Subject
+        </h2>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="{{ form.course.id_for_label }}" class="form-label">Degree Course *</label>
+            {{ form.course }}
+            {% if form.course.errors %}<div class="form-error">{{ form.course.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.code.id_for_label }}" class="form-label">Subject Code *</label>
+            {{ form.code }}
+            {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Subject Title *</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
+            <div class="form-group">
+              <label for="{{ form.semester_number.id_for_label }}" class="form-label">Semester</label>
+              {{ form.semester_number }}
+            </div>
+            <div class="form-group">
+              <label for="{{ form.credits.id_for_label }}" class="form-label">Credits</label>
+              {{ form.credits }}
+            </div>
+          </div>
+          <div style="margin-top: var(--space-6);">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Subject &rarr;</button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

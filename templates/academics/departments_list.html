@@ -1,0 +1,90 @@
+{% extends "base/base.html" %}
+
+{% block title %}Academic Departments — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
+    <div class="card">
+      <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+          Academic Departments
+        </h1>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+          Foundational institutional departments governing academic programs, student cohorts, and faculty jurisdictions.
+        </p>
+      </div>
+
+      {% if departments %}
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+                <th style="padding: var(--space-3);">Code</th>
+                <th style="padding: var(--space-3);">Department Name</th>
+                <th style="padding: var(--space-3);">Status</th>
+                <th style="padding: var(--space-3); text-align: right;">Courses</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in departments %}
+                <tr style="border-bottom: 1px solid var(--border-default);">
+                  <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+                    {{ d.code }}
+                  </td>
+                  <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                    {{ d.name }}
+                  </td>
+                  <td style="padding: var(--space-3);">
+                    {% if d.is_active %}
+                      <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-success-bg); color: var(--color-success-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Active</span>
+                    {% else %}
+                      <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">Inactive</span>
+                    {% endif %}
+                  </td>
+                  <td style="padding: var(--space-3); text-align: right; color: var(--text-secondary);">
+                    {{ d.courses.count }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
+          No academic departments created yet.
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Create Department Panel (Staff Only) -->
+    {% if user.is_staff %}
+      <div class="card">
+        <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
+          Add Department
+        </h2>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="{{ form.code.id_for_label }}" class="form-label">Department Code *</label>
+            {{ form.code }}
+            {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.name.id_for_label }}" class="form-label">Full Department Title *</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: var(--space-2);">
+            {{ form.is_active }}
+            <label for="{{ form.is_active.id_for_label }}" class="form-label" style="margin-bottom: 0;">Active Department</label>
+          </div>
+          <div style="margin-top: var(--space-6);">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Department &rarr;</button>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
