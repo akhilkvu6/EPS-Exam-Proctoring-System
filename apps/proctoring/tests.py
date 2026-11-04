@@ -26,6 +26,7 @@ from apps.proctoring.models import (
     ProctoringEventType,
     EventSeverity,
 )
+from apps.proctoring.services.ai_verifier import verify_and_log_ai_telemetry
 from apps.proctoring.services.noise_filter import record_proctoring_event
 
 
@@ -141,3 +142,36 @@ class ProctoringEngineTests(TestCase):
         self.assertEqual(data["status"], "recorded")
         self.assertFalse(data["is_noise_filtered"])
         self.assertEqual(data["trust_score"], 95.0)
+
+    def test_ai_telemetry_valid_events_and_zero_video_storage(self):
+        """Verifies ingestion of client edge vision metadata and stripping of binary/video payloads."""
+        metadata = {
+            "confidence": 0.94,
+            "face_count": 0,
+            "video": b"RAW_VIDEO_BYTES_PROHIBITED",
+            "frame_bytes": "BASE64_BYTES",
+        }
+        event, summary = verify_and_log_ai_telemetry(
+            attempt=self.attempt,
+            anomaly_type=ProctoringEventType.AI_ABSENCE,
+            duration_seconds=3.5,
+            metadata=metadata,
+        )
+
+        self.assertIsNotNone(event.id)
+        # Strict zero-video verification: raw video and frame bytes MUST be stripped
+        self.assertNotIn("video", event.metadata)
+        self.assertNotIn("frame_bytes", event.metadata)
+        self.assertEqual(event.metadata["confidence"], 0.94)
+
+        # Anomaly counter incremented
+        self.assertGreaterEqual(summary.ai_anomaly_count, 1)
+
+    def test_ai_telemetry_invalid_type_raises_error(self):
+        """Verifies that unauthorized anomaly taxonomy raises validation error."""
+        with self.assertRaises(ValueError):
+            verify_and_log_ai_telemetry(
+                attempt=self.attempt,
+                anomaly_type="UNAUTHORIZED_AI_TYPE",
+                duration_seconds=1.0,
+            )
