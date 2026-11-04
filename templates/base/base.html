@@ -46,6 +46,9 @@
       </button>
 
       {% if user.is_authenticated %}
+        <a href="{% url 'appearance:settings' %}" class="btn btn-secondary" style="padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);" title="Appearance Customization">
+          🎨
+        </a>
         <a href="{% url 'notifications:list' %}" class="btn btn-secondary" style="position: relative; padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);" title="Notifications">
           🔔
           {% if unread_notifications_count > 0 %}
