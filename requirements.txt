@@ -19,3 +19,6 @@ Pillow>=10.4.0
 
 # PDF Scorecard & Verification Transcript Generation
 reportlab>=4.2.0
+
+# WSGI Production HTTP Server (Linux / Containerized Deployments)
+gunicorn>=23.0.0
