@@ -35,9 +35,9 @@
       <a href="{% url 'teacher:students_list' %}" class="nav-link {% if request.resolver_match.url_name == 'students_list' %}active{% endif %}">
         👥 Enrolled Students
       </a>
-      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 8">
-        📚 Question Bank (Phase 8)
-      </span>
+      <a href="{% url 'question_bank:question_list' %}" class="nav-link {% if 'question_bank' in request.resolver_match.app_names or 'question' in request.resolver_match.url_name %}active{% endif %}">
+        📚 Question Bank
+      </a>
       <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 9">
         📝 Examinations (Phase 9)
       </span>

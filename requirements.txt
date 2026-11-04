@@ -13,3 +13,6 @@ psycopg[binary]>=3.2.0
 
 # Static Files Serving for Production / Staging
 whitenoise>=6.8.0
+
+# Image Processing (Question diagrams, visual prompts, proctoring media)
+Pillow>=10.4.0

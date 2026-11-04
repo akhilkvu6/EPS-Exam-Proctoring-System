@@ -1,0 +1,159 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ question.title }} | Question Detail{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <a href="{% url 'question_bank:question_list' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to Question Bank
+    </a>
+    <div style="display: flex; gap: var(--space-2);">
+      <a href="{% url 'question_bank:question_duplicate' question.pk %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">
+        Clone
+      </a>
+      <a href="{% url 'question_bank:question_edit' question.pk %}" class="btn btn-primary" style="font-size: var(--font-size-xs);">
+        Edit (v{{ question.version }})
+      </a>
+    </div>
+  </div>
+
+  <!-- Question Overview Card -->
+  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+      <div>
+        <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent); font-weight: var(--font-weight-bold); margin-right: var(--space-2);">
+          {{ question.subject.code }}
+        </span>
+        <span class="badge">
+          {{ question.get_question_type_display }}
+        </span>
+        <span class="badge">
+          {{ question.get_difficulty_display }}
+        </span>
+        <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 6px; border-radius: 4px; margin-left: var(--space-2);">
+          Snapshot Version v{{ question.version }}
+        </span>
+      </div>
+      <div style="font-size: var(--font-size-sm); color: var(--text-secondary); text-align: right;">
+        Marks: <strong>+{{ question.default_marks }}</strong> / Penalty: <strong>-{{ question.negative_marks }}</strong>
+      </div>
+    </div>
+
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); color: var(--text-primary);">
+      {{ question.title }}
+    </h1>
+
+    <div style="font-size: var(--font-size-base); line-height: 1.6; color: var(--text-primary); margin-bottom: var(--space-6); white-space: pre-wrap; background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md);">{{ question.content }}</div>
+
+    {% if question.image %}
+      <div style="margin-bottom: var(--space-6); text-align: center;">
+        <img src="{{ question.image.url }}" alt="Question Figure" style="max-width: 100%; max-height: 400px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      </div>
+    {% endif %}
+
+    <!-- Options Section -->
+    {% if options %}
+      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: var(--space-3);">
+        Configured Options & Answer Keys
+      </h3>
+      <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-6);">
+        {% for opt in options %}
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid {% if opt.is_correct %}#22c55e{% else %}var(--border-color){% endif %}; background-color: {% if opt.is_correct %}rgba(34, 197, 94, 0.08){% else %}var(--bg-surface-secondary){% endif %};">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <span style="font-weight: var(--font-weight-bold); color: var(--text-secondary);">{{ forloop.counter }}.</span>
+              <span style="color: var(--text-primary);">{{ opt.option_text }}</span>
+            </div>
+            {% if opt.is_correct %}
+              <span style="color: #22c55e; font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">
+                ✓ Correct Key
+              </span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Numerical validation details -->
+    {% if question.question_type == 'NUMERICAL' %}
+      <div style="background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-6);">
+        <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+          Numerical Validation Parameters
+        </h4>
+        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+          Target Value: <strong>{{ question.numerical_target }}</strong> (± {{ question.numerical_tolerance }} tolerance window)
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Solution / Rubric details -->
+    {% if question.explanation %}
+      <div style="margin-bottom: var(--space-4);">
+        <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--space-1);">
+          Post-Exam Model Solution / Explanation
+        </h4>
+        <div style="font-size: var(--font-size-sm); color: var(--text-secondary); background: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+          {{ question.explanation }}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if question.rubric %}
+      <div style="margin-bottom: var(--space-4);">
+        <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--space-1);">
+          Evaluation Rubric
+        </h4>
+        <div style="font-size: var(--font-size-sm); color: var(--text-secondary); background: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+          {{ question.rubric }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Candidate Delivery Security Inspection Card -->
+  <div class="card" style="padding: var(--space-6); border-left: 4px solid var(--color-accent); margin-bottom: var(--space-6);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+        🛡️ Candidate Security & Delivery Simulation
+      </h3>
+      <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+        Zero-Leakage Verified
+      </span>
+    </div>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
+      Below is the exact payload sent to candidates during an active examination. Note that solution keys, correct flags, rubrics, and explanations are securely stripped.
+    </p>
+    <pre style="background-color: #0f172a; color: #38bdf8; padding: var(--space-4); border-radius: var(--radius-md); font-size: 11px; overflow-x: auto; line-height: 1.4;">{{ student_safe_data|pprint }}</pre>
+  </div>
+
+  <!-- Version Snapshots History -->
+  <div class="card" style="padding: var(--space-6);">
+    <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">
+      🔒 Immutable Version Snapshot Registry
+    </h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-xs);">
+      <thead>
+        <tr style="text-align: left; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+          <th style="padding: 8px 0;">Version</th>
+          <th style="padding: 8px 0;">Snapshot ID</th>
+          <th style="padding: 8px 0;">Captured At</th>
+          <th style="padding: 8px 0; text-align: right;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for snap in snapshots %}
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 8px 0; font-weight: var(--font-weight-bold);">v{{ snap.version }}</td>
+            <td style="padding: 8px 0; font-family: monospace; color: var(--text-secondary);">{{ snap.id }}</td>
+            <td style="padding: 8px 0; color: var(--text-secondary);">{{ snap.created_at|date:"M d, Y H:i" }}</td>
+            <td style="padding: 8px 0; text-align: right;">
+              <span style="color: #22c55e; font-weight: var(--font-weight-semibold);">Locked & Immutable</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

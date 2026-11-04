@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block title %}Archive Question | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 500px; padding-top: var(--space-12); padding-bottom: var(--space-12);">
+  <div class="card" style="padding: var(--space-6); text-align: center;">
+    <div style="font-size: 40px; margin-bottom: var(--space-3);">📦</div>
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      Archive Question?
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
+      Are you sure you want to archive <strong>"{{ question.title }}"</strong>? Archived questions will no longer appear in future exam authoring pickers. Existing exam snapshots referencing this item remain intact.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div style="display: flex; justify-content: center; gap: var(--space-3);">
+        <a href="{% url 'question_bank:question_list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-danger" style="background-color: var(--color-error); color: white; border: none; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: var(--font-weight-semibold); cursor: pointer;">
+          Confirm Archive
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

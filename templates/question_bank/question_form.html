@@ -1,0 +1,211 @@
+{% extends "base/base.html" %}
+
+{% block title %}{% if is_edit %}Edit Question v{{ question.version }}{% else %}New Assessment Question{% endif %} | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'question_bank:question_list' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
+      ← Back to Question Bank
+    </a>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+      {% if is_edit %}Edit Question #{{ question.pk }} (Current: v{{ question.version }}){% else %}Create Assessment Question{% endif %}
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      {% if is_edit %}
+        Saving changes will automatically generate an incremented version (v{{ question.version|add:1 }}) snapshot to protect historical exam integrity.
+      {% else %}
+        Compose a reusable item with scoring, rubrics, and version-locked immutability.
+      {% endif %}
+    </p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Core Metadata -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        Item Classification & Metadata
+      </h2>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.subject.id_for_label }}">Assigned Academic Subject *</label>
+          {{ form.subject }}
+          {% if form.subject.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.subject.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.category.id_for_label }}">Category / Topic (Optional)</label>
+          {{ form.category }}
+          {% if form.category.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.category.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.question_type.id_for_label }}">Question Type *</label>
+          {{ form.question_type }}
+          {% if form.question_type.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.question_type.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.difficulty.id_for_label }}">Difficulty Tier *</label>
+          {{ form.difficulty }}
+          {% if form.difficulty.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.difficulty.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--space-4);">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Item Title / Administrative Header *</label>
+        {{ form.title }}
+        {% if form.title.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.title.errors }}</div>{% endif %}
+      </div>
+
+      <div>
+        <label class="form-label" for="{{ form.content.id_for_label }}">Prompt / Body Text (Markdown & Math Supported) *</label>
+        {{ form.content }}
+        {% if form.content.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.content.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- Media Attachment -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        Diagram / Visual Asset (Optional)
+      </h2>
+      <div>
+        <label class="form-label" for="{{ form.image.id_for_label }}">Question Figure / Diagram</label>
+        {{ form.image }}
+        {% if form.image.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.image.errors }}</div>{% endif %}
+        {% if is_edit and question.image %}
+          <div style="margin-top: var(--space-2); font-size: var(--font-size-xs);">
+            Current image: <a href="{{ question.image.url }}" target="_blank" rel="noopener">View uploaded figure</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Options Section (For MCQ, TF, Fill Blanks) -->
+    <div id="options-panel" class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        Answer Options & Keys
+      </h2>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
+        Check 'Is Correct' for all valid answers. For Single Choice, mark only one. For True/False, provide True and False options.
+      </p>
+
+      {{ formset.management_form }}
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        {% for opt_form in formset %}
+          <div style="display: grid; grid-template-columns: auto 1fr auto auto; gap: var(--space-3); align-items: center; background-color: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-md);">
+            <div style="font-weight: var(--font-weight-bold); color: var(--text-secondary); width: 24px; text-align: center;">
+              {{ forloop.counter }}.
+            </div>
+            <div>
+              {{ opt_form.id }}
+              {{ opt_form.option_text }}
+              {% if opt_form.option_text.errors %}
+                <div style="color: var(--color-error); font-size: 11px;">{{ opt_form.option_text.errors }}</div>
+              {% endif %}
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+              <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); cursor: pointer;">
+                {{ opt_form.is_correct }} Correct Key
+              </label>
+            </div>
+            <div>
+              {% if opt_form.instance.pk %}
+                <label style="font-size: var(--font-size-xs); color: var(--color-error); cursor: pointer;">
+                  {{ opt_form.DELETE }} Del
+                </label>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Numerical Parameters Section -->
+    <div id="numerical-panel" class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); display: none;">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        Numerical Validation Engine
+      </h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.numerical_target.id_for_label }}">Exact Numerical Target Value</label>
+          {{ form.numerical_target }}
+          {% if form.numerical_target.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.numerical_target.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.numerical_tolerance.id_for_label }}">Tolerance Window (± Absolute)</label>
+          {{ form.numerical_tolerance }}
+          {% if form.numerical_tolerance.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.numerical_tolerance.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoring & Rubric -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        Scoring Scheme & Rubrics
+      </h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.default_marks.id_for_label }}">Awarded Marks *</label>
+          {{ form.default_marks }}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.negative_marks.id_for_label }}">Negative Penalty Marks (e.g. 0.25)</label>
+          {{ form.negative_marks }}
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--space-4);">
+        <label class="form-label" for="{{ form.explanation.id_for_label }}">Post-Exam Solution / Explanation</label>
+        {{ form.explanation }}
+      </div>
+
+      <div>
+        <label class="form-label" for="{{ form.rubric.id_for_label }}">Grading Rubric (Descriptive / Short Answer)</label>
+        {{ form.rubric }}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+      <a href="{% url 'question_bank:question_list' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" style="padding: var(--space-3) var(--space-6);">
+        {% if is_edit %}Save & Lock Version v{{ question.version|add:1 }}{% else %}Save & Lock Question Snapshot{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Dynamic UI visibility toggle based on Question Type
+  document.addEventListener('DOMContentLoaded', function () {
+    const typeSelect = document.getElementById('id_question_type');
+    const optionsPanel = document.getElementById('options-panel');
+    const numericalPanel = document.getElementById('numerical-panel');
+
+    function syncTypeUI() {
+      const val = typeSelect ? typeSelect.value : '';
+      if (val === 'NUMERICAL') {
+        numericalPanel.style.display = 'block';
+        optionsPanel.style.display = 'none';
+      } else if (val === 'SHORT_ANSWER' || val === 'DESCRIPTIVE') {
+        numericalPanel.style.display = 'none';
+        optionsPanel.style.display = 'none';
+      } else {
+        numericalPanel.style.display = 'none';
+        optionsPanel.style.display = 'block';
+      }
+    }
+
+    if (typeSelect) {
+      typeSelect.addEventListener('change', syncTypeUI);
+      syncTypeUI();
+    }
+  });
+</script>
+{% endblock %}
