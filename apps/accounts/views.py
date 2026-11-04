@@ -29,7 +29,7 @@ def get_role_dashboard_url(user) -> str:
     elif user.role == UserRole.TEACHER:
         return "/teacher/dashboard/"
     elif user.role == UserRole.ADMIN or user.is_superuser:
-        return "/admin/dashboard/"
+        return "/administration/dashboard/"
 
     return "/"
 

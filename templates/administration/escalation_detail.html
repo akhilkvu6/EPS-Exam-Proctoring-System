@@ -1,0 +1,132 @@
+{% extends "administration/base_admin.html" %}
+
+{% block title %}Resolve Escalation {{ application.registration_number }} — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block admin_content %}
+<div>
+  <!-- Dossier Header -->
+  <div class="card" style="margin-bottom: var(--space-6);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-4);">
+      <div>
+        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-danger); text-transform: uppercase;">
+          Escalated Exception Review
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-top: var(--space-1);">
+          {{ application.user.get_full_name|default:application.user.username }}
+        </h1>
+        <div style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px;">
+          Username: <strong>{{ application.user.username }}</strong> &bull; Registration Ref: <strong style="color: var(--color-danger);">{{ application.registration_number }}</strong>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">APPLICATION STATUS</span>
+        <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-danger);">
+          Escalated to Institutional Admin
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Academic & Personal Data Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4); font-size: var(--font-size-xs);">
+      <div>
+        <div style="color: var(--text-tertiary);">DEPARTMENT</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.department_name }}</div>
+      </div>
+      <div>
+        <div style="color: var(--text-tertiary);">TARGET PROGRAM</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.course_name }}</div>
+      </div>
+      <div>
+        <div style="color: var(--text-tertiary);">ACADEMIC BATCH</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.batch_name }}</div>
+      </div>
+      <div>
+        <div style="color: var(--text-tertiary);">GUARDIAN</div>
+        <div style="font-weight: var(--font-weight-semibold);">{{ application.guardian_name|default:"Not specified" }}</div>
+      </div>
+      <div>
+        <div style="color: var(--text-tertiary);">CONTACT NUMBER</div>
+        <div style="font-weight: var(--font-weight-semibold);">{{ application.contact_number|default:"Not specified" }}</div>
+      </div>
+      <div>
+        <div style="color: var(--text-tertiary);">SUBMISSION DATE</div>
+        <div style="font-weight: var(--font-weight-semibold);">{{ application.created_at|date:"M d, Y H:i" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
+    <!-- Admin Determination Form -->
+    <div class="card">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
+        Executive Determination
+      </h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="{{ form.action.id_for_label }}" class="form-label">Administrative Determination *</label>
+          {{ form.action }}
+          {% if form.action.errors %}
+            <div class="form-error">{{ form.action.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.roll_number.id_for_label }}" class="form-label">Assign Official Roll Number (Optional Override)</label>
+          {{ form.roll_number }}
+          <div class="form-hint">{{ form.roll_number.help_text }}</div>
+          {% if form.roll_number.errors %}
+            <div class="form-error">{{ form.roll_number.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.remarks.id_for_label }}" class="form-label">Official Administrative Justification *</label>
+          {{ form.remarks }}
+          {% if form.remarks.errors %}
+            <div class="form-error">{{ form.remarks.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3);">
+          <button type="submit" class="btn btn-primary">Execute Determination &rarr;</button>
+          <a href="{% url 'administration:escalated_admissions' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Review Dossier & Faculty Remarks History -->
+    <div class="card">
+      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
+        Faculty Review Trail ({{ history.count }})
+      </h3>
+
+      {% if history %}
+        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+          {% for record in history %}
+            <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-3); font-size: var(--font-size-xs);">
+              <div style="display: flex; justify-content: space-between; font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+                <span style="color: var(--color-danger);">{{ record.get_action_display }}</span>
+                <span style="color: var(--text-tertiary); font-size: 10px;">{{ record.created_at|date:"M d, H:i" }}</span>
+              </div>
+              <div style="color: var(--text-secondary); margin-bottom: var(--space-1);">
+                {{ record.remarks }}
+              </div>
+              <div style="color: var(--text-tertiary); font-size: 10px;">
+                Reviewer: {{ record.reviewer.get_full_name|default:record.reviewer.username }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-align: center; padding: var(--space-6) 0;">
+          No prior departmental review records logged.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

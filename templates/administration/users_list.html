@@ -1,0 +1,127 @@
+{% extends "administration/base_admin.html" %}
+
+{% block title %}User Management — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+    <div>
+      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        Institutional User Directory
+      </h1>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        Manage user privileges, active authentication states, and security suspensions.
+      </p>
+    </div>
+
+    <!-- Search input -->
+    <form method="get" style="display: flex; gap: var(--space-2);">
+      <input 
+        type="text" 
+        name="q" 
+        value="{{ search_query }}" 
+        placeholder="Search username, name, email..." 
+        class="form-input" 
+        style="width: 240px; padding: var(--space-1) var(--space-3); font-size: var(--font-size-xs);">
+      <button type="submit" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+        Search
+      </button>
+    </form>
+  </div>
+
+  <!-- Role & Status Filter Pills -->
+  <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); flex-wrap: wrap;">
+    <a href="?" class="btn {% if not role_filter and not status_filter %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      All Users
+    </a>
+    <a href="?role=STUDENT" class="btn {% if role_filter == 'STUDENT' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Students Only
+    </a>
+    <a href="?role=TEACHER" class="btn {% if role_filter == 'TEACHER' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Faculty Only
+    </a>
+    <a href="?role=ADMIN" class="btn {% if role_filter == 'ADMIN' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Administrators
+    </a>
+    <a href="?status=SUSPENDED" class="btn {% if status_filter == 'SUSPENDED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Suspended Accounts
+    </a>
+  </div>
+
+  {% if users %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+            <th style="padding: var(--space-3);">Username</th>
+            <th style="padding: var(--space-3);">Full Name</th>
+            <th style="padding: var(--space-3);">Role</th>
+            <th style="padding: var(--space-3);">Status</th>
+            <th style="padding: var(--space-3);">Joined</th>
+            <th style="padding: var(--space-3); text-align: right;">Security Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr style="border-bottom: 1px solid var(--border-default);">
+              <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-semibold);">
+                @{{ u.username }}
+              </td>
+              <td style="padding: var(--space-3);">
+                <strong>{{ u.get_full_name|default:"-" }}</strong>
+              </td>
+              <td style="padding: var(--space-3);">
+                <span style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--color-accent);">
+                  {{ u.get_role_display }}
+                </span>
+              </td>
+              <td style="padding: var(--space-3);">
+                {% if u.status == 'ACTIVE' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-success-bg); color: var(--color-success-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Active</span>
+                {% elif u.status == 'SUSPENDED' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-danger-bg); color: var(--color-danger-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);">Suspended</span>
+                {% elif u.status == 'PENDING_APPROVAL' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-warning-bg); color: var(--color-warning-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Pending</span>
+                {% else %}
+                  <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">{{ u.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                {{ u.date_joined|date:"M d, Y" }}
+              </td>
+              <td style="padding: var(--space-3); text-align: right;">
+                {% if u != user %}
+                  <form method="post" action="{% url 'administration:user_status_toggle' u.id %}" style="display: inline-block;">
+                    {% csrf_token %}
+                    {% if u.status == 'SUSPENDED' %}
+                      <input type="hidden" name="new_status" value="ACTIVE">
+                      <input type="hidden" name="reason" value="Re-activated by institutional admin">
+                      <button type="submit" class="btn btn-secondary" style="font-size: var(--font-size-xs); padding: 2px 8px; color: var(--color-success-fg);">
+                        Activate Account
+                      </button>
+                    {% else %}
+                      <input type="hidden" name="new_status" value="SUSPENDED">
+                      <input type="hidden" name="reason" value="Suspended by institutional admin">
+                      <button type="submit" class="btn btn-secondary" style="font-size: var(--font-size-xs); padding: 2px 8px; color: var(--color-danger);" onclick="return confirm('Are you sure you want to suspend @{{ u.username }}?');">
+                        Suspend
+                      </button>
+                    {% endif %}
+                  </form>
+                {% else %}
+                  <span style="font-size: 11px; color: var(--text-tertiary);">Current User</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: var(--space-10) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+        No institutional users matching query.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

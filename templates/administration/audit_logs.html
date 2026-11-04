@@ -1,0 +1,82 @@
+{% extends "administration/base_admin.html" %}
+
+{% block title %}System Audit Logs — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+    <div>
+      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        Security & Administrative Audit Logs
+      </h1>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        Section 22: Immutable audit trail tracking executive decisions, security interventions, user status modifications, and system configuration updates.
+      </p>
+    </div>
+
+    <form method="get" style="display: flex; gap: var(--space-2);">
+      <input 
+        type="text" 
+        name="action_type" 
+        value="{{ action_type }}" 
+        placeholder="Filter by action code..." 
+        class="form-input" 
+        style="width: 220px; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      <button type="submit" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+        Filter
+      </button>
+    </form>
+  </div>
+
+  {% if audit_logs %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+            <th style="padding: var(--space-3);">Timestamp</th>
+            <th style="padding: var(--space-3);">Action Code</th>
+            <th style="padding: var(--space-3);">Actor</th>
+            <th style="padding: var(--space-3);">Subject / Target</th>
+            <th style="padding: var(--space-3);">Details</th>
+            <th style="padding: var(--space-3); text-align: right;">IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in audit_logs %}
+            <tr style="border-bottom: 1px solid var(--border-default); font-size: var(--font-size-xs);">
+              <td style="padding: var(--space-3); color: var(--text-secondary); white-space: nowrap;">
+                {{ log.created_at|date:"Y-m-d H:i:s" }}
+              </td>
+              <td style="padding: var(--space-3); font-weight: var(--font-weight-bold); color: var(--color-accent); font-family: var(--font-family-mono);">
+                {{ log.action_type }}
+              </td>
+              <td style="padding: var(--space-3);">
+                {% if log.actor %}
+                  <strong>@{{ log.actor.username }}</strong>
+                {% else %}
+                  <span style="color: var(--text-tertiary);">System</span>
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                {{ log.target_repr }}
+              </td>
+              <td style="padding: var(--space-3); color: var(--text-secondary); max-width: 320px;">
+                {{ log.details }}
+              </td>
+              <td style="padding: var(--space-3); text-align: right; color: var(--text-tertiary); font-family: var(--font-family-mono);">
+                {{ log.ip_address|default:"-" }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+        No audit entries matching filter criteria.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

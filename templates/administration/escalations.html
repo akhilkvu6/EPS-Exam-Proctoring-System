@@ -1,0 +1,67 @@
+{% extends "administration/base_admin.html" %}
+
+{% block title %}Escalated Admissions — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block admin_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+      Escalated Admission Applications
+    </h1>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+      Section 8.4: Admission applications escalated by department faculty requiring central institutional determination.
+    </p>
+  </div>
+
+  {% if escalations %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+            <th style="padding: var(--space-3);">App Ref</th>
+            <th style="padding: var(--space-3);">Candidate Name</th>
+            <th style="padding: var(--space-3);">Department & Program</th>
+            <th style="padding: var(--space-3);">Escalated At</th>
+            <th style="padding: var(--space-3); text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in escalations %}
+            <tr style="border-bottom: 1px solid var(--border-default);">
+              <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-danger);">
+                {{ app.registration_number }}
+              </td>
+              <td style="padding: var(--space-3);">
+                <strong>{{ app.user.get_full_name|default:app.user.username }}</strong>
+                <div style="font-size: 11px; color: var(--text-tertiary);">@{{ app.user.username }}</div>
+              </td>
+              <td style="padding: var(--space-3);">
+                {{ app.department_name }}
+                <div style="font-size: 11px; color: var(--text-tertiary);">{{ app.course_name }} ({{ app.batch_name }})</div>
+              </td>
+              <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                {{ app.updated_at|date:"M d, Y H:i" }}
+              </td>
+              <td style="padding: var(--space-3); text-align: right;">
+                <a href="{% url 'administration:escalation_detail' app.id %}" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+                  Resolve Escalation &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
+      <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">⚖️</div>
+      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Escalated Applications Pending
+      </h3>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        All departmental admission applications have either been resolved by faculty or none currently require executive escalation.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -125,7 +125,7 @@ class AuthenticationViewsTests(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/admin/dashboard/")
+        self.assertEqual(response.url, "/administration/dashboard/")
 
     def test_invalid_password_shows_error(self):
         """Invalid credentials show user-friendly error message."""

@@ -1,0 +1,109 @@
+{% extends "administration/base_admin.html" %}
+
+{% block title %}Institutional Settings — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block admin_content %}
+<div class="card" style="max-width: 760px;">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+      Institutional Platform Settings
+    </h1>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+      Central parameters governing legal institution name, transcripts branding, default appearance theme tokens, and admission policies.
+    </p>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-bottom: var(--space-4);">
+      1. Institutional Identity & Contact
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.institution_name.id_for_label }}" class="form-label">Official Legal Institution Name *</label>
+      {{ form.institution_name }}
+      <div class="form-hint">{{ form.institution_name.help_text }}</div>
+      {% if form.institution_name.errors %}
+        <div class="form-error">{{ form.institution_name.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.tagline.id_for_label }}" class="form-label">Motto / Transcripts Subheading</label>
+      {{ form.tagline }}
+      <div class="form-hint">{{ form.tagline.help_text }}</div>
+      {% if form.tagline.errors %}
+        <div class="form-error">{{ form.tagline.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+      <div class="form-group">
+        <label for="{{ form.contact_email.id_for_label }}" class="form-label">Central Administrative Email</label>
+        {{ form.contact_email }}
+        {% if form.contact_email.errors %}
+          <div class="form-error">{{ form.contact_email.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.contact_phone.id_for_label }}" class="form-label">Administrative Helpline Phone</label>
+        {{ form.contact_phone }}
+        {% if form.contact_phone.errors %}
+          <div class="form-error">{{ form.contact_phone.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-top: var(--space-6); margin-bottom: var(--space-4);">
+      2. Appearance & Design Tokens Defaults
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+      <div class="form-group">
+        <label for="{{ form.default_theme.id_for_label }}" class="form-label">Default Theme Mode</label>
+        {{ form.default_theme }}
+        <div class="form-hint">{{ form.default_theme.help_text }}</div>
+        {% if form.default_theme.errors %}
+          <div class="form-error">{{ form.default_theme.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.default_accent_color.id_for_label }}" class="form-label">Default Brand Accent Color</label>
+        {{ form.default_accent_color }}
+        <div class="form-hint">{{ form.default_accent_color.help_text }}</div>
+        {% if form.default_accent_color.errors %}
+          <div class="form-error">{{ form.default_accent_color.errors.0 }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-top: var(--space-6); margin-bottom: var(--space-4);">
+      3. Admissions & Roll Allocation Governance
+    </div>
+
+    <div class="form-group">
+      <label for="{{ form.roll_number_prefix.id_for_label }}" class="form-label">Official Roll Number Prefix</label>
+      {{ form.roll_number_prefix }}
+      <div class="form-hint">{{ form.roll_number_prefix.help_text }}</div>
+      {% if form.roll_number_prefix.errors %}
+        <div class="form-error">{{ form.roll_number_prefix.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
+      {{ form.allow_student_self_registration }}
+      <label for="{{ form.allow_student_self_registration.id_for_label }}" class="form-label" style="margin-bottom: 0;">
+        Enable Public Candidate Self-Registration Portal
+      </label>
+    </div>
+
+    <div style="margin-top: var(--space-8); display: flex; gap: var(--space-3);">
+      <button type="submit" class="btn btn-primary">Save Institutional Settings &rarr;</button>
+      <a href="{% url 'administration:dashboard' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

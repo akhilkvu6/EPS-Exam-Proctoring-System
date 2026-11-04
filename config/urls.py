@@ -12,6 +12,7 @@ urlpatterns = [
     path("accounts/", include("apps.accounts.urls", namespace="accounts")),
     path("student/", include("apps.student.urls", namespace="student")),
     path("teacher/", include("apps.teacher.urls", namespace="teacher")),
+    path("administration/", include("apps.administration.urls", namespace="administration")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 
