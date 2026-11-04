@@ -1,0 +1,127 @@
+{% extends "base/base.html" %}
+
+{% block title %}Grading Dashboard | {{ exam.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1100px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top Nav -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <a href="{% url 'evaluation:queue' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to Evaluation Queue
+    </a>
+    <div style="display: flex; gap: var(--space-3);">
+      <!-- Run Batch Auto-Grader -->
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="run_autograder" value="1">
+        <button type="submit" class="btn btn-primary" style="font-size: 12px;">
+          ⚡ Run Auto-Grader for Cohort
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Header Card -->
+  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent); margin-bottom: var(--space-2);">
+          {{ exam.code }}
+        </span>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+          {{ exam.title }}
+        </h1>
+        <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+          {{ exam.subject.code }} - {{ exam.subject.name }} | Cohort: {{ exam.batch.name }} | Total Marks: {{ exam.total_marks }}
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: {% if total_pending_subjective > 0 %}#ca8a04{% else %}#22c55e{% endif %};">
+          {{ total_pending_subjective }}
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary);">Pending Subjective Items</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Subjective Rubric Queue -->
+  {% if pending_items %}
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border-left: 4px solid #ca8a04;">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3); color: var(--text-primary);">
+        ⏳ Subjective Responses Requiring Faculty Rubric Grading
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        {% for item in pending_items %}
+          <div style="display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-surface-secondary); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);">
+            <div>
+              <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); font-size: var(--font-size-sm);">
+                {{ item.exam_question.question.title }} (Q{{ item.order }})
+              </div>
+              <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                Candidate: <strong>{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}</strong>
+                ({{ item.attempt.student.student_profile.roll_number|default:"PENDING" }}) | Marks Weight: {{ item.exam_question.marks }} pts
+              </div>
+            </div>
+            <div>
+              <a href="{% url 'evaluation:grade_item' item.id %}" class="btn btn-primary" style="font-size: 12px; padding: 4px 10px;">
+                Grade with Rubric →
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Cohort Submission Ledger -->
+  <h2 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">
+    Candidate Submission Ledger
+  </h2>
+  <div class="card" style="overflow: hidden; padding: 0;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+      <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+        <tr>
+          <th style="padding: var(--space-3) var(--space-4);">Roll Number</th>
+          <th style="padding: var(--space-3) var(--space-4);">Candidate</th>
+          <th style="padding: var(--space-3) var(--space-4);">Session Status</th>
+          <th style="padding: var(--space-3) var(--space-4);">Submitted At</th>
+          <th style="padding: var(--space-3) var(--space-4);">Score Awarded</th>
+          <th style="padding: var(--space-3) var(--space-4); text-align: right;">Integrity Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in attempts %}
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); font-size: 11px;">
+              {{ a.student.student_profile.roll_number|default:"PENDING" }}
+            </td>
+            <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); color: var(--text-primary);">
+              {{ a.student.get_full_name|default:a.student.username }}
+            </td>
+            <td style="padding: var(--space-3) var(--space-4);">
+              <span class="badge" style="font-size: 11px;">{{ a.get_status_display }}</span>
+            </td>
+            <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); color: var(--text-secondary);">
+              {{ a.submitted_at|date:"M d, Y H:i"|default:"Active" }}
+            </td>
+            <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent);">
+              {% if a.total_score is not None %}
+                {{ a.total_score }} / {{ exam.total_marks }}
+              {% else %}
+                <span style="color: var(--text-tertiary); font-weight: normal;">Pending Evaluation</span>
+              {% endif %}
+            </td>
+            <td style="padding: var(--space-3) var(--space-4); text-align: right; font-size: var(--font-size-xs);">
+              {% if a.proctoring_summary %}
+                Trust: <strong>{{ a.proctoring_summary.trust_score }}%</strong>
+              {% else %}
+                <span>100%</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

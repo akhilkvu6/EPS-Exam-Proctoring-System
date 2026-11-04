@@ -53,6 +53,7 @@ LOCAL_APPS = [
     "apps.exam_engine",
     "apps.proctoring",
     "apps.incidents",
+    "apps.evaluation",
 ]
 
 INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS

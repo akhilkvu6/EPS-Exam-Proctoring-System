@@ -44,9 +44,9 @@
       <a href="{% url 'examinations:exam_list' %}" class="nav-link {% if 'incidents' in request.resolver_match.app_names or 'console' in request.resolver_match.url_name %}active{% endif %}">
         👁️ Proctoring & Incidents
       </a>
-      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 15">
-        ⚖️ Evaluation Queue (Phase 15)
-      </span>
+      <a href="{% url 'evaluation:queue' %}" class="nav-link {% if 'evaluation' in request.resolver_match.app_names or 'grade' in request.resolver_match.url_name %}active{% endif %}">
+        ⚖️ Evaluation Queue
+      </a>
       <a href="{% url 'teacher:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
         👤 Faculty Profile
       </a>
