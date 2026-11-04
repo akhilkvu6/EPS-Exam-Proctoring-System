@@ -1,6 +1,0 @@
-2026/11/04-22:26:56.376 3564 Reusing MANIFEST c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
-2026/11/04-22:26:56.377 3564 Recovering log #4
-2026/11/04-22:26:56.377 3564 Reusing old log c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default\EdgeCoupons/coupons_data.db/000004.log 
-2026/11/04-22:26:56.424 11e8 Level-0 table #8: started
-2026/11/04-22:26:56.427 11e8 Level-0 table #8: 683444 bytes OK
-2026/11/04-22:26:56.429 11e8 Delete type=0 #4
