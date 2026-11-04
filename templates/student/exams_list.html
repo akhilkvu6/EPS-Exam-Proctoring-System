@@ -1,0 +1,40 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Examinations Portal — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block student_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        Examinations Register
+      </h1>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        Active, scheduled, and past institutional examinations assigned to your academic enrollment.
+      </p>
+    </div>
+  </div>
+
+  {% if exams %}
+    <!-- Exam list dynamically rendered when exams are scheduled -->
+    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+      {% for exam in exams %}
+        <div class="card" style="padding: var(--space-4);">
+          <!-- Exam item content -->
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-lg);">
+      <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">📝</div>
+      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        No Active Examinations Scheduled
+      </h3>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); max-width: 440px; margin: 0 auto var(--space-4) auto;">
+        You have no examinations currently in progress. Examination timetables and access codes will be scheduled by your course invigilators in Phase 10.
+      </p>
+      <a href="{% url 'student:dashboard' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Back to Dashboard</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Results & Scorecards — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block student_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+      Official Results & PDF Scorecards
+    </h1>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+      Cryptographically verified institutional marks transcripts and downloadable PDF certificates.
+    </p>
+  </div>
+
+  {% if results %}
+    <!-- Results list dynamically rendered when results are published -->
+  {% else %}
+    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-lg);">
+      <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">🏆</div>
+      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        No Published Results Found
+      </h3>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); max-width: 440px; margin: 0 auto var(--space-4) auto;">
+        Evaluation records and official verified scorecards with cryptographic QR validation will be published here upon completion of faculty grading.
+      </p>
+      <a href="{% url 'student:dashboard' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Back to Dashboard</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Academic Details — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block student_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+      Enrolled Academic Curriculum
+    </h1>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+      Institutional department, batch enrollment, and curriculum assignments.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6);">
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">DEPARTMENT</div>
+      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+        {{ profile.department_name|default:"Department of Computer Science" }}
+      </div>
+    </div>
+
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">COURSE PROGRAM</div>
+      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+        {{ profile.course_name|default:"Bachelor of Technology" }}
+      </div>
+    </div>
+
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">ACADEMIC BATCH</div>
+      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+        {{ profile.batch_name|default:"2024 - 2028" }}
+      </div>
+    </div>
+
+    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">ACTIVE SEMESTER</div>
+      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+        Semester {{ profile.current_semester }}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background-color: var(--bg-surface); border: 1px solid var(--border-default);">
+    <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      Registered Course Units
+    </h3>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-normal);">
+      Subject registrations and examination schedules are synchronised with your academic batch. Once scheduled by your course faculty, examinations will appear automatically in your candidate exam portal.
+    </p>
+  </div>
+</div>
+{% endblock %}

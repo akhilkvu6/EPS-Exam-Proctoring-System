@@ -1,0 +1,56 @@
+{% extends "base/base.html" %}
+
+{% block header_nav %}
+  <li><a href="{% url 'student:dashboard' %}" class="nav-link">Student Workspace</a></li>
+  <li><a href="{% url 'student:exams_list' %}" class="nav-link">Examinations</a></li>
+  <li><a href="{% url 'student:results_list' %}" class="nav-link">Results</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="display: grid; grid-template-columns: 240px 1fr; gap: var(--space-8); padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Student Sidebar -->
+  <aside style="display: flex; flex-direction: column; gap: var(--space-2);">
+    <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-2); text-align: center;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background-color: var(--color-accent-subtle); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0 auto var(--space-2) auto;">
+        {{ user.first_name|first|default:user.username|first|upper }}
+      </div>
+      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
+        {{ user.get_full_name|default:user.username }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: 2px;">
+        {% if user.student_profile.roll_number %}
+          Roll: <strong>{{ user.student_profile.roll_number }}</strong>
+        {% else %}
+          Reg: {{ user.student_profile.registration_number }}
+        {% endif %}
+      </div>
+    </div>
+
+    <nav aria-label="Student Workspace Navigation" style="display: flex; flex-direction: column; gap: var(--space-1);">
+      <a href="{% url 'student:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        📊 Overview Dashboard
+      </a>
+      <a href="{% url 'student:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        👤 Candidate Profile
+      </a>
+      <a href="{% url 'student:academics' %}" class="nav-link {% if request.resolver_match.url_name == 'academics' %}active{% endif %}">
+        🎓 Academic Details
+      </a>
+      <a href="{% url 'student:admission_status' %}" class="nav-link {% if request.resolver_match.url_name == 'admission_status' %}active{% endif %}">
+        📑 Admission Status
+      </a>
+      <a href="{% url 'student:exams_list' %}" class="nav-link {% if request.resolver_match.url_name == 'exams_list' %}active{% endif %}">
+        📝 Examinations
+      </a>
+      <a href="{% url 'student:results_list' %}" class="nav-link {% if request.resolver_match.url_name == 'results_list' %}active{% endif %}">
+        🏆 Scorecards & Results
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Student View Area -->
+  <section>
+    {% block student_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

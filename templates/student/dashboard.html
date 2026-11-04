@@ -1,0 +1,87 @@
+{% extends "student/base_student.html" %}
+
+{% block title %}Student Dashboard — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block student_content %}
+<div>
+  <!-- Header / Greeting Banner -->
+  <div class="card" style="margin-bottom: var(--space-6); background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+      <div>
+        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">
+          Student Workspace
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+          Welcome back, {{ user.get_full_name|default:user.username }}!
+        </h1>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+          {{ profile.course_name|default:"Program Enrolled" }} &bull; Semester {{ profile.current_semester }} &bull; Batch {{ profile.batch_name|default:"Active" }}
+        </p>
+      </div>
+
+      <div>
+        {% if profile.roll_number %}
+          <div style="background-color: var(--color-success-bg); border: 1px solid var(--color-success-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
+            <div style="font-size: var(--font-size-xs); color: var(--color-success-fg); font-weight: var(--font-weight-semibold);">OFFICIAL ROLL NUMBER</div>
+            <div style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-success-fg); font-family: var(--font-family-mono);">{{ profile.roll_number }}</div>
+          </div>
+        {% else %}
+          <div style="background-color: var(--color-warning-bg); border: 1px solid var(--color-warning-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
+            <div style="font-size: var(--font-size-xs); color: var(--color-warning-fg); font-weight: var(--font-weight-semibold);">REGISTRATION REF</div>
+            <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-warning-fg); font-family: var(--font-family-mono);">{{ profile.registration_number }}</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Active Semester</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        Semester {{ profile.current_semester }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--color-accent);">{{ profile.department_name|default:"Department Enrolled" }}</div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Active Examinations</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        {{ active_exams_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Ready for candidate attempt</div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Published Results</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        {{ published_results_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Verified scorecards</div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Admission Status</div>
+      <div style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-success); margin: var(--space-2) 0;">
+        {{ profile.get_admission_status_display }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);"><a href="{% url 'student:admission_status' %}">View review audit &rarr;</a></div>
+    </div>
+  </div>
+
+  <!-- Quick Action & Integrity Notice -->
+  <div class="card">
+    <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      Examination Integrity & Readiness Checklist
+    </h2>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-4);">
+      Prior to commencing institutional examinations, verify device readiness (working front-facing camera, microphone, and stable connection). EPS Phoenix operates client-side hybrid AI proctoring with zero continuous video recording to respect candidate privacy.
+    </p>
+    <div style="display: flex; gap: var(--space-3);">
+      <a href="{% url 'student:exams_list' %}" class="btn btn-primary" style="font-size: var(--font-size-xs);">Browse Examinations</a>
+      <a href="{% url 'student:profile' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Update Emergency Contact</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

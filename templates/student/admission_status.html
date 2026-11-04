@@ -1,0 +1,105 @@
+{% extends "base/base.html" %}
+
+{% block title %}Admission Status — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 760px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div class="card" style="padding: var(--space-8);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; margin-bottom: var(--space-6); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4);">
+      <div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+          Admission Application Tracker
+        </h1>
+        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+          Real-time lifecycle tracking of candidate registration and institutional review.
+        </p>
+      </div>
+
+      <div style="text-align: right;">
+        <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">APPLICATION ID</span>
+        <div style="font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent); font-size: var(--font-size-base);">
+          {{ profile.registration_number }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Status Banner -->
+    <div class="card" style="margin-bottom: var(--space-6); background-color: var(--bg-secondary); border-left: 4px solid {% if profile.is_admission_approved %}var(--color-success){% else %}var(--color-warning){% endif %};">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: var(--font-size-xs); text-transform: uppercase; color: var(--text-tertiary);">Current Status</div>
+          <div style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+            {{ profile.get_admission_status_display }}
+          </div>
+        </div>
+        <div>
+          {% if profile.is_admission_approved %}
+            <span style="display: inline-block; padding: 4px 12px; border-radius: var(--radius-full); background-color: var(--color-success-bg); color: var(--color-success-fg); font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">
+              Approved & Enrolled
+            </span>
+          {% else %}
+            <span style="display: inline-block; padding: 4px 12px; border-radius: var(--radius-full); background-color: var(--color-warning-bg); color: var(--color-warning-fg); font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">
+              In Review
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Lifecycle Steps Visualization -->
+    <div style="margin-bottom: var(--space-8);">
+      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">
+        Institutional Admission Stages
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); text-align: center;">
+        <div style="padding: var(--space-3); border-radius: var(--radius-md); background-color: var(--color-success-bg); border: 1px solid var(--color-success-border);">
+          <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: var(--color-success-fg);">1. Submitted</div>
+          <div style="font-size: 10px; color: var(--color-success-fg);">Application received</div>
+        </div>
+
+        <div style="padding: var(--space-3); border-radius: var(--radius-md); background-color: {% if profile.admission_status == 'PENDING_TEACHER' or profile.is_admission_approved %}var(--color-success-bg){% else %}var(--bg-tertiary){% endif %};">
+          <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);">2. Faculty Review</div>
+          <div style="font-size: 10px; color: var(--text-tertiary);">Department vetting</div>
+        </div>
+
+        <div style="padding: var(--space-3); border-radius: var(--radius-md); background-color: {% if profile.is_admission_approved %}var(--color-success-bg){% else %}var(--bg-tertiary){% endif %};">
+          <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);">3. Final Approval</div>
+          <div style="font-size: 10px; color: var(--text-tertiary);">Admin / Faculty sign-off</div>
+        </div>
+
+        <div style="padding: var(--space-3); border-radius: var(--radius-md); background-color: {% if profile.roll_number %}var(--color-success-bg){% else %}var(--bg-tertiary){% endif %};">
+          <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold);">4. Roll Allocation</div>
+          <div style="font-size: 10px; color: var(--text-tertiary);">Sequential lock generation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Application Details Summary -->
+    <div style="border-top: 1px solid var(--border-default); padding-top: var(--space-4); margin-bottom: var(--space-6);">
+      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3);">
+        Application Dossier Summary
+      </h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); font-size: var(--font-size-xs);">
+        <div><strong>Candidate Name:</strong> {{ user.get_full_name|default:user.username }}</div>
+        <div><strong>Target Department:</strong> {{ profile.department_name }}</div>
+        <div><strong>Target Program:</strong> {{ profile.course_name }}</div>
+        <div><strong>Batch:</strong> {{ profile.batch_name }}</div>
+        <div><strong>Submission Date:</strong> {{ profile.created_at|date:"M d, Y H:i" }}</div>
+        <div><strong>Official Roll Number:</strong> {{ profile.roll_number|default:"Pending final allocation" }}</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      {% if profile.is_admission_approved %}
+        <a href="{% url 'student:dashboard' %}" class="btn btn-primary">Proceed to Student Workspace &rarr;</a>
+      {% else %}
+        <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">
+          You will receive immediate workspace access once faculty approval is finalized.
+        </span>
+      {% endif %}
+      <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Sign Out</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
