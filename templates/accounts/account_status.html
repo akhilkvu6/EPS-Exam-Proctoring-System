@@ -1,0 +1,43 @@
+{% extends "base/base.html" %}
+
+{% block title %}Account Status — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; padding-top: var(--space-10); padding-bottom: var(--space-12);">
+  <div class="card" style="padding: var(--space-8); text-align: center;">
+    {% if user_obj.status == 'PENDING_APPROVAL' %}
+      <div style="font-size: 3rem; margin-bottom: var(--space-2);">⏳</div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        Admission Review in Progress
+      </h1>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-6);">
+        Your application is currently assigned to the institutional review queue. Once approved and an official roll number is allocated, full student workspace access will be activated.
+      </p>
+      <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-6); text-align: left; font-size: var(--font-size-xs);">
+        <div><strong>Username:</strong> {{ user_obj.username }}</div>
+        <div><strong>Role:</strong> {{ user_obj.get_role_display }}</div>
+        <div><strong>Application Status:</strong> <span style="color: var(--color-warning);">Pending Review</span></div>
+      </div>
+    {% elif user_obj.status == 'SUSPENDED' %}
+      <div style="font-size: 3rem; margin-bottom: var(--space-2);">🛑</div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-danger); margin-bottom: var(--space-2);">
+        Account Suspended
+      </h1>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-6);">
+        This account has been placed under administrative suspension. Active examinations and evaluations for this account are halted. Contact the institutional examination controller.
+      </p>
+    {% else %}
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        Account Active
+      </h1>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-6);">
+        Your account status is active.
+      </p>
+    {% endif %}
+
+    <div>
+      <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Sign Out</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base/base.html" %}
+
+{% block title %}Sign In — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 480px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div class="card" style="padding: var(--space-8);">
+    <div style="text-align: center; margin-bottom: var(--space-6);">
+      <div class="brand-logo-badge" style="margin: 0 auto var(--space-3) auto; width: 44px; height: 44px; font-size: var(--font-size-xl);">P</div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        Sign In to EPS Phoenix
+      </h1>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+        {{ INSTITUTION_NAME }} Authentication Portal
+      </p>
+    </div>
+
+    <!-- Role Switcher Tabs -->
+    <div class="tabs-nav" style="justify-content: center; margin-bottom: var(--space-6);">
+      <button 
+        type="button" 
+        class="tab-btn {% if selected_role == 'STUDENT' or not selected_role %}active{% endif %}" 
+        onclick="selectRoleTab('STUDENT', this)">
+        Student
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn {% if selected_role == 'TEACHER' %}active{% endif %}" 
+        onclick="selectRoleTab('TEACHER', this)">
+        Teacher
+      </button>
+      <button 
+        type="button" 
+        class="tab-btn {% if selected_role == 'ADMIN' %}active{% endif %}" 
+        onclick="selectRoleTab('ADMIN', this)">
+        Admin
+      </button>
+    </div>
+
+    <form method="post" action="{% url 'accounts:login' %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="intended_role" id="id_intended_role" value="{{ selected_role|default:'STUDENT' }}">
+      <input type="hidden" name="next" value="{{ next }}">
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger" style="margin-bottom: var(--space-4);">
+          {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="form-error">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+        </div>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="form-error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div style="margin-top: var(--space-6);">
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--space-3);">
+          Sign In &rarr;
+        </button>
+      </div>
+    </form>
+
+    <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--border-default); text-align: center; font-size: var(--font-size-xs); color: var(--text-tertiary);">
+      New student? Registration workflow is handled via the institutional admissions portal.
+    </div>
+  </div>
+</div>
+
+<script>
+  function selectRoleTab(role, buttonElement) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    buttonElement.classList.add('active');
+    const roleInput = document.getElementById('id_intended_role');
+    if (roleInput) roleInput.value = role;
+  }
+</script>
+{% endblock %}

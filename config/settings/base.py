@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = []
 
 LOCAL_APPS = [
     "apps.core",
+    "apps.accounts",
 ]
 
 INSTALLED_APPS = DJANGO_CORE_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -134,6 +135,14 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Custom User Model (Section 7)
+AUTH_USER_MODEL = "accounts.User"
+
+# Authentication URLs
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "core:index"
+LOGOUT_REDIRECT_URL = "accounts:login"
 
 # Institutional Branding & Platform Metadata
 INSTITUTION_NAME = os.environ.get("INSTITUTION_NAME", "Phoenix Institute of Technology")
