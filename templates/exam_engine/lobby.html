@@ -1,0 +1,80 @@
+{% extends "base/base.html" %}
+
+{% block title %}Examination Lobby | {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top Breadcrumb -->
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'student:dashboard' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to Student Dashboard
+    </a>
+  </div>
+
+  <div class="card" style="padding: var(--space-8); margin-bottom: var(--space-6);">
+    <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3);">
+      <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 6px; border-radius: 4px;">
+        {{ exam.code }}
+      </span>
+      <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+        {{ exam.subject.code }} - {{ exam.subject.name }}
+      </span>
+    </div>
+
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2); color: var(--text-primary);">
+      {{ exam.title }}
+    </h1>
+
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
+      Cohort: <strong>{{ exam.batch.name }}</strong> | Total Marks: <strong>{{ exam.total_marks }} pts</strong>
+    </p>
+
+    <!-- Key Parameters Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md); font-size: var(--font-size-xs); margin-bottom: var(--space-6);">
+      <div>
+        <div style="color: var(--text-secondary);">Allocated Duration</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary); margin-top: 2px;">
+          ⏱️ {{ total_minutes }} Minutes
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Window End (Deadline)</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary); margin-top: 2px;">
+          {{ exam.end_window|date:"M d, Y H:i" }}
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Proctoring Protocol</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary); margin-top: 2px;">
+          {% if exam.strict_proctoring %}🛡️ Active AI & Event Audit{% else %}Standard{% endif %}
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Timer Authority</div>
+        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent); margin-top: 2px;">
+          Server-Authoritative Clock
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Rules & Readiness Checklist -->
+    <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3);">
+      📋 Examination Directives & Readiness
+    </h2>
+    <div style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--space-6); background: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md);">
+      {{ exam.instructions|default:"Please ensure you have a stable network connection and an unobstructed webcam field of view before proceeding. Navigation away from the exam tab will be recorded in the security audit ledger."|linebreaks }}
+    </div>
+
+    <!-- Launch Form -->
+    <form method="post" style="text-align: center;">
+      {% csrf_token %}
+      <div style="margin-bottom: var(--space-4); font-size: var(--font-size-xs); color: var(--text-tertiary);">
+        By entering the examination room, your session timer will commence and cannot be paused.
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding: var(--space-3) var(--space-8); font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+        Launch Examination Room →
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
