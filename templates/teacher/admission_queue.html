@@ -1,0 +1,99 @@
+{% extends "teacher/base_teacher.html" %}
+
+{% block title %}Admission Applications Queue — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block teacher_content %}
+<div class="card">
+  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+    <div>
+      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        Admission Applications Review Queue
+      </h1>
+      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        Scoped to {{ teacher_profile.department_name }}. Review candidate records, record internal remarks, and approve or escalate.
+      </p>
+    </div>
+  </div>
+
+  <!-- Filter Pills -->
+  <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-6); flex-wrap: wrap;">
+    <a href="?status=ALL" class="btn {% if status_filter == 'ALL' or not status_filter %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      All
+    </a>
+    <a href="?status=SUBMITTED" class="btn {% if status_filter == 'SUBMITTED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Submitted / New
+    </a>
+    <a href="?status=INFO_REQUESTED" class="btn {% if status_filter == 'INFO_REQUESTED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Info Requested
+    </a>
+    <a href="?status=APPROVED" class="btn {% if status_filter == 'APPROVED' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Approved
+    </a>
+    <a href="?status=ESCALATED_ADMIN" class="btn {% if status_filter == 'ESCALATED_ADMIN' %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+      Escalated to Admin
+    </a>
+  </div>
+
+  {% if applications %}
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
+            <th style="padding: var(--space-3);">App Ref</th>
+            <th style="padding: var(--space-3);">Candidate Name</th>
+            <th style="padding: var(--space-3);">Program & Batch</th>
+            <th style="padding: var(--space-3);">Submitted Date</th>
+            <th style="padding: var(--space-3);">Status</th>
+            <th style="padding: var(--space-3); text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+            <tr style="border-bottom: 1px solid var(--border-default); transition: background-color var(--transition-fast);">
+              <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-semibold); color: var(--color-accent);">
+                {{ app.registration_number }}
+              </td>
+              <td style="padding: var(--space-3);">
+                <strong>{{ app.user.get_full_name|default:app.user.username }}</strong>
+                <div style="font-size: 11px; color: var(--text-tertiary);">@{{ app.user.username }}</div>
+              </td>
+              <td style="padding: var(--space-3);">
+                {{ app.course_name|default:"General Program" }}
+                <div style="font-size: 11px; color: var(--text-tertiary);">{{ app.batch_name }}</div>
+              </td>
+              <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                {{ app.created_at|date:"M d, Y" }}
+              </td>
+              <td style="padding: var(--space-3);">
+                {% if app.admission_status == 'APPROVED' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-success-bg); color: var(--color-success-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Approved</span>
+                {% elif app.admission_status == 'SUBMITTED' or app.admission_status == 'PENDING_TEACHER' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-warning-bg); color: var(--color-warning-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Pending</span>
+                {% elif app.admission_status == 'INFO_REQUESTED' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-info-bg); color: var(--color-info-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Info Requested</span>
+                {% elif app.admission_status == 'ESCALATED_ADMIN' %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--bg-tertiary); color: var(--text-secondary); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Escalated</span>
+                {% else %}
+                  <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-danger-bg); color: var(--color-danger-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">{{ app.get_admission_status_display }}</span>
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3); text-align: right;">
+                <a href="{% url 'teacher:admission_detail' app.id %}" class="btn btn-secondary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+                  Review Dossier &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: var(--space-10) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
+      <div style="font-size: 2rem; margin-bottom: var(--space-2);">📥</div>
+      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+        No applications found matching the selected filter criteria.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

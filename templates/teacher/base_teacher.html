@@ -1,0 +1,61 @@
+{% extends "base/base.html" %}
+
+{% block header_nav %}
+  <li><a href="{% url 'teacher:dashboard' %}" class="nav-link">Faculty Workspace</a></li>
+  <li><a href="{% url 'teacher:admission_queue' %}" class="nav-link">Admissions</a></li>
+  <li><a href="{% url 'teacher:students_list' %}" class="nav-link">Students</a></li>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="display: grid; grid-template-columns: 240px 1fr; gap: var(--space-8); padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Teacher Sidebar -->
+  <aside style="display: flex; flex-direction: column; gap: var(--space-2);">
+    <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-2); text-align: center;">
+      <div style="width: 52px; height: 52px; border-radius: 50%; background-color: var(--color-accent-subtle); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0 auto var(--space-2) auto;">
+        {{ user.first_name|first|default:user.username|first|upper }}
+      </div>
+      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
+        {{ user.get_full_name|default:user.username }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--color-accent); font-weight: var(--font-weight-semibold); margin-top: 2px;">
+        {{ user.teacher_profile.designation|default:"Faculty Member" }}
+      </div>
+      <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 2px;">
+        Staff ID: {{ user.teacher_profile.staff_id|default:"FAC-0001" }}
+      </div>
+    </div>
+
+    <nav aria-label="Teacher Workspace Navigation" style="display: flex; flex-direction: column; gap: var(--space-1);">
+      <a href="{% url 'teacher:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        📊 Overview Dashboard
+      </a>
+      <a href="{% url 'teacher:admission_queue' %}" class="nav-link {% if 'admission' in request.resolver_match.url_name %}active{% endif %}">
+        📥 Admission Queue
+      </a>
+      <a href="{% url 'teacher:students_list' %}" class="nav-link {% if request.resolver_match.url_name == 'students_list' %}active{% endif %}">
+        👥 Enrolled Students
+      </a>
+      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 8">
+        📚 Question Bank (Phase 8)
+      </span>
+      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 9">
+        📝 Examinations (Phase 9)
+      </span>
+      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 14">
+        👁️ Proctoring & Incidents (Phase 14)
+      </span>
+      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 15">
+        ⚖️ Evaluation Queue (Phase 15)
+      </span>
+      <a href="{% url 'teacher:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        👤 Faculty Profile
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Teacher View Area -->
+  <section>
+    {% block teacher_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

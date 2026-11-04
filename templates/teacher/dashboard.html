@@ -1,0 +1,86 @@
+{% extends "teacher/base_teacher.html" %}
+
+{% block title %}Faculty Workspace — {{ PLATFORM_NAME }}{% endblock %}
+
+{% block teacher_content %}
+<div>
+  <!-- Header / Greeting Banner -->
+  <div class="card" style="margin-bottom: var(--space-6); background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+      <div>
+        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">
+          Faculty & Evaluation Workspace
+        </div>
+        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+          Welcome back, {{ user.get_full_name|default:user.username }}!
+        </h1>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+          {{ teacher_profile.designation }} &bull; {{ teacher_profile.department_name }}
+        </p>
+      </div>
+
+      <div>
+        <div style="background-color: var(--color-accent-subtle); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
+          <div style="font-size: var(--font-size-xs); color: var(--color-accent); font-weight: var(--font-weight-semibold);">ACADEMIC JURISDICTION</div>
+          <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+            {{ teacher_profile.department_name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Overview Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Pending Admissions</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: {% if pending_admissions_count > 0 %}var(--color-warning){% else %}var(--text-primary){% endif %}; margin: var(--space-1) 0;">
+        {{ pending_admissions_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        <a href="{% url 'teacher:admission_queue' %}">Review applications &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Enrolled Students</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        {{ total_approved_students_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+        <a href="{% url 'teacher:students_list' %}">Browse directory &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Managed Exams</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        {{ active_exams_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Scheduled for Phase 9</div>
+    </div>
+
+    <div class="card" style="padding: var(--space-5);">
+      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Pending Grading</div>
+      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+        {{ pending_evaluations_count }}
+      </div>
+      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Scheduled for Phase 15</div>
+    </div>
+  </div>
+
+  <!-- Operational Duties Card -->
+  <div class="card">
+    <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      Faculty Responsibilities & Review Duties
+    </h2>
+    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-4);">
+      As a faculty member in {{ teacher_profile.department_name }}, you are responsible for screening student admission applications, managing question repositories, invigilating scheduled assessments via event metadata, and evaluating descriptive responses.
+    </p>
+    <div style="display: flex; gap: var(--space-3);">
+      <a href="{% url 'teacher:admission_queue' %}" class="btn btn-primary" style="font-size: var(--font-size-xs);">Open Admission Queue</a>
+      <a href="{% url 'teacher:students_list' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">View Enrolled Students</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+# Teacher app initialization
