@@ -1,0 +1,647 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Account — EPS Examination Proctoring System</title>
+    
+    <!-- Prevent Theme Flash -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('eps-theme') || 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design Tokens & School Component Styles -->
+    <link rel="stylesheet" href="/static/css/design-tokens.css">
+    <link rel="stylesheet" href="/static/css/bento.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    
+<link rel="stylesheet" href="/static/css/auth.css">
+
+</head>
+<body>
+
+    <!-- Mobile Navigation Drawer Overlay Backdrop -->
+    <div id="sidebar-overlay" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.4); z-index: 55; backdrop-filter: blur(2px);"></div>
+
+    
+        
+        <!-- Public Guest Header -->
+        <header class="public-header" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+            <div class="public-header__container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); height: 64px; display: flex; align-items: center; justify-content: space-between;">
+                <a href="/" class="nav-brand" style="display: flex; align-items: center; gap: var(--space-3); text-decoration: none;">
+                    <span class="brand-badge" style="width: 34px; height: 34px; border-radius: 9px; background: var(--text-primary); color: var(--text-inverse); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; letter-spacing: 0.04em; box-shadow: 0 2px 8px rgba(0,0,0,0.12);">EPS</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-weight: 700; font-size: var(--font-size-base); color: var(--text-primary); letter-spacing: -0.01em;">Examination Portal</span>
+                        <span style="font-size: 10px; font-weight: 700; background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); padding: 2px 7px; border-radius: 9999px; display: inline-flex; align-items: center; gap: 4px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; background: #10B981;"></span>
+                            Online
+                        </span>
+                    </div>
+                </a>
+
+                <nav style="display: flex; align-items: center; gap: var(--space-3);">
+                    <button type="button" class="theme-toggle-btn btn btn-ghost btn-sm" title="Toggle Theme" aria-label="Toggle light/dark theme" style="padding: 7px 10px; border-radius: var(--radius-control); display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="sun-moon" class="lucide-icon icon-sm"></i>
+                    </button>
+                    <a href="/accounts/login/" class="btn btn-secondary btn-sm" style="padding: 0.45rem 1rem; font-weight: 600; border-radius: var(--radius-control);">Sign In</a>
+                    <a href="/accounts/register/" class="btn btn-primary btn-sm" style="padding: 0.45rem 1.1rem; font-weight: 600; border-radius: var(--radius-control); box-shadow: 0 2px 8px rgba(0,0,0,0.1);">Get Started</a>
+                </nav>
+            </div>
+        </header>
+        
+    
+
+    <!-- Page Content & Alerts -->
+    <main class="app-content" style="padding-top: var(--space-8);">
+        
+
+        
+<div class="eps-auth-wrapper">
+    <div class="auth-card auth-card--wide" role="main" aria-labelledby="register-title">
+        
+        <!-- Header Section -->
+        <div class="auth-header">
+            <div class="auth-logo-badge">EPS</div>
+            <h1 class="auth-title" id="register-title">Create Your EPS Account</h1>
+            <p class="auth-subtitle">Which type of account do you need? Choose your account type to get started with EPS.</p>
+        </div>
+
+        <!-- Server Error / Message Display -->
+        
+
+        
+
+        <!-- Hidden input to track selected role -->
+        <input type="hidden" id="selected-role-input" name="role" value="student">
+
+        <!-- ==============================================================
+             STEP 1: ROLE SELECTION SCREEN (Exactly 2 Public Roles)
+             ============================================================== -->
+        <div id="role-selection-screen" class="role-selection-grid" style="display: none;">
+            <!-- Student Card -->
+            <div class="role-card-btn is-selected" id="role-card-student" role="button" tabindex="0">
+                <div class="role-card-indicator"><i data-lucide="check" class="lucide-icon icon-xs"></i></div>
+                <div>
+                    <div class="role-card-icon">
+                        <i data-lucide="graduation-cap" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="role-card-title">Student</h3>
+                    <p class="role-card-desc">
+                        Register as a student to access assigned examinations, complete readiness checks and view published results.
+                    </p>
+                </div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--auth-text-primary); display: flex; align-items: center; gap: 4px;">
+                    <span>Continue as Student</span>
+                    <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                </div>
+            </div>
+
+            <!-- Teacher Card -->
+            <div class="role-card-btn " id="role-card-teacher" role="button" tabindex="0">
+                <div class="role-card-indicator"><i data-lucide="check" class="lucide-icon icon-xs"></i></div>
+                <div>
+                    <div class="role-card-icon">
+                        <i data-lucide="presentation" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="role-card-title">Teacher</h3>
+                    <p class="role-card-desc">
+                        Register as a teacher to create examinations, manage questions, monitor candidates and evaluate submissions.
+                    </p>
+                </div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--auth-text-primary); display: flex; align-items: center; gap: 4px;">
+                    <span>Continue as Teacher</span>
+                    <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Role Status Bar (with Change Role trigger) -->
+        <div id="active-role-bar" class="active-role-bar" >
+            <div class="active-role-badge">
+                <i data-lucide="shield-check" class="lucide-icon icon-xs" style="color: #10B981;"></i>
+                <span>Selected Account Type: <span id="active-role-label">Student Account</span></span>
+            </div>
+            <button type="button" class="change-role-btn" id="change-role-btn">Change Role</button>
+        </div>
+
+        <!-- ==============================================================
+             STEP 2A: STUDENT REGISTRATION FORM
+             ============================================================== -->
+        <div id="student-form-container" style="">
+            <form method="post" action="/accounts/register/" novalidate id="student-reg-form">
+                <input type="hidden" name="csrfmiddlewaretoken" value="BSsdMn7YNYA8ItcNtjjX1VGMTJPdNhGVW8JnBcCpbRZrW3iCaSWisWbHuCwwrPal">
+                <input type="hidden" name="role" value="student">
+                <input type="hidden" name="roll_sequence" id="student-roll-sequence-input" value="">
+
+                <!-- 1. Full Name -->
+                <div class="auth-form-group">
+                    <label for="student-full-name" class="auth-label">
+                        <span>1. Full Name</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text"
+                           name="full_name"
+                           id="student-full-name"
+                           class="lp-input"
+                           placeholder="Enter your legal full name"
+                           value=""
+                           required>
+                    
+                </div>
+
+                <!-- 2. Academic Cohort Batch Selection -->
+                <div class="auth-form-group">
+                    <label for="student-batch-select" class="auth-label">
+                        <span>2. Academic Admission Batch</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <select name="batch" id="student-batch-select" class="lp-select">
+                        <option value="">Select Academic Batch (e.g. 2026 BCA)</option>
+                        
+                            <option value="1"
+                                    data-course-id="1"
+                                    data-prefix="2026BCA"
+                                    data-sem="1"
+                                    data-cap="60"
+                                    >
+                                2026 BCA (BCA) &mdash; Prefix: 2026BCA (60 Seats)
+                            </option>
+                        
+                            <option value="2"
+                                    data-course-id="2"
+                                    data-prefix="2026BSCCS"
+                                    data-sem="1"
+                                    data-cap="60"
+                                    >
+                                2026 BSC CS (BSCCS) &mdash; Prefix: 2026BSCCS (60 Seats)
+                            </option>
+                        
+                        <option value="" >&mdash; Other / Legacy Institutional Roll Lookup &mdash;</option>
+                    </select>
+                    
+                </div>
+
+                <!-- 3. Interactive Visual Roll Allocation Matrix (Loaded Dynamically on Batch Selection) -->
+                <div id="student-batch-grid-section" style="display: none; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label class="auth-label" style="margin: 0;">
+                            <span>3. Select Roll Number from Visual Grid</span>
+                            <span class="required-dot">*</span>
+                        </label>
+                        <span id="batch-grid-loading" style="font-size: 11px; color: var(--auth-text-muted); display: none;">
+                            <i data-lucide="loader-2" class="lucide-icon icon-xs"></i> Loading availability...
+                        </span>
+                    </div>
+
+                    <!-- 4-State Mini Legend -->
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; font-size: 11px;">
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #F1F5F9; border-radius: 4px; color: #475569;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span> Available
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #FFFBEB; border-radius: 4px; color: #92400E;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #F59E0B;"></span> Reserved (30m)
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #FEF3C7; border-radius: 4px; color: #78350F;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #D97706;"></span> Pending Review
+                        </span>
+                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; background: #F1F5F9; border-radius: 4px; color: #64748B;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8;"></span> Assigned
+                        </span>
+                    </div>
+
+                    <!-- Scrollable Grid Container -->
+                    <div id="batch-roll-grid" class="roll-grid-registration"></div>
+
+                    <!-- Selected Roll & Generated Username Banner -->
+                    <div id="selected-roll-confirmation" style="display: none; margin-top: 10px; padding: 12px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px;">
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #1E40AF;">
+                            Allocated Roll Number & Username
+                        </div>
+                        <div style="font-size: 19px; font-weight: 800; font-family: monospace; color: #1D4ED8; margin-top: 2px;" id="allocated-reg-preview">
+                            2026BCA01
+                        </div>
+                        <div style="font-size: 11.5px; color: #2563EB; margin-top: 3px;">
+                            <i data-lucide="check" class="lucide-icon icon-xs" style="vertical-align: middle;"></i>
+                            Held for 30 minutes. Your username will automatically match this roll number.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Course / Department -->
+                <div class="auth-form-group" id="student-course-group">
+                    <label for="student-course-select" class="auth-label">
+                        <span>Course / Academic Programme</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <select name="course" id="student-course-select" class="lp-select" required>
+                        <option value="">Select Course / Academic Programme</option>
+                        
+                            <option value="2" >
+                                B.Sc Computer Science (B.Sc CS) — Computer Science
+                            </option>
+                        
+                            <option value="1" >
+                                Bachelor of Computer Applications (BCA) — Computer Applications
+                            </option>
+                        
+                    </select>
+                    
+                </div>
+
+                <!-- 3. Roll Number (Filtered Searchable Institutional Enrollment Record) -->
+                <div class="auth-form-group" id="student-roll-group">
+                    <label for="student-roll-input" class="auth-label">
+                        <span>3. Roll Number (Institutionally Enrolled)</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div style="position: relative;">
+                        <input type="text"
+                               name="roll_number"
+                               id="student-roll-input"
+                               class="lp-input"
+                               placeholder="Select or enter your enrolled roll number (e.g. BCA202601)"
+                               value=""
+                               autocomplete="off"
+                               required>
+                        <!-- Dynamic Dropdown -->
+                        <div id="roll-lookup-dropdown" class="roll-lookup-dropdown" style="display: none;"></div>
+                    </div>
+                    <div id="roll-status-badge">
+                        
+                            <span class="auth-field-status is-checking" style="font-size: 11.5px; color: var(--auth-text-muted);">
+                                Select your course above to view and verify eligible enrolled roll numbers.
+                            </span>
+                        
+                    </div>
+                </div>
+
+                <!-- 4. Semester (Dropdown: Semester 1 to 8) -->
+                <div class="auth-form-group" id="student-semester-group">
+                    <label for="student-semester-select" class="auth-label">
+                        <span>4. Semester</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <select name="semester" id="student-semester-select" class="lp-select" required>
+                        <option value="">Select Semester</option>
+                        <option value="1" >Semester 1</option>
+                        <option value="2" >Semester 2</option>
+                        <option value="3" >Semester 3</option>
+                        <option value="4" >Semester 4</option>
+                        <option value="5" >Semester 5</option>
+                        <option value="6" >Semester 6</option>
+                        <option value="7" >Semester 7</option>
+                        <option value="8" >Semester 8</option>
+                    </select>
+                    
+                </div>
+
+                <!-- 5. Username (Real-time Debounced Validation) -->
+                <div class="auth-form-group" id="student-username-group">
+                    <label for="student-username-input" class="auth-label">
+                        <span>5. Username</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text"
+                           name="username"
+                           id="student-username-input"
+                           class="lp-input"
+                           placeholder="Choose a unique username"
+                           value=""
+                           autocomplete="username"
+                           required>
+                    <div id="student-username-status">
+                        
+                    </div>
+                </div>
+
+                <!-- 6. Email Address (Mandatory & Validated) -->
+                <div class="auth-form-group">
+                    <label for="student-email-input" class="auth-label">
+                        <span>6. Email Address</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="email"
+                           name="email"
+                           id="student-email-input"
+                           class="lp-input"
+                           placeholder="student@institution.edu"
+                           value=""
+                           autocomplete="email"
+                           required>
+                    <div id="student-email-status">
+                        
+                    </div>
+                </div>
+
+                <!-- 7. Password (Real-time Requirements & Strength Meter) -->
+                <div class="auth-form-group">
+                    <label for="student-password1-input" class="auth-label">
+                        <span>7. Password</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="auth-input-wrapper">
+                        <input type="password"
+                               name="password1"
+                               id="student-password1-input"
+                               class="lp-input"
+                               placeholder="Create a strong password"
+                               autocomplete="new-password"
+                               required>
+                        <button type="button" class="password-toggle-btn" data-target="student-password1-input" aria-label="Toggle password visibility">
+                            <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Live Password Checklist Box -->
+                    <div class="password-checklist-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--auth-text-muted);">
+                                Password Requirements
+                            </span>
+                            <span id="student-pass-strength-text" style="font-weight: 700; font-size: 11.5px;"></span>
+                        </div>
+                        <div class="password-strength-meter">
+                            <div id="student-pass-meter" class="password-strength-bar"></div>
+                        </div>
+                        <ul class="password-rules-list">
+                            <li id="student-rule-len" class="password-rule-item" data-label="Minimum 8 characters">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> Minimum 8 characters
+                            </li>
+                            <li id="student-rule-upper" class="password-rule-item" data-label="One uppercase letter (A-Z)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One uppercase letter
+                            </li>
+                            <li id="student-rule-lower" class="password-rule-item" data-label="One lowercase letter (a-z)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One lowercase letter
+                            </li>
+                            <li id="student-rule-num" class="password-rule-item" data-label="One number (0-9)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One number
+                            </li>
+                            <li id="student-rule-special" class="password-rule-item" data-label="One special character (!@#...)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One special character
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </div>
+
+                <!-- 8. Confirm Password -->
+                <div class="auth-form-group">
+                    <label for="student-password2-input" class="auth-label">
+                        <span>8. Confirm Password</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="auth-input-wrapper">
+                        <input type="password"
+                               name="password2"
+                               id="student-password2-input"
+                               class="lp-input"
+                               placeholder="Re-enter your password to confirm"
+                               autocomplete="new-password"
+                               required>
+                        <button type="button" class="password-toggle-btn" data-target="student-password2-input" aria-label="Toggle password visibility">
+                            <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+                    <div id="student-confirm-status">
+                        
+                    </div>
+                </div>
+
+                <!-- Submit CTA -->
+                <button type="submit" class="auth-submit-btn" id="student-submit-btn">
+                    <span>Create Student Account</span>
+                    <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ==============================================================
+             STEP 2B: TEACHER REGISTRATION FORM
+             ============================================================== -->
+        <div id="teacher-form-container" style="display: none;">
+            <form method="post" action="/accounts/register/" novalidate id="teacher-reg-form">
+                <input type="hidden" name="csrfmiddlewaretoken" value="BSsdMn7YNYA8ItcNtjjX1VGMTJPdNhGVW8JnBcCpbRZrW3iCaSWisWbHuCwwrPal">
+                <input type="hidden" name="role" value="teacher">
+
+                <!-- 1. Full Name -->
+                <div class="auth-form-group">
+                    <label for="teacher-full-name" class="auth-label">
+                        <span>1. Full Name</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text"
+                           name="full_name"
+                           id="teacher-full-name"
+                           class="lp-input"
+                           placeholder="Enter your academic full name"
+                           value=""
+                           required>
+                    
+                </div>
+
+                <!-- 2. Employee ID -->
+                <div class="auth-form-group">
+                    <label for="teacher-emp-id" class="auth-label">
+                        <span>2. Employee ID / Staff Code</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text"
+                           name="employee_id"
+                           id="teacher-emp-id"
+                           class="lp-input"
+                           placeholder="Institutional Employee ID (e.g. EMP-2026-08)"
+                           value=""
+                           required>
+                    
+                </div>
+
+                <!-- 3. Department -->
+                <div class="auth-form-group">
+                    <label for="teacher-dept-select" class="auth-label">
+                        <span>3. Department</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <select name="department" id="teacher-dept-select" class="lp-select" required>
+                        <option value="">Select Academic Department</option>
+                        
+                            <option value="2" >
+                                Computer Applications (BCA)
+                            </option>
+                        
+                            <option value="1" >
+                                Computer Science (CS)
+                            </option>
+                        
+                    </select>
+                    
+                </div>
+
+                <!-- 4. Username -->
+                <div class="auth-form-group">
+                    <label for="teacher-username-input" class="auth-label">
+                        <span>4. Username</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="text"
+                           name="username"
+                           id="teacher-username-input"
+                           class="lp-input"
+                           placeholder="Choose a unique username"
+                           value=""
+                           autocomplete="username"
+                           required>
+                    <div id="teacher-username-status">
+                        
+                    </div>
+                </div>
+
+                <!-- 5. Email Address -->
+                <div class="auth-form-group">
+                    <label for="teacher-email-input" class="auth-label">
+                        <span>5. Email Address</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <input type="email"
+                           name="email"
+                           id="teacher-email-input"
+                           class="lp-input"
+                           placeholder="teacher@institution.edu"
+                           value=""
+                           autocomplete="email"
+                           required>
+                    <div id="teacher-email-status">
+                        
+                    </div>
+                </div>
+
+                <!-- 6. Password -->
+                <div class="auth-form-group">
+                    <label for="teacher-password1-input" class="auth-label">
+                        <span>6. Password</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="auth-input-wrapper">
+                        <input type="password"
+                               name="password1"
+                               id="teacher-password1-input"
+                               class="lp-input"
+                               placeholder="Create a strong password"
+                               autocomplete="new-password"
+                               required>
+                        <button type="button" class="password-toggle-btn" data-target="teacher-password1-input" aria-label="Toggle password visibility">
+                            <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Checklist Box -->
+                    <div class="password-checklist-box">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--auth-text-muted);">
+                                Password Requirements
+                            </span>
+                            <span id="teacher-pass-strength-text" style="font-weight: 700; font-size: 11.5px;"></span>
+                        </div>
+                        <div class="password-strength-meter">
+                            <div id="teacher-pass-meter" class="password-strength-bar"></div>
+                        </div>
+                        <ul class="password-rules-list">
+                            <li id="teacher-rule-len" class="password-rule-item" data-label="Minimum 8 characters">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> Minimum 8 characters
+                            </li>
+                            <li id="teacher-rule-upper" class="password-rule-item" data-label="One uppercase letter (A-Z)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One uppercase letter
+                            </li>
+                            <li id="teacher-rule-lower" class="password-rule-item" data-label="One lowercase letter (a-z)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One lowercase letter
+                            </li>
+                            <li id="teacher-rule-num" class="password-rule-item" data-label="One number (0-9)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One number
+                            </li>
+                            <li id="teacher-rule-special" class="password-rule-item" data-label="One special character (!@#...)">
+                                <i data-lucide="circle" class="lucide-icon icon-xs"></i> One special character
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </div>
+
+                <!-- 7. Confirm Password -->
+                <div class="auth-form-group">
+                    <label for="teacher-password2-input" class="auth-label">
+                        <span>7. Confirm Password</span>
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="auth-input-wrapper">
+                        <input type="password"
+                               name="password2"
+                               id="teacher-password2-input"
+                               class="lp-input"
+                               placeholder="Re-enter your password to confirm"
+                               autocomplete="new-password"
+                               required>
+                        <button type="button" class="password-toggle-btn" data-target="teacher-password2-input" aria-label="Toggle password visibility">
+                            <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+                    <div id="teacher-confirm-status">
+                        
+                    </div>
+                </div>
+
+                <div style="font-size: 12px; color: var(--auth-text-muted); margin-bottom: 20px; line-height: 1.45;">
+                    <i data-lucide="info" class="lucide-icon icon-xs" style="vertical-align: middle;"></i>
+                    Teacher registrations are created in Pending status and require administrator review and approval before examiner permissions are activated.
+                </div>
+
+                <!-- Submit CTA -->
+                <button type="submit" class="auth-submit-btn" id="teacher-submit-btn">
+                    <span>Create Teacher Account</span>
+                    <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Prompt to Sign In -->
+        <div class="auth-footer-prompt">
+            <span>Already have an account?</span>
+            <a href="/accounts/login/" class="auth-footer-link">Sign In</a>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    
+    <!-- Minimal Public Footer -->
+    <footer class="footer" style="padding: var(--space-6) var(--space-4); text-align: center; border-top: 1px solid var(--border-subtle); background-color: var(--bg-surface); color: var(--text-muted); font-size: var(--font-size-xs); transition: background-color var(--transition-normal);">
+        <p style="margin: 0; line-height: 1.5;">EPS &mdash; Examination Proctoring System &bull; &copy; 2026 All rights reserved.</p>
+    </footer>
+    
+
+    
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
+    
+<script src="/static/js/auth.js"></script>
+
+</body>
+</html>

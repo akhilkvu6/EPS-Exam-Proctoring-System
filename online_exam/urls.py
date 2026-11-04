@@ -4,6 +4,7 @@ from accounts import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('design/', views.design_system, name='design_system_root'),
 
     path('admin/', admin.site.urls),
 

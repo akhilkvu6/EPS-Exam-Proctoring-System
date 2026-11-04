@@ -1,0 +1,1338 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPS — Secure Online Examination & Proctoring Platform</title>
+    
+    <!-- Prevent Theme Flash -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('eps-theme') || 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design Tokens & School Component Styles -->
+    <link rel="stylesheet" href="/static/css/design-tokens.css">
+    <link rel="stylesheet" href="/static/css/bento.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    
+<link rel="stylesheet" href="/static/css/landing.css">
+
+</head>
+<body>
+
+    <!-- Mobile Navigation Drawer Overlay Backdrop -->
+    <div id="sidebar-overlay" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.4); z-index: 55; backdrop-filter: blur(2px);"></div>
+
+    
+        
+<!-- ==========================================================================
+     SECTION 1: STICKY NAVIGATION BAR
+     ========================================================================== -->
+<header class="lp-nav" id="top-nav">
+    <div class="lp-container lp-nav__inner">
+        <!-- Left: Logo & Portal Identity -->
+        <a href="/" class="lp-nav__brand" aria-label="EPS Homepage">
+            <span class="lp-brand-badge">EPS</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="lp-brand-title">Examination Portal</span>
+                <span class="lp-brand-status">
+                    <span class="lp-status-dot"></span>
+                    <span>Institutional</span>
+                </span>
+            </div>
+        </a>
+
+        <!-- Right: Primary Navigation Links -->
+        <nav class="lp-nav__menu" aria-label="Public sections navigation">
+            <a href="#features" class="lp-nav-link">Features</a>
+            <a href="#workflow" class="lp-nav-link">How It Works</a>
+            <a href="#teachers" class="lp-nav-link">For Teachers</a>
+            <a href="#students" class="lp-nav-link">For Students</a>
+            <a href="#security" class="lp-nav-link">Security</a>
+        </nav>
+
+        <!-- Right Actions: Theme Toggle & Gateway Buttons -->
+        <div class="lp-nav__actions">
+            <button type="button" class="lp-theme-toggle theme-toggle-btn" title="Toggle Light/Dark Theme" aria-label="Toggle light/dark theme">
+                <i data-lucide="sun-moon" class="lucide-icon icon-sm"></i>
+            </button>
+            <a href="/accounts/login/" class="lp-btn lp-btn-secondary lp-btn-sm">Sign In</a>
+            <a href="/accounts/register/" class="lp-btn lp-btn-primary lp-btn-sm">Get Started</a>
+
+            <!-- Mobile Hamburger Toggle -->
+            <button type="button" class="lp-nav-toggle-btn" id="lp-mobile-menu-toggle" aria-label="Open mobile navigation menu" aria-expanded="false">
+                <i data-lucide="menu" class="lucide-icon icon-sm"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div class="lp-mobile-drawer" id="lp-mobile-drawer" aria-label="Mobile navigation drawer">
+    <div class="lp-mobile-drawer__links">
+        <a href="#features" class="lp-mobile-drawer__link">Features</a>
+        <a href="#workflow" class="lp-mobile-drawer__link">How It Works</a>
+        <a href="#teachers" class="lp-mobile-drawer__link">For Teachers</a>
+        <a href="#students" class="lp-mobile-drawer__link">For Students</a>
+        <a href="#security" class="lp-mobile-drawer__link">Security</a>
+    </div>
+    <div class="lp-mobile-drawer__actions">
+        <a href="/accounts/login/" class="lp-btn lp-btn-secondary" style="width: 100%;">Sign In</a>
+        <a href="/accounts/register/" class="lp-btn lp-btn-primary" style="width: 100%;">Get Started</a>
+    </div>
+</div>
+
+    
+
+    <!-- Page Content & Alerts -->
+    <main class="app-content" style="padding: 0; max-width: 100%; width: 100%; margin: 0;">
+        
+
+        
+<div class="eps-landing-page">
+
+    <!-- ==========================================================================
+         SECTION 2: HERO SECTION
+         ========================================================================== -->
+    <section class="lp-hero" id="hero">
+        <div class="lp-container">
+            <div class="lp-hero__content">
+                <!-- Small Eyebrow -->
+                <div class="lp-eyebrow">
+                    <span class="lp-status-dot"></span>
+                    <span>SECURE ONLINE EXAMINATION PLATFORM</span>
+                </div>
+
+                <!-- Main Heading -->
+                <h1 class="lp-hero__title">
+                    Examinations. Integrity. Confidence.
+                </h1>
+
+                <!-- Subheading -->
+                <p class="lp-hero__subheading">
+                    A complete platform to create, conduct, monitor and evaluate online examinations. Give teachers the tools to manage assessments and students a secure, seamless examination experience.
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="lp-hero__actions">
+                    <a href="/accounts/register/" class="lp-btn lp-btn-primary lp-btn-lg">
+                        <span>Get Started</span>
+                        <i data-lucide="arrow-right" class="lucide-icon icon-sm"></i>
+                    </a>
+                    <a href="#features" class="lp-btn lp-btn-secondary lp-btn-lg">
+                        <span>Explore the Platform</span>
+                        <i data-lucide="chevron-down" class="lucide-icon icon-sm"></i>
+                    </a>
+                </div>
+
+                <!-- Three Compact Highlights -->
+                <div class="lp-hero__highlights">
+                    <div class="lp-highlight-item">
+                        <i data-lucide="shield-check" class="lucide-icon icon-xs"></i>
+                        <span>Secure Examinations</span>
+                    </div>
+                    <div class="lp-highlight-item">
+                        <i data-lucide="scan-face" class="lucide-icon icon-xs"></i>
+                        <span>Intelligent Proctoring</span>
+                    </div>
+                    <div class="lp-highlight-item">
+                        <i data-lucide="clipboard-check" class="lucide-icon icon-xs"></i>
+                        <span>Reliable Evaluation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Visual Preview: Realistic EPS Dashboard Interface Mockup -->
+            <div class="lp-window-mockup" style="max-width: 1060px;" aria-label="EPS Institutional Dashboard Product Preview">
+                <div class="lp-window-mockup__header">
+                    <div class="lp-window-dots">
+                        <span class="lp-window-dot" style="background-color: #EF4444;"></span>
+                        <span class="lp-window-dot" style="background-color: #F59E0B;"></span>
+                        <span class="lp-window-dot" style="background-color: #10B981;"></span>
+                    </div>
+                    <div class="lp-window-mockup__title">
+                        <i data-lucide="monitor" class="lucide-icon icon-xs"></i>
+                        <span>EPS OPERATIONAL PREVIEW &middot; INSTITUTIONAL DASHBOARD</span>
+                    </div>
+                    <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">
+                        SESSION ID #8492
+                    </div>
+                </div>
+                <div class="lp-window-mockup__body">
+                    <!-- Top Telemetry Row -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 14px;">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted); margin-bottom: 4px;">ACTIVE EXAMINATION</div>
+                            <div style="font-weight: 700; font-size: 15px; color: var(--lp-text-primary);">CS301 Computer Architecture</div>
+                            <div style="font-size: 11px; color: var(--lp-text-secondary); margin-top: 2px;">Midterm Assessment &bull; Room 4A</div>
+                        </div>
+
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 14px;">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted); margin-bottom: 4px;">REMAINING SESSION TIME</div>
+                            <div style="font-weight: 800; font-size: 18px; font-family: monospace; color: var(--lp-text-primary); letter-spacing: -0.02em;">
+                                <span class="lp-mockup-timer">01:42:18</span>
+                            </div>
+                            <div style="font-size: 11px; color: #10B981; margin-top: 2px;">Synchronized &bull; NTP Stratum-1</div>
+                        </div>
+
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 14px;">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted); margin-bottom: 4px;">CANDIDATE TELEMETRY</div>
+                            <div style="display: flex; align-items: baseline; gap: 6px;">
+                                <span style="font-weight: 800; font-size: 18px; color: var(--lp-text-primary);">142</span>
+                                <span style="font-size: 11.5px; color: var(--lp-text-muted);">/ 142 Active</span>
+                            </div>
+                            <div style="font-size: 11px; color: #10B981; margin-top: 2px;">100% Video Streams Live</div>
+                        </div>
+
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 14px;">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted); margin-bottom: 4px;">PROCTORING STATUS</div>
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                <span class="lp-status-dot" style="width: 7px; height: 7px;"></span>
+                                <span style="font-weight: 700; font-size: 14px; color: var(--lp-text-primary);">Normal Integrity</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--lp-text-secondary); margin-top: 4px;">0 Critical Violations</div>
+                        </div>
+                    </div>
+
+                    <!-- Active Candidates Monitoring Grid Preview -->
+                    <div style="border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); overflow: hidden;">
+                        <div style="padding: 10px 14px; background-color: var(--lp-bg-tertiary); border-bottom: 1px solid var(--lp-border); display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 11.5px; font-weight: 700; color: var(--lp-text-primary); text-transform: uppercase; letter-spacing: 0.05em;">
+                                Live Invigilation Grid &middot; Candidate Stream Samples
+                            </span>
+                            <span class="lp-pill lp-pill--neutral">Updated 1s ago</span>
+                        </div>
+                        <table class="lp-mockup-table">
+                            <thead>
+                                <tr>
+                                    <th>Candidate ID</th>
+                                    <th>Verification</th>
+                                    <th>Camera &amp; Audio</th>
+                                    <th>Browser Environment</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">Alex Morgan</div>
+                                        <div style="font-size: 10.5px; color: var(--lp-text-muted);">Roll #CS-2026-081</div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--success"><i data-lucide="check" class="lucide-icon icon-xs"></i> Biometric Match</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px;"><i data-lucide="video" class="lucide-icon icon-xs" style="color:#10B981;"></i> 720p 30fps</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px;"><i data-lucide="lock" class="lucide-icon icon-xs" style="color:#10B981;"></i> Fullscreen Active</span></td>
+                                    <td>
+                                        <div style="font-size: 11px; font-weight: 600;">24/30 Questions</div>
+                                        <div style="width: 90px; height: 4px; background: var(--lp-border); border-radius: 2px; margin-top: 3px; overflow: hidden;">
+                                            <div style="width: 80%; height: 100%; background: var(--lp-text-primary);"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">Sarah Chen</div>
+                                        <div style="font-size: 10.5px; color: var(--lp-text-muted);">Roll #CS-2026-042</div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--success"><i data-lucide="check" class="lucide-icon icon-xs"></i> Biometric Match</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px;"><i data-lucide="video" class="lucide-icon icon-xs" style="color:#10B981;"></i> 720p 30fps</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px;"><i data-lucide="lock" class="lucide-icon icon-xs" style="color:#10B981;"></i> Fullscreen Active</span></td>
+                                    <td>
+                                        <div style="font-size: 11px; font-weight: 600;">21/30 Questions</div>
+                                        <div style="width: 90px; height: 4px; background: var(--lp-border); border-radius: 2px; margin-top: 3px; overflow: hidden;">
+                                            <div style="width: 70%; height: 100%; background: var(--lp-text-primary);"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">David Kumar</div>
+                                        <div style="font-size: 10.5px; color: var(--lp-text-muted);">Roll #CS-2026-118</div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--success"><i data-lucide="check" class="lucide-icon icon-xs"></i> Biometric Match</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px;"><i data-lucide="video" class="lucide-icon icon-xs" style="color:#10B981;"></i> 720p 30fps</span></td>
+                                    <td><span style="font-weight: 500; font-size: 11.5px; color:#D97706;"><i data-lucide="alert-triangle" class="lucide-icon icon-xs" style="color:#D97706;"></i> Tab Refocus (1.2s)</span></td>
+                                    <td>
+                                        <div style="font-size: 11px; font-weight: 600;">19/30 Questions</div>
+                                        <div style="width: 90px; height: 4px; background: var(--lp-border); border-radius: 2px; margin-top: 3px; overflow: hidden;">
+                                            <div style="width: 63%; height: 100%; background: var(--lp-text-primary);"></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="lp-pill lp-pill--warning">Review Indicator</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 3: PLATFORM OVERVIEW (6 FEATURE CARDS)
+         ========================================================================== -->
+    <section class="lp-section lp-section--alt" id="features">
+        <div class="lp-container">
+            <div class="lp-section-header">
+                <div class="lp-eyebrow">ONE PLATFORM. COMPLETE CONTROL.</div>
+                <h2 class="lp-heading">Everything You Need to Conduct Examinations</h2>
+                <p class="lp-subtext">
+                    From preparing questions to publishing results, manage every stage of the examination process in one place.
+                </p>
+            </div>
+
+            <div class="lp-grid-6">
+                <!-- Card 1 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="clipboard-list" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Examination Management</h3>
+                    <p class="lp-card__desc">
+                        Create, schedule and manage examinations with flexible settings and controlled access.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="file-question" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Question Management</h3>
+                    <p class="lp-card__desc">
+                        Build question sets, configure marks and organize different question formats.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="scan-face" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Intelligent Proctoring</h3>
+                    <p class="lp-card__desc">
+                        Monitor examination activity through browser checks and AI-assisted camera analysis.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="monitor-check" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Live Invigilation</h3>
+                    <p class="lp-card__desc">
+                        Monitor candidate progress, examination status and reported incidents.
+                    </p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="clipboard-check" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Evaluation &amp; Grading</h3>
+                    <p class="lp-card__desc">
+                        Automatically evaluate objective questions and manually assess descriptive answers.
+                    </p>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="chart-no-axes-combined" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Results &amp; Performance</h3>
+                    <p class="lp-card__desc">
+                        Publish examination results and provide students with their scores and feedback.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 4: EXAMINATION LIFECYCLE (7-STEP CONNECTED TIMELINE)
+         ========================================================================== -->
+    <section class="lp-section" id="workflow">
+        <div class="lp-container">
+            <div class="lp-section-header">
+                <div class="lp-eyebrow">A CONNECTED WORKFLOW</div>
+                <h2 class="lp-heading">From Preparation to Results</h2>
+                <p class="lp-subtext">
+                    Every examination follows a clear, organized journey. EPS brings the entire process together.
+                </p>
+            </div>
+
+            <!-- Responsive 7-step timeline -->
+            <div class="lp-timeline-horizontal">
+                <!-- Step 1 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">1</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="file-plus" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Create</h4>
+                        <p class="lp-timeline-node__desc">Prepare examinations and questions.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">2</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="users" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Assign</h4>
+                        <p class="lp-timeline-node__desc">Select students who can attend.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">3</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="laptop" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Prepare</h4>
+                        <p class="lp-timeline-node__desc">Complete device compatibility checks.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">4</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="clipboard-pen" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Conduct</h4>
+                        <p class="lp-timeline-node__desc">Attend timed online examinations.</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">5</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="eye" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Monitor</h4>
+                        <p class="lp-timeline-node__desc">Observe examination activity.</p>
+                    </div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">6</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="check-check" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Evaluate</h4>
+                        <p class="lp-timeline-node__desc">Grade answers and review submissions.</p>
+                    </div>
+                </div>
+
+                <!-- Step 7 -->
+                <div class="lp-timeline-node">
+                    <div class="lp-timeline-step-badge">7</div>
+                    <div class="lp-timeline-node__card">
+                        <i data-lucide="award" class="lucide-icon icon-sm lp-timeline-node__icon"></i>
+                        <h4 class="lp-timeline-node__title">Publish</h4>
+                        <p class="lp-timeline-node__desc">Release final examination results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 5: INTELLIGENT PROCTORING (6 FEATURES + PREVIEW 2)
+         ========================================================================== -->
+    <section class="lp-section lp-section--alt" id="proctoring">
+        <div class="lp-container">
+            <div class="lp-split-section">
+                <div>
+                    <div class="lp-eyebrow">ACADEMIC INTEGRITY</div>
+                    <h2 class="lp-heading">A Smarter Approach to Examination Monitoring</h2>
+                    <p class="lp-subtext" style="margin-bottom: 24px;">
+                        Maintain examination oversight with browser activity monitoring, camera-based checks and AI-assisted incident detection.
+                    </p>
+
+                    <!-- Six Features Grid -->
+                    <div class="lp-feature-list">
+                        <div class="lp-feature-item">
+                            <i data-lucide="scan-face" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Face Presence Detection</h4>
+                                <p class="lp-feature-item__desc">Identify when a candidate's face is not visible during configured monitoring.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="users" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Multiple-Face Detection</h4>
+                                <p class="lp-feature-item__desc">Flag instances where more than one face is detected in the camera view.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="activity" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Browser Activity Monitoring</h4>
+                                <p class="lp-feature-item__desc">Record fullscreen exits, tab changes and relevant browser activity.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="eye" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Head Pose &amp; Gaze Indicators</h4>
+                                <p class="lp-feature-item__desc">Identify potentially unusual head orientation and looking-away patterns where detection is reliable.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="smartphone" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Object Detection</h4>
+                                <p class="lp-feature-item__desc">Identify configured objects, such as mobile phones, when supported by the detection model.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="file-image" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Incident Evidence</h4>
+                                <p class="lp-feature-item__desc">Review configured screenshots, recordings and event-related evidence.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Supporting Note Requirement -->
+                    <div style="margin-top: 24px; padding: 12px 16px; background-color: var(--lp-bg-tertiary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); font-size: 12.5px; color: var(--lp-text-secondary); display: flex; align-items: center; gap: 10px;">
+                        <i data-lucide="info" class="lucide-icon icon-xs" style="color: var(--lp-text-muted); flex-shrink: 0;"></i>
+                        <span>Automated detections are indicators for human review, not automatic proof of examination misconduct.</span>
+                    </div>
+                </div>
+
+                <!-- Preview 2: Realistic Teacher Monitoring Dashboard Preview -->
+                <div class="lp-mockup-frame" aria-label="Teacher Live Monitoring Dashboard Preview">
+                    <div class="lp-mockup-topbar">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="lp-status-dot"></span>
+                            <span style="font-weight: 700; font-size: 11px; text-transform: uppercase;">LIVE PROCTORING STREAM</span>
+                        </div>
+                        <span class="lp-pill lp-pill--neutral">Room #A-104</span>
+                    </div>
+                    <div class="lp-mockup-body">
+                        <!-- Simulated Camera HUD Box -->
+                        <div style="background-color: var(--lp-bg-tertiary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); height: 180px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 14px;">
+                            <div style="border: 2px dashed rgba(16, 185, 129, 0.7); width: 110px; height: 125px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.04);">
+                                <i data-lucide="user" class="lucide-icon icon-lg" style="color: var(--lp-text-secondary); opacity: 0.7;"></i>
+                                <span style="font-size: 9.5px; font-weight: 700; color: #10B981; margin-top: 4px;">FACE LOCK 99%</span>
+                            </div>
+                            <div style="position: absolute; top: 8px; left: 8px; font-size: 10px; font-weight: 700; background: rgba(0,0,0,0.6); color: #FFF; padding: 2px 6px; border-radius: 4px;">
+                                CAM 01 &bull; 1080p
+                            </div>
+                            <div style="position: absolute; bottom: 8px; right: 8px; font-size: 10px; font-weight: 700; background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid #10B981; padding: 2px 6px; border-radius: 4px;">
+                                1 Face Detected
+                            </div>
+                        </div>
+
+                        <!-- Incident Log Stream -->
+                        <div style="font-size: 11px; font-weight: 700; color: var(--lp-text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                            Real-time Verification Timeline
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: var(--lp-bg-secondary); border-radius: 4px; border: 1px solid var(--lp-border-subtle);">
+                                <span style="font-size: 11px; font-weight: 600;">14:38:12 &middot; Biometric identity verified</span>
+                                <span class="lp-pill lp-pill--success">Passed</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: var(--lp-bg-secondary); border-radius: 4px; border: 1px solid var(--lp-border-subtle);">
+                                <span style="font-size: 11px; font-weight: 600;">14:41:05 &middot; Fullscreen focus confirmed</span>
+                                <span class="lp-pill lp-pill--success">Active</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: var(--lp-bg-secondary); border-radius: 4px; border: 1px solid var(--lp-border-subtle);">
+                                <span style="font-size: 11px; font-weight: 600;">14:49:22 &middot; Off-screen gaze flag &lt; 2.5s</span>
+                                <span class="lp-pill lp-pill--neutral">Noted for Review</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 6: STUDENT EXPERIENCE (6 FEATURES + PREVIEW 3)
+         ========================================================================== -->
+    <section class="lp-section" id="students">
+        <div class="lp-container">
+            <div class="lp-split-section lp-split-section--reverse">
+                <div>
+                    <div class="lp-eyebrow">DESIGNED FOR CANDIDATES</div>
+                    <h2 class="lp-heading">Focus on Your Examination. We'll Handle the Rest.</h2>
+                    <p class="lp-subtext" style="margin-bottom: 24px;">
+                        A clear and distraction-free examination environment that helps students prepare, attend and complete their assessments confidently.
+                    </p>
+
+                    <!-- Six Student Features -->
+                    <div class="lp-feature-list">
+                        <div class="lp-feature-item">
+                            <i data-lucide="calendar-days" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Assigned Exams</h4>
+                                <p class="lp-feature-item__desc">View upcoming and available examinations.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="laptop" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Device Readiness</h4>
+                                <p class="lp-feature-item__desc">Check your camera, microphone and browser before an exam.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="clock" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Examination Timer</h4>
+                                <p class="lp-feature-item__desc">Keep track of your remaining examination time.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="save" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Automatic Saving</h4>
+                                <p class="lp-feature-item__desc">Keep answers saved throughout the examination.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="list-checks" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Question Navigation</h4>
+                                <p class="lp-feature-item__desc">Move between questions and track your progress.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="graduation-cap" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Published Results</h4>
+                                <p class="lp-feature-item__desc">Access your completed examination scores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview 3: Realistic Student Examination Screen -->
+                <div class="lp-mockup-frame" aria-label="Student Examination Interface Preview">
+                    <div class="lp-mockup-topbar">
+                        <div>
+                            <div style="font-weight: 700; font-size: 12px; color: var(--lp-text-primary);">CS301 &middot; Computer Architecture</div>
+                            <div style="font-size: 10px; color: var(--lp-text-muted);">Midterm Examination</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="lp-pill lp-pill--neutral" style="font-family: monospace; font-size: 11px; font-weight: 700;">
+                                <i data-lucide="clock" class="lucide-icon icon-xs"></i>
+                                <span class="lp-mockup-timer">00:45:12</span>
+                            </span>
+                            <span class="lp-pill lp-pill--success"><i data-lucide="check" class="lucide-icon icon-xs"></i> Saved</span>
+                        </div>
+                    </div>
+                    <div class="lp-mockup-body">
+                        <!-- Question Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--lp-text-muted);">Question 8 of 30 &bull; Multiple Choice</span>
+                            <span style="font-size: 11px; font-weight: 600; color: var(--lp-text-secondary);">2.0 Marks</span>
+                        </div>
+
+                        <!-- Question Prompt -->
+                        <div style="font-size: 13.5px; font-weight: 600; color: var(--lp-text-primary); margin-bottom: 14px; line-height: 1.45;">
+                            What is the primary architectural purpose of the Program Counter (PC) register in a standard CPU pipeline?
+                        </div>
+
+                        <!-- Radio Options -->
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px;">
+                            <div style="padding: 10px 12px; border: 1.5px solid var(--lp-text-primary); border-radius: 6px; background-color: var(--lp-bg-secondary); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; border: 4px solid var(--lp-text-primary); background: #FFF; display: inline-block;"></span>
+                                <span>A. Holds the memory address of the next instruction to be fetched</span>
+                            </div>
+                            <div style="padding: 10px 12px; border: 1px solid var(--lp-border); border-radius: 6px; font-size: 12px; color: var(--lp-text-secondary); display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--lp-border); display: inline-block;"></span>
+                                <span>B. Stores the current status flags produced by the Arithmetic Logic Unit</span>
+                            </div>
+                            <div style="padding: 10px 12px; border: 1px solid var(--lp-border); border-radius: 6px; font-size: 12px; color: var(--lp-text-secondary); display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--lp-border); display: inline-block;"></span>
+                                <span>C. Temporarily buffers operand data before cache writeback</span>
+                            </div>
+                        </div>
+
+                        <!-- Palette Grid Preview -->
+                        <div style="border-top: 1px solid var(--lp-border); padding-top: 12px;">
+                            <div style="font-size: 10.5px; font-weight: 700; color: var(--lp-text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                                Question Palette
+                            </div>
+                            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">1</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">2</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">3</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">4</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">5</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">6</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;">7</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; background: var(--lp-text-primary); color: #FFF; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center;">8</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--lp-border); font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">9</span>
+                                <span style="width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--lp-border); font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center;">10</span>
+                                <span style="font-size: 10px; color: var(--lp-text-muted); align-self: center; margin-left: 4px;">... 30 Total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 7: TEACHER EXPERIENCE (7 FEATURES + PREVIEW 4)
+         ========================================================================== -->
+    <section class="lp-section lp-section--alt" id="teachers">
+        <div class="lp-container">
+            <div class="lp-split-section">
+                <div>
+                    <div class="lp-eyebrow">BUILT FOR EXAMINERS</div>
+                    <h2 class="lp-heading">Complete Control Over Every Examination</h2>
+                    <p class="lp-subtext" style="margin-bottom: 24px;">
+                        Give teachers the tools to prepare assessments, manage candidates, monitor examination sessions and evaluate student performance.
+                    </p>
+
+                    <!-- Seven Teacher Features -->
+                    <div class="lp-feature-list" style="grid-template-columns: 1fr 1fr;">
+                        <div class="lp-feature-item">
+                            <i data-lucide="file-plus" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Create Examinations</h4>
+                                <p class="lp-feature-item__desc">Build and schedule online assessments.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="file-question" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Manage Questions</h4>
+                                <p class="lp-feature-item__desc">Prepare and organize question sets.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="users" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Assign Students</h4>
+                                <p class="lp-feature-item__desc">Control examination access.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="monitor" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Live Monitoring</h4>
+                                <p class="lp-feature-item__desc">Observe active examination sessions.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="shield-alert" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Review Incidents</h4>
+                                <p class="lp-feature-item__desc">Examine reported monitoring events.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item">
+                            <i data-lucide="clipboard-check" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Evaluate Answers</h4>
+                                <p class="lp-feature-item__desc">Grade submissions and provide feedback.</p>
+                            </div>
+                        </div>
+
+                        <div class="lp-feature-item" style="grid-column: span 2;">
+                            <i data-lucide="chart-column" class="lucide-icon icon-sm lp-feature-item__icon"></i>
+                            <div>
+                                <h4 class="lp-feature-item__title">Publish Results</h4>
+                                <p class="lp-feature-item__desc">Release verified examination scores.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview 4: Realistic Teacher Management Dashboard -->
+                <div class="lp-mockup-frame" aria-label="Teacher Examination Management Dashboard Preview">
+                    <div class="lp-mockup-topbar">
+                        <div style="font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                            EXAMINATION WORKBENCH &middot; SPRING 2026
+                        </div>
+                        <span class="lp-pill lp-pill--success">Published &bull; Active</span>
+                    </div>
+                    <div class="lp-mockup-body">
+                        <!-- Exam Info Banner -->
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 12px 14px; margin-bottom: 14px;">
+                            <div style="font-weight: 700; font-size: 14px; color: var(--lp-text-primary);">Data Structures &amp; Algorithms Midterm</div>
+                            <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 11px; color: var(--lp-text-secondary); flex-wrap: wrap;">
+                                <span><i data-lucide="calendar" class="lucide-icon icon-xs"></i> 90 Minutes</span>
+                                <span><i data-lucide="help-circle" class="lucide-icon icon-xs"></i> 35 Questions</span>
+                                <span><i data-lucide="award" class="lucide-icon icon-xs"></i> 100 Total Marks</span>
+                                <span><i data-lucide="users" class="lucide-icon icon-xs"></i> 84 Candidates</span>
+                            </div>
+                        </div>
+
+                        <!-- Question Bank Sample Table -->
+                        <div style="font-size: 11px; font-weight: 700; color: var(--lp-text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                            Configured Question Items
+                        </div>
+                        <table class="lp-mockup-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Question Topic</th>
+                                    <th>Format</th>
+                                    <th>Evaluation</th>
+                                    <th>Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1</strong></td>
+                                    <td>Binary Search Trees Inversion</td>
+                                    <td>Multiple Choice</td>
+                                    <td><span class="lp-pill lp-pill--success">Auto-graded</span></td>
+                                    <td><strong>2.0</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2</strong></td>
+                                    <td>Dijkstra Algorithm Time Complexity</td>
+                                    <td>Multiple Choice</td>
+                                    <td><span class="lp-pill lp-pill--success">Auto-graded</span></td>
+                                    <td><strong>3.0</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3</strong></td>
+                                    <td>Hash Table Collision Resolution Analysis</td>
+                                    <td>Descriptive</td>
+                                    <td><span class="lp-pill lp-pill--neutral">Teacher Scored</span></td>
+                                    <td><strong>5.0</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 8: ADMINISTRATION (4 FEATURE BLOCKS + PREVIEW 5)
+         ========================================================================== -->
+    <section class="lp-section" id="admin">
+        <div class="lp-container">
+            <div class="lp-section-header">
+                <div class="lp-eyebrow">INSTITUTION-WIDE OVERSIGHT</div>
+                <h2 class="lp-heading">One Place to Manage the Entire Examination System</h2>
+                <p class="lp-subtext">
+                    Give administrators a centralized view of users, examinations, monitoring activity and institutional examination records.
+                </p>
+            </div>
+
+            <!-- Four Feature Blocks -->
+            <div class="lp-grid-4" style="margin-bottom: 48px;">
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="users-round" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">User Management</h3>
+                    <p class="lp-card__desc">Manage student and teacher accounts.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="notebook-tabs" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Examination Oversight</h3>
+                    <p class="lp-card__desc">View and manage institution-wide examinations.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="shield-check" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Proctoring Oversight</h3>
+                    <p class="lp-card__desc">Review incidents and authorized evidence.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="settings" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">System Administration</h3>
+                    <p class="lp-card__desc">Configure platform policies and settings.</p>
+                </div>
+            </div>
+
+            <!-- Preview 5: Realistic Administrative Dashboard Preview -->
+            <div class="lp-window-mockup" style="max-width: 980px;" aria-label="Administrative Oversight Dashboard Preview">
+                <div class="lp-window-mockup__header">
+                    <div class="lp-window-dots">
+                        <span class="lp-window-dot"></span>
+                        <span class="lp-window-dot"></span>
+                        <span class="lp-window-dot"></span>
+                    </div>
+                    <div class="lp-window-mockup__title">
+                        <i data-lucide="shield" class="lucide-icon icon-xs"></i>
+                        <span>ADMINISTRATOR INSTITUTIONAL CONTROL CONSOLE</span>
+                    </div>
+                    <span class="lp-pill lp-pill--success">System Health: 99.98%</span>
+                </div>
+                <div class="lp-mockup-body">
+                    <!-- Metric Strips -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px;">
+                        <div style="padding: 12px; background: var(--lp-bg-secondary); border-radius: 6px; border: 1px solid var(--lp-border);">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">TOTAL STUDENTS</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--lp-text-primary);">1,420</div>
+                        </div>
+                        <div style="padding: 12px; background: var(--lp-bg-secondary); border-radius: 6px; border: 1px solid var(--lp-border);">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">FACULTY / EXAMINERS</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--lp-text-primary);">68</div>
+                        </div>
+                        <div style="padding: 12px; background: var(--lp-bg-secondary); border-radius: 6px; border: 1px solid var(--lp-border);">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">SCHEDULED EXAMS</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--lp-text-primary);">18</div>
+                        </div>
+                        <div style="padding: 12px; background: var(--lp-bg-secondary); border-radius: 6px; border: 1px solid var(--lp-border);">
+                            <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">INCIDENTS UNDER AUDIT</div>
+                            <div style="font-size: 18px; font-weight: 800; color: var(--lp-text-primary);">4</div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Log Table -->
+                    <table class="lp-mockup-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Administrative Event</th>
+                                <th>Role</th>
+                                <th>Target Session</th>
+                                <th>Verification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-family: monospace;">14:30:10 UTC</td>
+                                <td>Institutional Browser Lockdown Policy Applied</td>
+                                <td>Superuser</td>
+                                <td>All Active Halls</td>
+                                <td><span class="lp-pill lp-pill--success">Enforced</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace;">14:15:02 UTC</td>
+                                <td>Teacher Account Verification Approved</td>
+                                <td>Admin Officer</td>
+                                <td>Dr. Katherine Hayes</td>
+                                <td><span class="lp-pill lp-pill--success">Approved</span></td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: monospace;">13:50:44 UTC</td>
+                                <td>Batch Student Enrollment CSV Imported</td>
+                                <td>Registrar</td>
+                                <td>CS2026 Cohort (140)</td>
+                                <td><span class="lp-pill lp-pill--success">Imported</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 9: RESULTS AND EVALUATION (3 CARDS + PREVIEW 6)
+         ========================================================================== -->
+    <section class="lp-section lp-section--alt" id="results">
+        <div class="lp-container">
+            <div class="lp-split-section">
+                <div>
+                    <div class="lp-eyebrow">FAIR AND ORGANIZED EVALUATION</div>
+                    <h2 class="lp-heading">Turn Submissions Into Meaningful Results</h2>
+                    <p class="lp-subtext" style="margin-bottom: 24px;">
+                        Simplify the evaluation process with objective auto-grading, teacher-reviewed answers and organized result publication.
+                    </p>
+
+                    <!-- Three Feature Cards -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="lp-card" style="padding: 20px;">
+                            <div style="display: flex; gap: 14px; align-items: flex-start;">
+                                <div class="lp-card__icon-box" style="margin-bottom: 0; width: 40px; height: 40px;">
+                                    <i data-lucide="zap" class="lucide-icon icon-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="lp-card__title" style="font-size: 15px; margin-bottom: 4px;">Automatic Grading</h3>
+                                    <p class="lp-card__desc" style="font-size: 13px;">
+                                        Evaluate supported objective questions using configured answer keys.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lp-card" style="padding: 20px;">
+                            <div style="display: flex; gap: 14px; align-items: flex-start;">
+                                <div class="lp-card__icon-box" style="margin-bottom: 0; width: 40px; height: 40px;">
+                                    <i data-lucide="pen-line" class="lucide-icon icon-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="lp-card__title" style="font-size: 15px; margin-bottom: 4px;">Teacher Evaluation</h3>
+                                    <p class="lp-card__desc" style="font-size: 13px;">
+                                        Review descriptive answers, award marks and provide feedback.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lp-card" style="padding: 20px;">
+                            <div style="display: flex; gap: 14px; align-items: flex-start;">
+                                <div class="lp-card__icon-box" style="margin-bottom: 0; width: 40px; height: 40px;">
+                                    <i data-lucide="chart-no-axes-combined" class="lucide-icon icon-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="lp-card__title" style="font-size: 15px; margin-bottom: 4px;">Results Publication</h3>
+                                    <p class="lp-card__desc" style="font-size: 13px;">
+                                        Make finalized examination scores available to students.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview 6: Realistic Results Dashboard Preview -->
+                <div class="lp-mockup-frame" aria-label="Student Examination Results Dashboard Preview">
+                    <div class="lp-mockup-topbar">
+                        <div style="font-weight: 700; font-size: 11px; text-transform: uppercase;">
+                            OFFICIAL CANDIDATE SCORECARD &middot; PUBLISHED
+                        </div>
+                        <span class="lp-pill lp-pill--success"><i data-lucide="check" class="lucide-icon icon-xs"></i> Verified</span>
+                    </div>
+                    <div class="lp-mockup-body">
+                        <!-- Score Ribbon -->
+                        <div style="background-color: var(--lp-bg-secondary); border: 1px solid var(--lp-border); border-radius: var(--lp-radius-sm); padding: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">CANDIDATE SCORE</div>
+                                <div style="font-size: 24px; font-weight: 800; color: var(--lp-text-primary);">88 / 100</div>
+                                <div style="font-size: 11px; color: #10B981; font-weight: 600;">Grade: A &bull; Top 10% Performance</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 11px; font-weight: 600; color: var(--lp-text-muted);">EVALUATION STATUS</div>
+                                <span class="lp-pill lp-pill--success" style="font-size: 11px; padding: 4px 8px; margin-top: 4px;">Completed &amp; Signed</span>
+                            </div>
+                        </div>
+
+                        <!-- Section Breakdown -->
+                        <table class="lp-mockup-table">
+                            <thead>
+                                <tr>
+                                    <th>Section</th>
+                                    <th>Questions</th>
+                                    <th>Method</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Part A</strong> &middot; Objective Knowledge</td>
+                                    <td>20 Qs</td>
+                                    <td><span class="lp-pill lp-pill--success">Automated</span></td>
+                                    <td><strong>38 / 40</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Part B</strong> &middot; Algorithmic Design</td>
+                                    <td>10 Qs</td>
+                                    <td><span class="lp-pill lp-pill--neutral">Teacher Graded</span></td>
+                                    <td><strong>26 / 30</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Part C</strong> &middot; System Synthesis</td>
+                                    <td>5 Qs</td>
+                                    <td><span class="lp-pill lp-pill--neutral">Teacher Graded</span></td>
+                                    <td><strong>24 / 30</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 10: SECURITY AND TRANSPARENCY (6 FEATURES)
+         ========================================================================== -->
+    <section class="lp-section" id="security">
+        <div class="lp-container">
+            <div class="lp-section-header">
+                <div class="lp-eyebrow">TRUST THROUGH TRANSPARENCY</div>
+                <h2 class="lp-heading">Secure Examinations. Accountable Monitoring.</h2>
+                <p class="lp-subtext">
+                    Protect examination workflows with controlled access, transparent monitoring policies and accountable evidence review.
+                </p>
+            </div>
+
+            <!-- Six Security Features Grid -->
+            <div class="lp-grid-6">
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="lock-keyhole" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Secure Authentication</h3>
+                    <p class="lp-card__desc">Controlled access for every user role.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="shield-check" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Role-Based Access</h3>
+                    <p class="lp-card__desc">Separate permissions for administrators, teachers and students.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="monitor-check" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Examination Controls</h3>
+                    <p class="lp-card__desc">Configurable browser and examination monitoring.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="file-clock" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Activity History</h3>
+                    <p class="lp-card__desc">Timestamped examination events and incident records.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="folder-lock" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Protected Evidence</h3>
+                    <p class="lp-card__desc">Controlled access to examination evidence.</p>
+                </div>
+
+                <div class="lp-card">
+                    <div class="lp-card__icon-box">
+                        <i data-lucide="history" class="lucide-icon icon-md"></i>
+                    </div>
+                    <h3 class="lp-card__title">Audit Trail</h3>
+                    <p class="lp-card__desc">Track important actions and review activity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 11: THREE ROLES, ONE PLATFORM
+         ========================================================================== -->
+    <section class="lp-section lp-section--alt" id="roles">
+        <div class="lp-container">
+            <div class="lp-section-header">
+                <div class="lp-eyebrow">TAILORED EXPERIENCES</div>
+                <h2 class="lp-heading">Three Roles, One Unified Platform</h2>
+                <p class="lp-subtext">
+                    Dedicated, permission-enforced workflows for every participant in the examination ecosystem.
+                </p>
+            </div>
+
+            <div class="lp-roles-grid">
+                <!-- Role 1: Administrator -->
+                <div class="lp-role-card">
+                    <div>
+                        <div class="lp-role-card__icon">
+                            <i data-lucide="shield-check" class="lucide-icon icon-lg"></i>
+                        </div>
+                        <div class="lp-role-card__role-name">Administrator</div>
+                        <h3 class="lp-role-card__title">Oversee the Entire Institution</h3>
+                        <p class="lp-role-card__desc">
+                            Manage users, examinations, monitoring policies, evidence and institutional records.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="lp-role-card__labels">
+                            USER MANAGEMENT &bull; EXAM OVERSIGHT &bull; SYSTEM CONTROL
+                        </div>
+                        <a href="/accounts/login/" class="lp-btn lp-btn-secondary" style="width: 100%;">
+                            <span>Sign In as Admin</span>
+                            <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Role 2: Teacher -->
+                <div class="lp-role-card">
+                    <div>
+                        <div class="lp-role-card__icon">
+                            <i data-lucide="presentation" class="lucide-icon icon-lg"></i>
+                        </div>
+                        <div class="lp-role-card__role-name">Teacher</div>
+                        <h3 class="lp-role-card__title">Create. Conduct. Evaluate.</h3>
+                        <p class="lp-role-card__desc">
+                            Prepare examinations, assign students, monitor sessions, evaluate answers and publish results.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="lp-role-card__labels">
+                            EXAM CREATION &bull; LIVE MONITORING &bull; GRADING
+                        </div>
+                        <a href="/accounts/login/" class="lp-btn lp-btn-secondary" style="width: 100%;">
+                            <span>Sign In as Teacher</span>
+                            <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Role 3: Student -->
+                <div class="lp-role-card">
+                    <div>
+                        <div class="lp-role-card__icon">
+                            <i data-lucide="graduation-cap" class="lucide-icon icon-lg"></i>
+                        </div>
+                        <div class="lp-role-card__role-name">Student</div>
+                        <h3 class="lp-role-card__title">Prepare. Attend. Achieve.</h3>
+                        <p class="lp-role-card__desc">
+                            Complete readiness checks, attend examinations, submit answers and view published results.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="lp-role-card__labels">
+                            READINESS &bull; EXAMINATION &bull; RESULTS
+                        </div>
+                        <a href="/accounts/login/" class="lp-btn lp-btn-secondary" style="width: 100%;">
+                            <span>Sign In as Student</span>
+                            <i data-lucide="arrow-right" class="lucide-icon icon-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+         SECTION 12: FINAL CALL TO ACTION
+         ========================================================================== -->
+    <section class="lp-section" id="cta">
+        <div class="lp-container">
+            <div class="lp-cta-box">
+                <h2 class="lp-cta-box__title">
+                    The Future of Organized Online Examinations Starts Here.
+                </h2>
+                <p class="lp-cta-box__subtext">
+                    Everything required to create, conduct, monitor and evaluate examinations — in one unified platform.
+                </p>
+                <div class="lp-cta-box__actions">
+                    <a href="/accounts/login/" class="lp-btn lp-btn-primary lp-btn-lg">
+                        <span>Sign In to EPS</span>
+                        <i data-lucide="log-in" class="lucide-icon icon-sm"></i>
+                    </a>
+                    <a href="/accounts/register/" class="lp-btn lp-btn-secondary lp-btn-lg">
+                        <span>Create Your Account</span>
+                        <i data-lucide="user-plus" class="lucide-icon icon-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+    </main>
+
+    
+<!-- ==========================================================================
+     SECTION 13: FOOTER
+     ========================================================================== -->
+<footer class="lp-footer" id="footer">
+    <div class="lp-container">
+        <div class="lp-footer__top">
+            <!-- Brand Column -->
+            <div class="lp-footer__brand-col">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <span class="lp-brand-badge" style="width: 28px; height: 28px; font-size: 11px;">EPS</span>
+                    <span class="lp-footer__brand-title">EPS — Examination Proctoring System</span>
+                </div>
+                <p class="lp-footer__brand-desc">
+                    An integrated platform for secure online examinations and academic assessment.
+                </p>
+            </div>
+
+            <!-- Navigation Links Column 1 -->
+            <div>
+                <div class="lp-footer__col-title">Platform &amp; Features</div>
+                <ul class="lp-footer__links">
+                    <li><a href="/" class="lp-footer__link">Home</a></li>
+                    <li><a href="#features" class="lp-footer__link">Features</a></li>
+                    <li><a href="#workflow" class="lp-footer__link">How It Works</a></li>
+                    <li><a href="#proctoring" class="lp-footer__link">Proctoring</a></li>
+                    <li><a href="#security" class="lp-footer__link">Security</a></li>
+                </ul>
+            </div>
+
+            <!-- Portal Portals Column 2 -->
+            <div>
+                <div class="lp-footer__col-title">Portals &amp; Access</div>
+                <ul class="lp-footer__links">
+                    <li><a href="/accounts/login/" class="lp-footer__link">Sign In</a></li>
+                    <li><a href="/accounts/register/" class="lp-footer__link">Register</a></li>
+                    <li><a href="#teachers" class="lp-footer__link">For Teachers</a></li>
+                    <li><a href="#students" class="lp-footer__link">For Students</a></li>
+                    <li><a href="#admin" class="lp-footer__link">Administration</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="lp-footer__bottom">
+            <div>
+                &copy; 2026 EPS — Examination Proctoring System. All rights reserved.
+            </div>
+            <div style="display: flex; gap: 18px;">
+                <span>Institutional Edition</span>
+                <span>ISO/IEC 27001 Aligned Controls</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
+    
+<script src="/static/js/landing.js"></script>
+
+</body>
+</html>

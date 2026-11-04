@@ -25,10 +25,13 @@
                         <span>Student Registration Particulars</span>
                     </div>
                     <p style="font-size: var(--font-size-sm); color: var(--text-primary); margin-bottom: var(--space-1);">
-                        Roll Number: <strong>{{ profile.roll_number }}</strong> &bull; Department: <strong>{{ profile.department }}</strong>
+                        Username: <strong>@{{ request.user.username }}</strong> &bull; Email: <strong>{{ request.user.email }}</strong>
+                    </p>
+                    <p style="font-size: var(--font-size-sm); color: var(--text-primary); margin-bottom: var(--space-1);">
+                        Assigned Roll Number: <strong>{{ profile.roll_number }}</strong> &bull; Department: <strong>{{ profile.department }}</strong>
                     </p>
                     <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin: 0;">
-                        Your departmental teacher will verify your enrollment. As soon as your account is approved, your scheduled exams will become available.
+                        Your departmental teacher will review and approve your registration. Once approved, your examinations will unlock immediately.
                     </p>
                 {% elif role == 'teacher' %}
                     <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--pastel-yellow-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2); display: flex; align-items: center; gap: var(--space-1);">

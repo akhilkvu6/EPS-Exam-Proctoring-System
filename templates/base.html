@@ -91,6 +91,10 @@
                             <span class="nav-item__icon"><i data-lucide="user-check" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Student Approvals</span>
                         </a>
+                        <a href="{% url 'teacher_batches_list' %}" data-tooltip="Department Batches" class="nav-item {% if 'teacher_batch' in request.resolver_match.url_name %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="calendar-range" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Batches</span>
+                        </a>
                         <a href="{% url 'import_students' %}" data-tooltip="Excel Import" class="nav-item {% if request.resolver_match.url_name == 'import_students' %}is-active{% endif %}">
                             <span class="nav-item__icon"><i data-lucide="file-spreadsheet" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Excel Import</span>
@@ -162,6 +166,14 @@
                         </a>
 
                         <div class="nav-section-title">Academic Setup</div>
+                        <a href="{% url 'admin_batches_list' %}" data-tooltip="Academic Batches" class="nav-item {% if 'batch' in request.resolver_match.url_name %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="calendar-range" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Academic Batches</span>
+                        </a>
+                        <a href="{% url 'admin_roll_correction' %}" data-tooltip="Roll Correction" class="nav-item {% if request.resolver_match.url_name == 'admin_roll_correction' %}is-active{% endif %}">
+                            <span class="nav-item__icon"><i data-lucide="hash" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Roll Correction</span>
+                        </a>
                         <a href="{% url 'admin_departments' %}" data-tooltip="Departments" class="nav-item {% if request.resolver_match.url_name == 'admin_departments' or request.resolver_match.url_name == 'admin_edit_department' %}is-active{% endif %}">
                             <span class="nav-item__icon"><i data-lucide="building-2" class="lucide-icon"></i></span>
                             <span class="nav-item__label">Departments</span>
@@ -294,6 +306,7 @@
                     </div>
                 </header>
     {% else %}
+        {% block public_header %}
         <!-- Public Guest Header -->
         <header class="public-header" style="background-color: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
             <div class="public-header__container" style="max-width: 1200px; margin: 0 auto; padding: 0 var(--space-6); height: 64px; display: flex; align-items: center; justify-content: space-between;">
@@ -317,10 +330,11 @@
                 </nav>
             </div>
         </header>
+        {% endblock %}
     {% endif %}
 
     <!-- Page Content & Alerts -->
-    <main class="app-content" {% if not request.user.is_authenticated %}style="padding-top: var(--space-8);"{% endif %}>
+    <main class="app-content" {% if request.resolver_match.url_name == 'home' %}style="padding: 0; max-width: 100%; width: 100%; margin: 0;"{% elif not request.user.is_authenticated %}style="padding-top: var(--space-8);"{% endif %}>
         {% if messages %}
             {% for message in messages %}
                 <div class="alert {% if message.tags == 'error' %}alert--error{% elif message.tags == 'success' %}alert--success{% elif message.tags == 'warning' %}alert--warning{% else %}alert--info{% endif %}">
@@ -346,10 +360,12 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% block footer %}
     <!-- Minimal Public Footer -->
     <footer class="footer" style="padding: var(--space-6) var(--space-4); text-align: center; border-top: 1px solid var(--border-subtle); background-color: var(--bg-surface); color: var(--text-muted); font-size: var(--font-size-xs); transition: background-color var(--transition-normal);">
         <p style="margin: 0; line-height: 1.5;">EPS &mdash; Examination Proctoring System &bull; &copy; 2026 All rights reserved.</p>
     </footer>
+    {% endblock %}
 
     {% if request.user.is_authenticated %}
             </div><!-- close app-main -->

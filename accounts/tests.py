@@ -1,8 +1,9 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from accounts.models import (
-    User, TeacherProfile, StudentProfile, Department,
-    ClassGroup, Notification, ApprovalRecord, AuditLog
+    User, TeacherProfile, StudentProfile, Department, Course, StudentEnrollment,
+    ClassGroup, Notification, ApprovalRecord, AuditLog,
+    AcademicBatch, RollNumberReservation, StudentSemesterHistory
 )
 
 
@@ -1225,4 +1226,627 @@ class SecurityRemediationStage1Tests(TestCase):
         p = subprocess.run([sys.executable, 'manage.py', 'check', '--deploy'], env=env, capture_output=True, text=True)
         self.assertEqual(p.returncode, 0)
         self.assertIn('System check identified no issues', p.stdout)
+
+
+
+class UnifiedAuthAndEnrollmentTests(TestCase):
+    """
+    Comprehensive verification for:
+    - Unified 2-field Sign In (username, email, roll number)
+    - Ambiguous duplicate email rejection
+    - Student registration with verified institutional StudentEnrollment records
+    - Teacher registration with Employee ID and pending status
+    - Real-time debounced async availability APIs
+    - Admin Student Enrollment Master Roster management
+    """
+    def setUp(self):
+        self.client = Client()
+
+        # Institutional Academic Hierarchy
+        self.dept = Department.objects.create(name='Information Technology', code='IT_DEPT')
+        self.course = Course.objects.create(
+            name='Bachelor of Science in IT',
+            code='BSCIT',
+            department=self.dept,
+            total_semesters=6
+        )
+
+        # Admin user
+        self.admin = User.objects.create_superuser(
+            username='auth_admin',
+            email='admin@it.institution.edu',
+            password='AdminPassword123!',
+            role='admin'
+        )
+
+        # Approved teacher
+        self.teacher = User.objects.create_user(
+            username='auth_teacher',
+            email='prof_rao@it.institution.edu',
+            password='TeacherPass123!',
+            role='teacher',
+            first_name='Anand Rao'
+        )
+        TeacherProfile.objects.create(
+            user=self.teacher,
+            employee_id='IT_EMP_901',
+            department=self.dept.name,
+            qualification='M.Tech CSE',
+            institution='EPS IT Campus',
+            verification_status='approved'
+        )
+
+        # Pre-authorized institutional student enrollment records
+        self.enrollment1 = StudentEnrollment.objects.create(
+            roll_number='IT202601',
+            full_name='Aarav Mehta',
+            email='aarav.mehta@it.institution.edu',
+            department=self.dept,
+            course=self.course,
+            course_name=self.course.name,
+            semester='3',
+            is_active=True,
+            is_registered=False
+        )
+
+        self.enrollment2 = StudentEnrollment.objects.create(
+            roll_number='IT202602',
+            full_name='Pooja Hegde',
+            email='pooja.h@it.institution.edu',
+            department=self.dept,
+            course=self.course,
+            course_name=self.course.name,
+            semester='3',
+            is_active=True,
+            is_registered=False
+        )
+
+    def test_login_with_username(self):
+        """User can sign in using their username."""
+        resp = self.client.post(reverse('common_login'), {
+            'username': 'auth_teacher',
+            'password': 'TeacherPass123!',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, reverse('teacher_dashboard'))
+
+    def test_login_with_email(self):
+        """User can sign in using their institutional email address."""
+        resp = self.client.post(reverse('common_login'), {
+            'username': 'prof_rao@it.institution.edu',
+            'password': 'TeacherPass123!',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, reverse('teacher_dashboard'))
+
+    def test_login_rejects_duplicate_ambiguous_email(self):
+        """If multiple accounts share the same email, login prompts to use username."""
+        # Create second user with same email
+        User.objects.create_user(
+            username='duplicate_email_user',
+            email='prof_rao@it.institution.edu',
+            password='AnotherPass123!',
+            role='teacher'
+        )
+        resp = self.client.post(reverse('common_login'), {
+            'username': 'prof_rao@it.institution.edu',
+            'password': 'TeacherPass123!',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Multiple accounts share this email address')
+
+    def test_login_rejects_deactivated_account(self):
+        """Deactivated accounts are rejected at login."""
+        self.teacher.is_active = False
+        self.teacher.save()
+
+        resp = self.client.post(reverse('common_login'), {
+            'username': 'auth_teacher',
+            'password': 'TeacherPass123!',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'deactivated')
+
+    def test_student_registration_with_valid_enrollment(self):
+        """Student registers successfully by selecting verified active enrollment record."""
+        resp = self.client.post(reverse('central_register'), {
+            'role': 'student',
+            'full_name': 'Aarav Mehta',
+            'course': self.course.id,
+            'roll_number': 'IT202601',
+            'semester': '3',
+            'username': 'aarav_mehta_it',
+            'email': 'aarav.mehta@it.institution.edu',
+            'password1': 'AaravPass123!',
+            'password2': 'AaravPass123!',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, reverse('registration_success'))
+
+        user = User.objects.get(username='aarav_mehta_it')
+        self.assertEqual(user.role, 'student')
+        self.assertEqual(user.student_profile.roll_number, 'IT202601')
+        self.assertEqual(user.student_profile.verification_status, 'pending')
+
+        # Enrollment record is marked registered
+        self.enrollment1.refresh_from_db()
+        self.assertTrue(self.enrollment1.is_registered)
+        self.assertEqual(self.enrollment1.registered_student, user.student_profile)
+
+    def test_student_registration_rejects_already_registered_roll(self):
+        """Rejects registration attempt if roll number is already claimed."""
+        # Mark enrollment as registered
+        self.enrollment1.is_registered = True
+        self.enrollment1.save()
+
+        resp = self.client.post(reverse('central_register'), {
+            'role': 'student',
+            'full_name': 'Aarav Imposter',
+            'course': self.course.id,
+            'roll_number': 'IT202601',
+            'semester': '3',
+            'username': 'imposter_user',
+            'email': 'imposter@institution.edu',
+            'password1': 'ImposterPass123!',
+            'password2': 'ImposterPass123!',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'already been registered')
+
+    def test_student_registration_rejects_weak_password(self):
+        """Rejects registration when password does not meet institutional complexity."""
+        resp = self.client.post(reverse('central_register'), {
+            'role': 'student',
+            'full_name': 'Pooja Hegde',
+            'course': self.course.id,
+            'roll_number': 'IT202602',
+            'semester': '3',
+            'username': 'pooja_hegde',
+            'email': 'pooja.h@it.institution.edu',
+            'password1': 'weakpass',
+            'password2': 'weakpass',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(User.objects.filter(username='pooja_hegde').exists())
+
+    def test_teacher_registration_flow(self):
+        """Teacher registers with Employee ID and department, setting status to pending."""
+        resp = self.client.post(reverse('central_register'), {
+            'role': 'teacher',
+            'full_name': 'Dr. Vikram Chandra',
+            'employee_id': 'IT_FACULTY_55',
+            'department': self.dept.id,
+            'username': 'dr_vikram_c',
+            'email': 'vikram.c@it.institution.edu',
+            'password1': 'VikramPass123!',
+            'password2': 'VikramPass123!',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertRedirects(resp, reverse('registration_success'))
+
+        user = User.objects.get(username='dr_vikram_c')
+        self.assertEqual(user.role, 'teacher')
+        self.assertEqual(user.teacher_profile.employee_id, 'IT_FACULTY_55')
+        self.assertEqual(user.teacher_profile.verification_status, 'pending')
+
+    def test_check_username_api(self):
+        """Real-time username availability API returns correct availability."""
+        # Taken username
+        resp = self.client.get(reverse('check_username_api') + '?username=auth_teacher')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertFalse(data['available'])
+
+        # Available username
+        resp = self.client.get(reverse('check_username_api') + '?username=new_unique_candidate')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['available'])
+
+    def test_check_email_api(self):
+        """Real-time email availability API returns correct availability."""
+        # Taken email
+        resp = self.client.get(reverse('check_email_api') + '?email=prof_rao@it.institution.edu')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertFalse(data['available'])
+
+        # Available email
+        resp = self.client.get(reverse('check_email_api') + '?email=candidate.new@it.institution.edu')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['available'])
+
+    def test_eligible_rolls_api(self):
+        """Eligible rolls API returns un-registered active rolls with masked candidate names."""
+        resp = self.client.get(reverse('eligible_rolls_api') + f'?course_id={self.course.id}')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        rolls = [r['roll_number'] for r in data['eligible_rolls']]
+        self.assertIn('IT202601', rolls)
+        self.assertIn('IT202602', rolls)
+
+        # Check privacy masking on name
+        for r in data['eligible_rolls']:
+            if r['roll_number'] == 'IT202601':
+                self.assertIn('*', r['masked_name'])
+
+    def test_admin_enrollments_view_and_add(self):
+        """Admin can view the student enrollment roster and manually enroll a new record."""
+        self.client.force_login(self.admin)
+        resp = self.client.get(reverse('admin_enrollments'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Student Enrollment Master Roster')
+
+        # Add single enrollment
+        resp = self.client.post(reverse('admin_enrollments'), {
+            'add_enrollment': '1',
+            'full_name': 'Divya Krishnan',
+            'roll_number': 'IT202688',
+            'course': self.course.id,
+            'semester': '3',
+            'email': 'divya.k@it.institution.edu',
+        })
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(StudentEnrollment.objects.filter(roll_number='IT202688').exists())
+
+
+class AcademicBatchManagementTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.dept = Department.objects.create(name='Information Science', code='IS')
+        self.other_dept = Department.objects.create(name='Mechanical Engineering', code='ME')
+        self.course = Course.objects.create(name='Bachelor of Computer Applications', code='BCA', department=self.dept, total_semesters=6)
+        self.other_course = Course.objects.create(name='Mechanical Engg', code='MECH', department=self.other_dept, total_semesters=8)
+
+        # Admin user
+        self.admin = User.objects.create_superuser(
+            username='admin_batch_test',
+            email='admin.batch.test@eps.edu',
+            password='AdminPassword123!',
+            role='admin'
+        )
+
+        # Teacher in IS department
+        self.teacher_user = User.objects.create_user(
+            username='teacher_batch_is',
+            email='teacher.is@eps.edu',
+            password='TeacherPassword123!',
+            role='teacher'
+        )
+        self.teacher_profile = TeacherProfile.objects.create(
+            user=self.teacher_user,
+            employee_id='T_IS_101',
+            department='Information Science',
+            verification_status='approved'
+        )
+
+        # Batch 2026 BCA with 60 positions
+        self.batch = AcademicBatch.objects.create(
+            department=self.dept,
+            course=self.course,
+            admission_year=2026,
+            course_code='BCA',
+            batch_name='2026 BCA',
+            batch_identifier='A',
+            capacity=60,
+            start_roll_number=1,
+            end_roll_number=60,
+            current_semester='1',
+            admission_semester='1',
+            total_semesters=6,
+            enrollment_status='open',
+            is_active=True,
+            created_by=self.admin
+        )
+        # Create reservations
+        for seq in range(1, 61):
+            RollNumberReservation.objects.create(
+                batch=self.batch,
+                roll_sequence=seq,
+                registration_number=self.batch.generate_registration_number(seq),
+                status='available'
+            )
+
+    def test_batch_creation_and_prefix_generation(self):
+        """Batch generates correct prefix and formatted registration numbers."""
+        self.assertEqual(self.batch.prefix, '2026BCAA')
+        reg_1 = self.batch.generate_registration_number(1)
+        reg_60 = self.batch.generate_registration_number(60)
+        self.assertEqual(reg_1, '2026BCAA01')
+        self.assertEqual(reg_60, '2026BCAA60')
+
+    def test_prefix_collision_prevention(self):
+        """Cannot create a batch that results in duplicate prefix."""
+        from accounts.forms import AcademicBatchForm
+        form = AcademicBatchForm(data={
+            'department': self.dept.id,
+            'course': self.course.id,
+            'admission_year': 2026,
+            'course_code': 'BCA',
+            'batch_name': '2026 BCA Duplicate',
+            'batch_identifier': 'A',
+            'capacity': 60,
+            'start_roll_number': 1,
+            'end_roll_number': 60,
+            'current_semester': '1',
+            'admission_semester': '1',
+            'total_semesters': 6,
+            'enrollment_status': 'open',
+            'is_active': True,
+        })
+        self.assertFalse(form.is_valid())
+        self.assertTrue(any('prefix' in str(e).lower() for e in form.errors.values()))
+
+    def test_batch_roll_grid_api(self):
+        """GET /accounts/api/batch-roll-grid/ returns positions matrix and metadata."""
+        resp = self.client.get(reverse('batch_roll_grid_api') + f'?batch_id={self.batch.id}')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['batch']['prefix'], '2026BCAA')
+        self.assertEqual(len(data['positions']), 60)
+        self.assertEqual(data['positions'][0]['registration_number'], '2026BCAA01')
+        self.assertTrue(data['positions'][0]['is_selectable'])
+
+    def test_reserve_roll_api_workflow(self):
+        """POST /accounts/api/reserve-roll/ temporarily reserves a sequence."""
+        resp = self.client.post(reverse('reserve_roll_api'), {
+            'batch_id': self.batch.id,
+            'roll_sequence': 5,
+            'name': 'Candidate A',
+            'email': 'candidate.a@institution.edu'
+        })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['registration_number'], '2026BCAA05')
+
+        # Check DB reservation status
+        res = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=5)
+        self.assertEqual(res.status, 'reserved')
+        self.assertIsNotNone(res.expires_at)
+
+        # Another client trying to reserve position 5 gets rejected
+        client2 = Client()
+        resp2 = client2.post(reverse('reserve_roll_api'), {
+            'batch_id': self.batch.id,
+            'roll_sequence': 5,
+        })
+        self.assertEqual(resp2.status_code, 409)
+
+    def test_student_batch_registration_and_auto_username(self):
+        """Student registers with separate email and chosen username; EPS auto-generates roll number and teacher approves."""
+        resp = self.client.post(reverse('register'), {
+            'role': 'student',
+            'full_name': 'Aarav Patel',
+            'username': 'aarav_patel',
+            'email': 'aarav.patel@institution.edu',
+            'batch': self.batch.id,
+            'course': self.course.id,
+            'semester': '1',
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        # 1. User was created with their chosen username (NEVER replaced with roll number)
+        user = User.objects.get(email='aarav.patel@institution.edu')
+        self.assertEqual(user.username, 'aarav_patel')
+        self.assertEqual(user.email, 'aarav.patel@institution.edu')
+        self.assertEqual(user.role, 'student')
+
+        # 2. EPS automatically generated the institutional roll number
+        profile = user.student_profile
+        self.assertEqual(profile.roll_number, '2026BCAA01')
+        self.assertEqual(profile.batch, self.batch)
+        self.assertEqual(profile.roll_sequence, 1)
+        self.assertEqual(profile.verification_status, 'pending')
+
+        # 3. Reservation is marked pending
+        res = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=1)
+        self.assertEqual(res.status, 'pending')
+        self.assertEqual(res.student_profile, profile)
+
+        # 4. Teacher is first-level approver: Authorized teacher reviews and approves
+        self.client.force_login(self.teacher_user)
+        # Check teacher sees student in approval queue
+        queue_resp = self.client.get(reverse('teacher_student_approvals'))
+        self.assertEqual(queue_resp.status_code, 200)
+        self.assertContains(queue_resp, 'aarav_patel')
+        self.assertContains(queue_resp, '2026BCAA01')
+
+        # Approve student
+        appr_resp = self.client.post(reverse('review_student', kwargs={'student_id': profile.id}), {
+            'action': 'approve',
+            'reason': 'Academic credentials verified by faculty.'
+        })
+        self.assertEqual(appr_resp.status_code, 302)
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.verification_status, 'approved')
+        self.assertEqual(profile.reviewed_by, self.teacher_user)
+        res.refresh_from_db()
+        self.assertEqual(res.status, 'assigned')
+
+    def test_admin_student_approval_and_rejection_lifecycle(self):
+        """Approving student marks reservation assigned; rejecting releases reservation."""
+        # Register first student (automatically gets sequence 1: 2026BCAA01)
+        self.client.post(reverse('register'), {
+            'role': 'student',
+            'full_name': 'Meera Nair',
+            'username': 'meera_nair',
+            'email': 'meera.nair@institution.edu',
+            'batch': self.batch.id,
+            'course': self.course.id,
+            'semester': '1',
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+        })
+        student_user = User.objects.get(email='meera.nair@institution.edu')
+        self.assertEqual(student_user.username, 'meera_nair')
+        profile = student_user.student_profile
+        self.assertEqual(profile.roll_number, '2026BCAA01')
+
+        # Admin approves
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('admin_review_student', kwargs={'student_id': profile.id}), {
+            'action': 'approve',
+            'reason': 'Verified documents.'
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        profile.refresh_from_db()
+        self.assertEqual(profile.verification_status, 'approved')
+        res = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=1)
+        self.assertEqual(res.status, 'assigned')
+
+        # Now test rejection on second student (automatically gets next sequence: 2026BCAA02)
+        self.client.logout()
+        self.client.post(reverse('register'), {
+            'role': 'student',
+            'full_name': 'Karan Singh',
+            'username': 'karan_singh',
+            'email': 'karan.singh@institution.edu',
+            'batch': self.batch.id,
+            'course': self.course.id,
+            'semester': '1',
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+        })
+        karan_user = User.objects.get(email='karan.singh@institution.edu')
+        self.assertEqual(karan_user.username, 'karan_singh')
+        karan_prof = karan_user.student_profile
+        self.assertEqual(karan_prof.roll_number, '2026BCAA02')
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('admin_review_student', kwargs={'student_id': karan_prof.id}), {
+            'action': 'reject',
+            'reason': 'Incomplete credentials.'
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        karan_prof.refresh_from_db()
+        self.assertEqual(karan_prof.verification_status, 'rejected')
+        res2 = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=2)
+        self.assertEqual(res2.status, 'released')
+
+    def test_batch_semester_promotion(self):
+        """Batch semester promotion increments student semester and records StudentSemesterHistory."""
+        # Create student in batch
+        student_user = User.objects.create_user(
+            username='2026BCAA04',
+            email='student4@eps.edu',
+            password='StudentPassword123!',
+            role='student'
+        )
+        student_prof = StudentProfile.objects.create(
+            user=student_user,
+            full_name='Pooja Hegde',
+            roll_number='2026BCAA04',
+            department='Information Science',
+            course=self.course,
+            batch=self.batch,
+            roll_sequence=4,
+            semester='1',
+            verification_status='approved'
+        )
+        RollNumberReservation.objects.filter(batch=self.batch, roll_sequence=4).update(
+            status='assigned',
+            student_profile=student_prof
+        )
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('admin_batch_promote', kwargs={'batch_id': self.batch.id}), {
+            'target_semester': 2,
+            'academic_session': '2026-2027 Even Semester',
+            'reason': 'Regular progression.'
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        self.batch.refresh_from_db()
+        self.assertEqual(self.batch.current_semester, '2')
+        self.assertEqual(self.batch.prefix, '2026BCAA')
+
+        student_prof.refresh_from_db()
+        self.assertEqual(student_prof.semester, '2')
+        self.assertEqual(student_prof.roll_number, '2026BCAA04')
+
+        # Semester history record created
+        history = StudentSemesterHistory.objects.filter(student=student_prof)
+        self.assertEqual(history.count(), 1)
+        self.assertEqual(history.first().previous_semester, '1')
+        self.assertEqual(history.first().new_semester, '2')
+
+    def test_controlled_roll_number_correction(self):
+        """Admin atomically corrects student's roll sequence from 10 to 11 with AuditLog."""
+        student_user = User.objects.create_user(
+            username='2026BCAA10',
+            email='student10@eps.edu',
+            password='StudentPassword123!',
+            role='student'
+        )
+        student_prof = StudentProfile.objects.create(
+            user=student_user,
+            full_name='Vikram Seth',
+            roll_number='2026BCAA10',
+            department='Information Science',
+            course=self.course,
+            batch=self.batch,
+            roll_sequence=10,
+            semester='1',
+            verification_status='approved'
+        )
+        RollNumberReservation.objects.filter(batch=self.batch, roll_sequence=10).update(
+            status='assigned',
+            student_profile=student_prof
+        )
+
+        self.client.force_login(self.admin)
+        resp = self.client.post(reverse('admin_roll_correction'), {
+            'student': student_prof.id,
+            'new_roll_sequence': 11,
+            'reason': 'Administrative clerical correction of admission merit position.'
+        })
+        self.assertEqual(resp.status_code, 302)
+
+        student_prof.refresh_from_db()
+        student_user.refresh_from_db()
+        self.assertEqual(student_prof.roll_sequence, 11)
+        self.assertEqual(student_prof.roll_number, '2026BCAA11')
+        self.assertEqual(student_user.username, '2026BCAA11')
+
+        # Old reservation released, new reservation assigned
+        old_res = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=10)
+        new_res = RollNumberReservation.objects.get(batch=self.batch, roll_sequence=11)
+        self.assertEqual(old_res.status, 'released')
+        self.assertEqual(new_res.status, 'assigned')
+
+        # AuditLog recorded
+        self.assertTrue(AuditLog.objects.filter(action='ROLL_NUMBER_CORRECTED').exists())
+
+    def test_teacher_department_boundary_enforcement(self):
+        """Teacher can only access batches inside their own department."""
+        other_batch = AcademicBatch.objects.create(
+            department=self.other_dept,
+            course=self.other_course,
+            admission_year=2026,
+            course_code='MECH',
+            batch_name='2026 MECH',
+            capacity=30,
+            start_roll_number=1,
+            end_roll_number=30,
+            current_semester='1',
+            enrollment_status='open',
+            is_active=True
+        )
+
+        self.client.force_login(self.teacher_user)
+        # Allowed for teacher's own department batch
+        resp_own = self.client.get(reverse('teacher_batch_detail', kwargs={'batch_id': self.batch.id}))
+        self.assertEqual(resp_own.status_code, 200)
+
+        # Denied (403) for other department's batch
+        resp_other = self.client.get(reverse('teacher_batch_detail', kwargs={'batch_id': other_batch.id}))
+        self.assertEqual(resp_other.status_code, 403)
 

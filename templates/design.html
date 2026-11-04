@@ -1,0 +1,1986 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}EPS Design Foundation (EDF) — Visual Design System &amp; Playground{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/design.css' %}">
+<style>
+    /* Design Reference Page Specific Layout - 100% Full Width Architecture */
+    .edf-container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-6) var(--space-20);
+        box-sizing: border-box;
+    }
+    .edf-section {
+        margin-bottom: var(--space-12);
+        padding-bottom: var(--space-8);
+        border-bottom: 1px solid var(--border-subtle);
+        width: 100%;
+    }
+    .edf-section:last-of-type {
+        border-bottom: none;
+    }
+    .edf-section-header {
+        margin-bottom: var(--space-6);
+    }
+    .edf-swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: var(--space-4);
+    }
+    .edf-swatch {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-xs);
+    }
+    .edf-swatch__color {
+        height: 64px;
+        width: 100%;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .edf-swatch__info {
+        padding: var(--space-3);
+    }
+    .edf-spacing-box {
+        background-color: var(--color-info-bg);
+        border: 1px solid var(--color-info-border);
+        color: var(--color-info-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: var(--radius-xs);
+    }
+    .edf-component-row {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+    }
+    .edf-quicknav {
+        display: flex;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-8);
+        padding: var(--space-3) var(--space-4);
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-xs);
+        align-items: center;
+    }
+    .edf-quicknav a {
+        font-size: var(--font-size-xs);
+        font-weight: 600;
+        color: var(--text-secondary);
+        padding: 5px 11px;
+        border-radius: var(--radius-sm);
+        background-color: var(--bg-subtle);
+        transition: all var(--transition-fast);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .edf-quicknav a:hover {
+        background-color: var(--color-primary);
+        color: var(--color-primary-contrast);
+    }
+    .semantic-matrix-table td {
+        vertical-align: middle;
+        font-size: var(--font-size-xs);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edf-container">
+
+    <!-- Master Header -->
+    <div style="margin-bottom: var(--space-6);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4);">
+            <div>
+                <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1);">
+                    <span class="badge badge--primary">EPS Design Foundation (EDF)</span>
+                    <span class="badge badge--success">
+                        <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                        <span>Semantic Standardized (WCAG AA)</span>
+                    </span>
+                </div>
+                <h1 class="heading-1" style="margin: 0 0 4px 0;">Visual Design System &amp; Component Playground</h1>
+                <p class="text-lead" style="margin: 0; font-size: var(--font-size-base);">
+                    Single source of truth for institutional typography, 4-tier semantic colors, layout tokens, and interactive UI components.
+                </p>
+            </div>
+            <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="playground-theme-toggle">
+                    <i data-lucide="sun-moon" class="lucide-icon icon-xs"></i>
+                    <span>Toggle Light / Dark</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-open-drawer">
+                    <i data-lucide="sliders" class="lucide-icon icon-xs"></i>
+                    <span>Open Theme Studio</span>
+                </button>
+                <a href="{% url 'home' %}" class="btn btn-outline btn-sm">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                    <span>Back to EPS Home</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Jump Bar -->
+    <nav class="edf-quicknav" aria-label="Design system sections">
+        <span style="font-size: var(--font-size-xs); font-weight: 700; color: var(--text-muted); align-self: center; margin-right: 4px;">Jump to:</span>
+        <a href="#theme-studio"><i data-lucide="sliders" class="lucide-icon icon-xs"></i> Theme Studio</a>
+        <a href="#typography">1. Typography</a>
+        <a href="#colors">2. Semantic Colors</a>
+        <a href="#layout">3. Layout &amp; Spacing</a>
+        <a href="#buttons">4. Buttons &amp; States</a>
+        <a href="#forms">5. Form Controls</a>
+        <a href="#tables">6. Tables &amp; Telemetry</a>
+        <a href="#cards">7. Cards &amp; Bento</a>
+        <a href="#badges">8. Badges &amp; Indicators</a>
+        <a href="#navigation">9. Navigation &amp; Tabs</a>
+        <a href="#overlays">10. Modals &amp; Alerts</a>
+        <a href="#skeletons">11. Skeletons &amp; States</a>
+        <a href="#icons">12. Lucide Icons</a>
+    </nav>
+
+    <!-- ==========================================================================
+         SECTION 0: LIVE DESIGN PLAYGROUND & THEME STUDIO WORKBENCH (FULL-WIDTH)
+         ========================================================================== -->
+    <section id="theme-studio" class="edf-workbench">
+        <div class="edf-workbench__header">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="sliders" class="lucide-icon icon-sm" style="color:var(--color-secondary);"></i>
+                    <h2 class="heading-4" style="margin: 0; font-size: 16px;">Live Design Playground &amp; Token Studio</h2>
+                    <span class="badge badge--primary" style="font-size: 10px;">Real-time Engine</span>
+                    <span class="badge badge--neutral workbench-modified-badge" style="font-size: 10px;">0 tokens customized</span>
+                </div>
+                <div class="text-caption" style="margin-top: 3px;">
+                    Adjusting controls dynamically mutates CSS custom properties on <code class="text-mono">:root</code>. Components below immediately reflect changes in real time. Non-destructive design tool.
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-xs" id="workbench-theme-toggle">
+                    <i data-lucide="sun-moon" class="lucide-icon icon-xs"></i>
+                    <span>Toggle Theme</span>
+                </button>
+                <button type="button" class="btn btn-ghost btn-xs" id="workbench-reset-btn" title="Reset all tokens to defaults">
+                    <i data-lucide="rotate-ccw" class="lucide-icon icon-xs"></i>
+                    <span>Reset Defaults</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-xs" id="workbench-export-css-btn">
+                    <i data-lucide="code" class="lucide-icon icon-xs"></i>
+                    <span>Export CSS</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-xs" id="workbench-export-json-btn">
+                    <i data-lucide="file-json" class="lucide-icon icon-xs"></i>
+                    <span>Export JSON</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="edf-workbench__body">
+            <div class="edf-workbench__grid">
+                <!-- Group 1: Palette & Canvas Tokens -->
+                <div class="edf-workbench__group">
+                    <div class="edf-workbench__group-title">
+                        <i data-lucide="palette" class="lucide-icon icon-xs"></i>
+                        <span>1. Palette &amp; Surfaces</span>
+                    </div>
+                    <div id="workbench-controls-palette"></div>
+                </div>
+
+                <!-- Group 2: Typography & Structure Tokens -->
+                <div class="edf-workbench__group">
+                    <div class="edf-workbench__group-title">
+                        <i data-lucide="type" class="lucide-icon icon-xs"></i>
+                        <span>2. Typography &amp; Scale</span>
+                    </div>
+                    <div id="workbench-controls-typography"></div>
+                </div>
+
+                <!-- Group 3: Geometry & Motion Tokens -->
+                <div class="edf-workbench__group">
+                    <div class="edf-workbench__group-title">
+                        <i data-lucide="sparkles" class="lucide-icon icon-xs"></i>
+                        <span>3. Geometry &amp; Motion</span>
+                    </div>
+                    <div id="workbench-controls-geometry"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="edf-workbench__footer">
+            <div class="text-caption">
+                <i data-lucide="info" class="lucide-icon icon-xs" style="vertical-align: middle;"></i>
+                Changes remain purely client-side in memory. Use <strong>Export CSS</strong> to copy approved values to <code class="text-mono">static/css/design-tokens.css</code>.
+            </div>
+            <div style="display: flex; gap: var(--space-2);">
+                <button type="button" class="btn btn-ghost btn-xs" onclick="EPSDesign.openDrawer()">
+                    <i data-lucide="sidebar" class="lucide-icon icon-xs"></i>
+                    <span>Open as Floating Drawer</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Showcase: 12 Full-Width Sections -->
+    <main class="edf-main-showcase" style="width: 100%;">
+
+
+<!-- ==========================================================================
+                 SECTION 1: TYPOGRAPHY
+                 ========================================================================== -->
+            <section id="typography" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">1. Typography System</h2>
+                    <p class="text-caption">Standardized scale using Google Inter for human interface text and JetBrains Mono for codes/keys.</p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-5);">
+                    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-display">Display Heading</span>
+                            <span class="text-mono">36px / 800 / -0.03em</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-1">Heading 1 (Page Title)</span>
+                            <span class="text-mono">30px / 700 / -0.025em</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-2">Heading 2 (Section Title)</span>
+                            <span class="text-mono">24px / 700 / -0.02em</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-3">Heading 3 (Card Title)</span>
+                            <span class="text-mono">20px / 600 / -0.015em</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-4">Heading 4 (Subheader)</span>
+                            <span class="text-mono">18px / 600</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: var(--space-2);">
+                            <span class="heading-5">Heading 5 (Widget Header)</span>
+                            <span class="text-mono">16px / 600</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <span class="heading-6">Heading 6 (Overline Tag)</span>
+                            <span class="text-mono">13px / 600 / CAPS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body & Paragraphs -->
+                <div class="card">
+                    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                        <p class="text-lead" style="margin: 0;">
+                            <strong>Lead Paragraph (.text-lead):</strong> Used for introductory page descriptions and primary summary callouts across examination workflows.
+                        </p>
+                        <p class="text-body" style="margin: 0;">
+                            <strong>Body Paragraph (.text-body):</strong> Standard examination instructions, question prompts, and explanatory text rendering with accessible line height and contrast.
+                        </p>
+                        <p class="text-sm" style="margin: 0;">
+                            <strong>Small Text (.text-sm):</strong> Used for metadata, secondary tables, and candidate identity pills.
+                        </p>
+                        <p class="text-caption" style="margin: 0;">
+                            <strong>Caption Text (.text-caption):</strong> Helper notes, timestamps, input requirement instructions, and footnotes.
+                        </p>
+                        <p style="margin: 0;">
+                            <strong>Monospace Inline (.text-mono):</strong> <code class="text-mono">--color-primary: #1C1917</code> or candidate attempt IDs: <code class="text-mono">ATT-2026-88194</code>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 2: OFFICIAL EPS SEMANTIC COLOUR SPECIFICATION
+                 ========================================================================== -->
+            <section id="colors" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">2. Official EPS Semantic Colour Specification</h2>
+                    <p class="text-caption">
+                        Strict institutional 4-tier semantic color system. Always accompanied by icons and descriptive text labels for accessible, unambiguous status communication.
+                    </p>
+                </div>
+
+                <!-- 5 Official Semantic Swatches -->
+                <h3 class="heading-5" style="margin-bottom: var(--space-3);">A. Core Semantic Palette (5 Standard Tiers)</h3>
+                <div class="edf-swatch-grid" style="margin-bottom: var(--space-6);">
+                    <!-- 1. PRIMARY BLUE -->
+                    <div class="edf-swatch" style="border-color: var(--color-primary-border);">
+                        <div class="edf-swatch__color" style="background-color: var(--color-primary);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700; color: var(--color-primary-text); display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                                <span>1. BLUE — Primary Action</span>
+                            </div>
+                            <div class="text-mono">--color-primary</div>
+                            <div class="text-caption" style="font-size: 10px; margin-top: 2px;">Save &bull; Submit &bull; Start Exam &bull; Next</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. SUCCESS GREEN -->
+                    <div class="edf-swatch" style="border-color: var(--color-success-border);">
+                        <div class="edf-swatch__color" style="background-color: var(--color-success);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700; color: var(--color-success-text); display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                                <span>2. GREEN — Safe / Success</span>
+                            </div>
+                            <div class="text-mono">--color-success</div>
+                            <div class="text-caption" style="font-size: 10px; margin-top: 2px;">Approve &bull; Verify &bull; Publish &bull; Passed</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. DANGER RED -->
+                    <div class="edf-swatch" style="border-color: var(--color-danger-border);">
+                        <div class="edf-swatch__color" style="background-color: var(--color-danger);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700; color: var(--color-danger-text); display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                <span>3. RED — Critical / Danger</span>
+                            </div>
+                            <div class="text-mono">--color-danger</div>
+                            <div class="text-caption" style="font-size: 10px; margin-top: 2px;">Delete &bull; Terminate &bull; Force End &bull; Annul</div>
+                        </div>
+                    </div>
+
+                    <!-- 4. WARNING ORANGE -->
+                    <div class="edf-swatch" style="border-color: var(--color-warning-border);">
+                        <div class="edf-swatch__color" style="background-color: var(--color-warning);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700; color: var(--color-warning-text); display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                <span>4. ORANGE — Warning / Alert</span>
+                            </div>
+                            <div class="text-mono">--color-warning</div>
+                            <div class="text-caption" style="font-size: 10px; margin-top: 2px;">Flag Review &bull; Caution &bull; Suspend &bull; Latency</div>
+                        </div>
+                    </div>
+
+                    <!-- 5. SECONDARY GREY -->
+                    <div class="edf-swatch" style="border-color: var(--border-default);">
+                        <div class="edf-swatch__color" style="background-color: var(--color-secondary);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="slash" class="lucide-icon icon-xs"></i>
+                                <span>5. GREY — Secondary Neutral</span>
+                            </div>
+                            <div class="text-mono">--color-secondary</div>
+                            <div class="text-caption" style="font-size: 10px; margin-top: 2px;">Cancel &bull; Close &bull; Back &bull; View &bull; Preview</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comprehensive Semantic Operational Matrix Table -->
+                <h3 class="heading-5" style="margin-bottom: var(--space-3);">B. Semantic Rules &amp; Operational Matrix</h3>
+                <div class="table-container" style="margin-bottom: var(--space-6);">
+                    <table class="table semantic-matrix-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 140px;">Status &amp; Color</th>
+                                <th>EPS Meaning &amp; Applicable Events</th>
+                                <th style="width: 160px;">Badge Format</th>
+                                <th style="width: 160px;">Status Telemetry</th>
+                                <th style="width: 130px;">Action Button</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- RED ROW -->
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="status-dot status-dot--red status-dot--pulse"></span>
+                                        <strong style="color: var(--color-danger);">RED</strong>
+                                    </div>
+                                    <div class="text-caption">Critical / Danger</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">
+                                        Critical violations, failed security checks, destructive actions, serious incidents.
+                                    </div>
+                                    <div class="text-caption">
+                                        Multiple faces in frame, webcam hardware disconnect, clipboard/paste attempts, attempt annulment, account suspension.
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--danger">
+                                        <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                        <span>Critical Incident</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--red status-dot--pulse"></span>
+                                        <span style="color: var(--color-danger-text); font-weight: 600;">Feed Dropped</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm">
+                                        <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                        <span>Lock Attempt</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- ORANGE ROW -->
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="status-dot status-dot--orange"></span>
+                                        <strong style="color: var(--color-warning);">ORANGE</strong>
+                                    </div>
+                                    <div class="text-caption">Warning / Alert</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">
+                                        Suspicious behaviour, connection instability, pending attention, approaching deadlines.
+                                    </div>
+                                    <div class="text-caption">
+                                        Gaze shift offscreen, sustained noise/audio spike, network latency &gt;450ms, timer &lt;5 mins, ungraded subjective answers.
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--warning">
+                                        <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                        <span>Review Needed</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--orange"></span>
+                                        <span style="color: var(--color-warning-text); font-weight: 600;">Latency Alert</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-warning btn-sm">
+                                        <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                        <span>Issue Warning</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- GREEN ROW -->
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="status-dot status-dot--green status-dot--pulse"></span>
+                                        <strong style="color: var(--color-success);">GREEN</strong>
+                                    </div>
+                                    <div class="text-caption">Safe / Success</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">
+                                        Normal proctoring status, verified identity, successful submission, approved operations.
+                                    </div>
+                                    <div class="text-caption">
+                                        Candidate biometric match OK, 1 face detected, answers saved to DB, student registration approved, passed test score.
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--success">
+                                        <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                                        <span>Verified Safe</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--green status-dot--pulse"></span>
+                                        <span style="color: var(--color-success-text); font-weight: 600;">Streaming OK</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm">
+                                        <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                        <span>Approve Pass</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- BLUE ROW -->
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="status-dot status-dot--blue"></span>
+                                        <strong style="color: var(--color-primary);">BLUE</strong>
+                                    </div>
+                                    <div class="text-caption">Primary / Info</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">
+                                        Primary execution actions: Save, continue, submit attempt, hardware guidelines.
+                                    </div>
+                                    <div class="text-caption">
+                                        Hardware check guidelines, examination honor code clauses, waiting room lobby countdown, published result notice.
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--primary">
+                                        <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                                        <span>Main Action</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--blue"></span>
+                                        <span style="color: var(--color-primary-text); font-weight: 600;">Lobby Active</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm">
+                                        <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                                        <span>Instructions</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- GREY ROW -->
+                            <tr>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span class="status-dot status-dot--neutral"></span>
+                                        <strong style="color: var(--text-secondary);">GREY</strong>
+                                    </div>
+                                    <div class="text-caption">Secondary / Neutral</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 2px;">
+                                        Supporting, non-destructive actions: Cancel, back, close, view details, preview.
+                                    </div>
+                                    <div class="text-caption">
+                                        Dismiss dialog, navigate to previous question, download PDF syllabus, refresh telemetry feed.
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge--neutral">
+                                        <i data-lucide="slash" class="lucide-icon icon-xs"></i>
+                                        <span>Standby / Inactive</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--neutral"></span>
+                                        <span style="color: var(--text-secondary); font-weight: 600;">Standby Mode</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-secondary btn-sm">
+                                        <i data-lucide="x" class="lucide-icon icon-xs"></i>
+                                        <span>Cancel Action</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Neutral Surfaces Reference -->
+                <h3 class="heading-5" style="margin-bottom: var(--space-3);">C. Neutral Institutional Surfaces (Uncolored Canvases)</h3>
+                <div class="edf-swatch-grid">
+                    <div class="edf-swatch">
+                        <div class="edf-swatch__color" style="background-color: var(--color-primary);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700;">Primary Brand Charcoal</div>
+                            <div class="text-mono">--color-primary</div>
+                        </div>
+                    </div>
+                    <div class="edf-swatch">
+                        <div class="edf-swatch__color" style="background-color: var(--bg-app);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700;">Canvas Background</div>
+                            <div class="text-mono">--bg-app</div>
+                        </div>
+                    </div>
+                    <div class="edf-swatch">
+                        <div class="edf-swatch__color" style="background-color: var(--bg-surface);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700;">Card Surface (White)</div>
+                            <div class="text-mono">--bg-surface</div>
+                        </div>
+                    </div>
+                    <div class="edf-swatch">
+                        <div class="edf-swatch__color" style="background-color: var(--sidebar-bg);"></div>
+                        <div class="edf-swatch__info">
+                            <div class="text-xs" style="font-weight: 700;">Sidebar Warm Neutral</div>
+                            <div class="text-mono">--sidebar-bg</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 3: LAYOUT SYSTEM & SPACING SCALE
+                 ========================================================================== -->
+            <section id="layout" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">3. Layout System &amp; Spacing Scale</h2>
+                    <p class="text-caption">Predictable 4px and 8px geometric scale ensuring optical balance and alignment.</p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-5);">
+                    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-1 (4px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-1); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-2 (8px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-2); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-3 (12px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-3); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-4 (16px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-4); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-6 (24px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-6); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-8 (32px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-8); height: 24px;"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="width: 100px; font-size: 12px; font-family: var(--font-mono);">--space-12 (48px)</span>
+                            <div class="edf-spacing-box" style="width: var(--space-12); height: 24px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="heading-5" style="margin-bottom: var(--space-3);">Breakpoints &amp; Dimensions</h3>
+                    <table class="table table-compact">
+                        <thead>
+                            <tr>
+                                <th>Breakpoint Key</th>
+                                <th>Target Viewport</th>
+                                <th>Sidebar Mode</th>
+                                <th>Content Max Width</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-mono">Desktop XL</td>
+                                <td>&gt; 1280px</td>
+                                <td>Expanded (240px) or Collapsed (72px)</td>
+                                <td>1360px</td>
+                            </tr>
+                            <tr>
+                                <td class="text-mono">Desktop / Tablet</td>
+                                <td>1024px &ndash; 1279px</td>
+                                <td>Collapsed Default (72px)</td>
+                                <td>100% Fluid</td>
+                            </tr>
+                            <tr>
+                                <td class="text-mono">Mobile Drawer</td>
+                                <td>&lt; 1024px</td>
+                                <td>Hidden / Off-Canvas Drawer Overlay</td>
+                                <td>100% Fluid</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 4: BUTTON SUITE & INTERACTIVE STATES
+                 ========================================================================== -->
+            <section id="buttons" class="edf-section">
+                <div class="edf-section-header">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);">
+                        <div>
+                            <h2 class="heading-2">4. Buttons &amp; Interactive States</h2>
+                            <p class="text-caption">Standardized action hierarchy, semantic color meanings, consistent dimensions, and fluid 160ms hover/active micro-interactions.</p>
+                        </div>
+                        <span class="badge badge--primary">EPS Institutional Standard</span>
+                    </div>
+                </div>
+
+                <!-- A. Semantic Action Buttons -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <h3 class="heading-4" style="margin-bottom: var(--space-2);">A. Semantic Action Buttons (5 Categories)</h3>
+                    <p class="text-caption" style="margin-bottom: var(--space-4);">
+                        Every button color communicates the operational consequence of the action. All buttons feature smooth -1px translateY hover lift, scale(0.98) active click press, and accessible focus rings.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-5);">
+                        <!-- 1. PRIMARY BLUE -->
+                        <div style="background-color: var(--bg-subtle); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span class="badge badge--primary" style="font-size: 10px;">Primary Action</span>
+                                    <span class="text-mono" style="font-size: 11px;">#2563EB</span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-bottom: 2px;">BLUE — Main Actions</div>
+                                <div class="text-caption" style="font-size: 11px;">Save, Continue, Create, Submit, Add New, Next Step, Apply Filters, Start Exam.</div>
+                            </div>
+                            <button type="button" class="btn btn-primary demo-interactive-btn">
+                                <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+
+                        <!-- 2. SUCCESS GREEN -->
+                        <div style="background-color: var(--bg-subtle); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span class="badge badge--success" style="font-size: 10px;">Positive Decision</span>
+                                    <span class="text-mono" style="font-size: 11px;">#16A34A</span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--color-success-text); font-size: var(--font-size-sm); margin-bottom: 2px;">GREEN — Success &amp; Approval</div>
+                                <div class="text-caption" style="font-size: 11px;">Approve, Verify, Accept, Confirm, Mark Completed, Publish Results, Activate Account.</div>
+                            </div>
+                            <button type="button" class="btn btn-success demo-interactive-btn">
+                                <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                                <span>Approve Candidate</span>
+                            </button>
+                        </div>
+
+                        <!-- 3. DANGER RED -->
+                        <div style="background-color: var(--bg-subtle); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span class="badge badge--danger" style="font-size: 10px;">Critical / Destructive</span>
+                                    <span class="text-mono" style="font-size: 11px;">#DC2626</span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--color-danger-text); font-size: var(--font-size-sm); margin-bottom: 2px;">RED — Danger &amp; Removal</div>
+                                <div class="text-caption" style="font-size: 11px;">Delete, Remove, Revoke Access, Terminate, Reject, Force End Exam, Annul Attempt.</div>
+                            </div>
+                            <button type="button" class="btn btn-danger demo-interactive-btn">
+                                <i data-lucide="trash-2" class="lucide-icon icon-xs"></i>
+                                <span>Delete Examination</span>
+                            </button>
+                        </div>
+
+                        <!-- 4. WARNING ORANGE -->
+                        <div style="background-color: var(--bg-subtle); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span class="badge badge--warning" style="font-size: 10px;">Caution / Alert</span>
+                                    <span class="text-mono" style="font-size: 11px;">#EA580C</span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--color-warning-text); font-size: var(--font-size-sm); margin-bottom: 2px;">ORANGE — Warning &amp; Review</div>
+                                <div class="text-caption" style="font-size: 11px;">Flag for Review, Escalate, Suspend Temporarily, Hold Submission, Request Reverification.</div>
+                            </div>
+                            <button type="button" class="btn btn-warning demo-interactive-btn">
+                                <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                <span>Flag for Review</span>
+                            </button>
+                        </div>
+
+                        <!-- 5. SECONDARY GREY -->
+                        <div style="background-color: var(--bg-subtle); padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span class="badge badge--neutral" style="font-size: 10px;">Supporting / Routine</span>
+                                    <span class="text-mono" style="font-size: 11px;">Neutral</span>
+                                </div>
+                                <div style="font-weight: 700; color: var(--text-primary); font-size: var(--font-size-sm); margin-bottom: 2px;">GREY — Secondary Neutral</div>
+                                <div class="text-caption" style="font-size: 11px;">Cancel, Back, Close, View Details, Preview, Edit, Download, Refresh, Clear Search.</div>
+                            </div>
+                            <button type="button" class="btn btn-secondary demo-interactive-btn">
+                                <i data-lucide="x" class="lucide-icon icon-xs"></i>
+                                <span>Cancel &amp; Back</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. Alternative Button Styles -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <h3 class="heading-4" style="margin-bottom: var(--space-2);">B. Alternative Button Styles</h3>
+                    <p class="text-caption" style="margin-bottom: var(--space-4);">
+                        Secondary hierarchy actions, minimal toolbars, inline text triggers, and icon-only controls.
+                    </p>
+
+                    <div class="edf-component-row" style="align-items: center; margin-bottom: var(--space-4);">
+                        <button type="button" class="btn btn-outline demo-interactive-btn">
+                            <i data-lucide="file-text" class="lucide-icon icon-xs"></i>
+                            <span>Outline (.btn-outline)</span>
+                        </button>
+                        <button type="button" class="btn btn-ghost demo-interactive-btn">
+                            <i data-lucide="external-link" class="lucide-icon icon-xs"></i>
+                            <span>Ghost (.btn-ghost)</span>
+                        </button>
+                        <a href="javascript:void(0)" class="btn btn-link">
+                            <i data-lucide="help-circle" class="lucide-icon icon-xs"></i>
+                            <span>Link Style (.btn-link)</span>
+                        </a>
+                        <div style="height: 24px; width: 1px; background-color: var(--border-default); margin: 0 var(--space-2);"></div>
+                        <!-- Icon-only buttons -->
+                        <button type="button" class="btn btn-icon btn-secondary demo-interactive-btn" title="Search Candidates" aria-label="Search">
+                            <i data-lucide="search" class="lucide-icon icon-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-primary demo-interactive-btn" title="Add Question" aria-label="Add Question">
+                            <i data-lucide="plus" class="lucide-icon icon-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-danger demo-interactive-btn" title="Delete Entry" aria-label="Delete">
+                            <i data-lucide="trash-2" class="lucide-icon icon-sm"></i>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-warning demo-interactive-btn" title="Flag Notice" aria-label="Flag">
+                            <i data-lucide="flag" class="lucide-icon icon-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- C. Button Sizes Scale -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <h3 class="heading-4" style="margin-bottom: var(--space-2);">C. Standardized Button Dimensions</h3>
+                    <p class="text-caption" style="margin-bottom: var(--space-4);">
+                        All buttons adhere to consistent optical heights across semantic variants.
+                    </p>
+
+                    <div class="edf-component-row" style="align-items: center;">
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                            <span class="text-mono" style="font-size: 11px;">Small (.btn-sm) — 32px height</span>
+                            <button type="button" class="btn btn-primary btn-sm">
+                                <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                <span>Small Action</span>
+                            </button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                            <span class="text-mono" style="font-size: 11px;">Medium (.btn-md / Default) — 40px height</span>
+                            <button type="button" class="btn btn-primary btn-md">
+                                <i data-lucide="check" class="lucide-icon icon-xs"></i>
+                                <span>Medium Default</span>
+                            </button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                            <span class="text-mono" style="font-size: 11px;">Large (.btn-lg) — 48px height</span>
+                            <button type="button" class="btn btn-primary btn-lg">
+                                <i data-lucide="check" class="lucide-icon icon-sm"></i>
+                                <span>Large Primary CTA</span>
+                            </button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                            <span class="text-mono" style="font-size: 11px;">Extra Small (.btn-xs) — 26px table height</span>
+                            <button type="button" class="btn btn-danger btn-xs">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                <span>Lock (xs)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D. Interactive States & Live Test Controls -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4);">
+                        <div>
+                            <h3 class="heading-4" style="margin-bottom: 2px;">D. Interactive States &amp; Micro-Interactions</h3>
+                            <p class="text-caption" style="margin: 0;">Hover (-1px lift), Active (scale 0.98), Focus-visible ring, Disabled, and Loading spinners.</p>
+                        </div>
+                        <!-- Functional test controls -->
+                        <div style="display: flex; gap: var(--space-2);">
+                            <button type="button" class="btn btn-secondary btn-sm" id="demo-toggle-btn-loading">
+                                <i data-lucide="loader" class="lucide-icon icon-xs"></i>
+                                <span>Test Loading Spinners</span>
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" id="demo-toggle-btn-disabled">
+                                <i data-lucide="lock" class="lucide-icon icon-xs"></i>
+                                <span>Test Disabled State</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="edf-component-row" style="align-items: center; margin-bottom: var(--space-4);">
+                        <button type="button" class="btn btn-primary demo-interactive-btn">Primary State</button>
+                        <button type="button" class="btn btn-success demo-interactive-btn">Success State</button>
+                        <button type="button" class="btn btn-danger demo-interactive-btn">Danger State</button>
+                        <button type="button" class="btn btn-warning demo-interactive-btn">Warning State</button>
+                        <button type="button" class="btn btn-secondary demo-interactive-btn">Secondary State</button>
+                        <button type="button" class="btn btn-primary is-loading">Always Loading</button>
+                        <button type="button" class="btn btn-danger" disabled>Always Disabled</button>
+                    </div>
+                    <div class="text-caption" style="background-color: var(--bg-subtle); padding: var(--space-3); border-radius: var(--radius-sm); border-left: 3px solid var(--color-primary);">
+                        <i data-lucide="info" class="lucide-icon icon-xs" style="vertical-align: middle;"></i>
+                        Click <strong>Test Loading Spinners</strong> or <strong>Test Disabled State</strong> above to observe live state propagation across all interactive buttons on the page. Press <kbd style="font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--bg-surface); border: 1px solid var(--border-default);">Tab</kbd> to inspect accessible focus rings.
+                    </div>
+                </div>
+
+                <!-- E. Official EPS Proctoring Status Demonstrations (Section 7) -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <h3 class="heading-4" style="margin-bottom: var(--space-2);">E. EPS Proctoring Status Demonstrations</h3>
+                    <p class="text-caption" style="margin-bottom: var(--space-4);">
+                        Strict visual status telemetry mapping across all official examination invigilation conditions. Color reinforces state alongside explicit icons and descriptive labels.
+                    </p>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 220px;">Proctoring Telemetry Event</th>
+                                    <th style="width: 120px;">Status Tier</th>
+                                    <th style="width: 200px;">Badge Format</th>
+                                    <th style="width: 180px;">Indicator Telemetry</th>
+                                    <th>Invigilator Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 1. Face detected (Green) -->
+                                <tr>
+                                    <td><strong>Face detected</strong></td>
+                                    <td><span class="badge badge--success">Safe</span></td>
+                                    <td><span class="badge badge--success"><i data-lucide="check-circle" class="lucide-icon icon-xs"></i> 1 Face Detected</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--green status-dot--pulse"></span>Streaming OK</span></td>
+                                    <td><button type="button" class="btn btn-secondary btn-xs"><i data-lucide="eye" class="lucide-icon icon-xs"></i> Inspect</button></td>
+                                </tr>
+                                <!-- 2. Face temporarily missing (Orange) -->
+                                <tr>
+                                    <td><strong>Face temporarily missing</strong></td>
+                                    <td><span class="badge badge--warning">Warning</span></td>
+                                    <td><span class="badge badge--warning"><i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i> Face Absent (4s)</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--orange"></span>Attention Required</span></td>
+                                    <td><button type="button" class="btn btn-warning btn-xs"><i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i> Flag Notice</button></td>
+                                </tr>
+                                <!-- 3. Multiple faces detected (Red) -->
+                                <tr>
+                                    <td><strong>Multiple faces detected</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i> 2+ Faces in Frame</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>Breach Alert</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i> Lock Attempt</button></td>
+                                </tr>
+                                <!-- 4. Tab switched (Orange) -->
+                                <tr>
+                                    <td><strong>Tab switched</strong></td>
+                                    <td><span class="badge badge--warning">Warning</span></td>
+                                    <td><span class="badge badge--warning"><i data-lucide="external-link" class="lucide-icon icon-xs"></i> Blur Event (1x)</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--orange"></span>Offscreen Focus</span></td>
+                                    <td><button type="button" class="btn btn-warning btn-xs"><i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i> Warn Candidate</button></td>
+                                </tr>
+                                <!-- 5. Repeated prohibited activity (Red) -->
+                                <tr>
+                                    <td><strong>Repeated prohibited activity</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="shield-alert" class="lucide-icon icon-xs"></i> Persistent Breach</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>Locked Session</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="slash" class="lucide-icon icon-xs"></i> Annul Attempt</button></td>
+                                </tr>
+                                <!-- 6. Camera working (Green) -->
+                                <tr>
+                                    <td><strong>Camera working</strong></td>
+                                    <td><span class="badge badge--success">Safe</span></td>
+                                    <td><span class="badge badge--success"><i data-lucide="video" class="lucide-icon icon-xs"></i> HD 720p Feed</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--green status-dot--pulse"></span>Hardware Active</span></td>
+                                    <td><button type="button" class="btn btn-secondary btn-xs"><i data-lucide="check" class="lucide-icon icon-xs"></i> Verified</button></td>
+                                </tr>
+                                <!-- 7. Camera disconnected (Red) -->
+                                <tr>
+                                    <td><strong>Camera disconnected</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="video-off" class="lucide-icon icon-xs"></i> Stream Dropped</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>Device Lost</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="refresh-cw" class="lucide-icon icon-xs"></i> Halt Attempt</button></td>
+                                </tr>
+                                <!-- 8. Network unstable (Orange) -->
+                                <tr>
+                                    <td><strong>Network unstable</strong></td>
+                                    <td><span class="badge badge--warning">Warning</span></td>
+                                    <td><span class="badge badge--warning"><i data-lucide="wifi-off" class="lucide-icon icon-xs"></i> Latency 640ms</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--orange"></span>Offline Cache</span></td>
+                                    <td><button type="button" class="btn btn-warning btn-xs"><i data-lucide="clock" class="lucide-icon icon-xs"></i> Queue Sync</button></td>
+                                </tr>
+                                <!-- 9. Network disconnected (Red) -->
+                                <tr>
+                                    <td><strong>Network disconnected</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="wifi-off" class="lucide-icon icon-xs"></i> Connection Severed</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>Offline Timeout</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="pause" class="lucide-icon icon-xs"></i> Pause Timer</button></td>
+                                </tr>
+                                <!-- 10. Identity verified (Green) -->
+                                <tr>
+                                    <td><strong>Identity verified</strong></td>
+                                    <td><span class="badge badge--success">Safe</span></td>
+                                    <td><span class="badge badge--success"><i data-lucide="user-check" class="lucide-icon icon-xs"></i> Match 99.2%</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--green status-dot--pulse"></span>Biometric OK</span></td>
+                                    <td><button type="button" class="btn btn-success btn-xs"><i data-lucide="check" class="lucide-icon icon-xs"></i> Admit Candidate</button></td>
+                                </tr>
+                                <!-- 11. Identity pending (Orange) -->
+                                <tr>
+                                    <td><strong>Identity pending</strong></td>
+                                    <td><span class="badge badge--warning">Warning</span></td>
+                                    <td><span class="badge badge--warning"><i data-lucide="user-plus" class="lucide-icon icon-xs"></i> Photo In Review</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--orange"></span>Lobby Hold</span></td>
+                                    <td><button type="button" class="btn btn-warning btn-xs"><i data-lucide="user-check" class="lucide-icon icon-xs"></i> Manual Verify</button></td>
+                                </tr>
+                                <!-- 12. Identity failed (Red) -->
+                                <tr>
+                                    <td><strong>Identity failed</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="user-x" class="lucide-icon icon-xs"></i> Biometric Mismatch</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>Entry Denied</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="x-circle" class="lucide-icon icon-xs"></i> Reject Entry</button></td>
+                                </tr>
+                                <!-- 13. Exam submitted (Green) & Submission failed (Red) -->
+                                <tr>
+                                    <td><strong>Exam submitted</strong></td>
+                                    <td><span class="badge badge--success">Safe</span></td>
+                                    <td><span class="badge badge--success"><i data-lucide="award" class="lucide-icon icon-xs"></i> Finalized Receipt</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--green status-dot--pulse"></span>Saved to DB</span></td>
+                                    <td><button type="button" class="btn btn-secondary btn-xs"><i data-lucide="download" class="lucide-icon icon-xs"></i> View Receipt</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Submission failed</strong></td>
+                                    <td><span class="badge badge--danger">Critical</span></td>
+                                    <td><span class="badge badge--danger"><i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i> Sync Failure</span></td>
+                                    <td><span class="status-indicator"><span class="status-dot status-dot--red status-dot--pulse"></span>DB Conflict</span></td>
+                                    <td><button type="button" class="btn btn-danger btn-xs"><i data-lucide="refresh-cw" class="lucide-icon icon-xs"></i> Force Resync</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- F. Destructive Action Confirmation Demonstrations (Section 8) -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <h3 class="heading-4" style="margin-bottom: var(--space-2);">F. Destructive Action Confirmation Demonstrations</h3>
+                    <p class="text-caption" style="margin-bottom: var(--space-4);">
+                        Strict visual hierarchy for irreversible destructive operations: always pairing a prominent neutral Grey Cancel button with a high-contrast Red confirmation button and clear explanation of consequences.
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+                        <!-- 1. Delete User -->
+                        <div style="border: 1px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-card); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); color: var(--color-danger-text); font-weight: 700;">
+                                    <i data-lucide="user-x" class="lucide-icon icon-sm"></i>
+                                    <span>1. Delete User Account</span>
+                                </div>
+                                <p class="text-caption" style="color: var(--color-danger-text); opacity: 0.9; margin: 0;">
+                                    Permanently deletes user credentials, exam enrollment history, and grade records. Irreversible.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary btn-xs">Cancel</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-modal-target="demo-modal-confirm">
+                                    <i data-lucide="trash-2" class="lucide-icon icon-xs"></i>
+                                    <span>Delete User</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Delete Examination -->
+                        <div style="border: 1px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-card); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); color: var(--color-danger-text); font-weight: 700;">
+                                    <i data-lucide="file-x" class="lucide-icon icon-sm"></i>
+                                    <span>2. Delete Examination</span>
+                                </div>
+                                <p class="text-caption" style="color: var(--color-danger-text); opacity: 0.9; margin: 0;">
+                                    Cancels test paper, purges all candidate answer sheets and proctoring telemetry snapshots.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary btn-xs">Cancel</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-modal-target="demo-modal-confirm">
+                                    <i data-lucide="trash-2" class="lucide-icon icon-xs"></i>
+                                    <span>Delete Exam</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 3. Revoke Access -->
+                        <div style="border: 1px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-card); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); color: var(--color-danger-text); font-weight: 700;">
+                                    <i data-lucide="lock" class="lucide-icon icon-sm"></i>
+                                    <span>3. Revoke Access</span>
+                                </div>
+                                <p class="text-caption" style="color: var(--color-danger-text); opacity: 0.9; margin: 0;">
+                                    Immediately terminates active session token, ejecting user from the invigilation room.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary btn-xs">Cancel</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-modal-target="demo-modal-confirm">
+                                    <i data-lucide="slash" class="lucide-icon icon-xs"></i>
+                                    <span>Revoke Access</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 4. Force End Examination -->
+                        <div style="border: 1px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-card); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); color: var(--color-danger-text); font-weight: 700;">
+                                    <i data-lucide="alert-octagon" class="lucide-icon icon-sm"></i>
+                                    <span>4. Force End Examination</span>
+                                </div>
+                                <p class="text-caption" style="color: var(--color-danger-text); opacity: 0.9; margin: 0;">
+                                    Auto-submits all in-progress student sessions and locks the examination room immediately.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary btn-xs">Cancel</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-modal-target="demo-modal-confirm">
+                                    <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                    <span>Force End Exam</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 5. Permanently Delete Records -->
+                        <div style="border: 1px solid var(--color-danger-border); background-color: var(--color-danger-bg); border-radius: var(--radius-card); padding: var(--space-4); display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-3);">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: var(--space-2); color: var(--color-danger-text); font-weight: 700;">
+                                    <i data-lucide="archive" class="lucide-icon icon-sm"></i>
+                                    <span>5. Permanently Delete Records</span>
+                                </div>
+                                <p class="text-caption" style="color: var(--color-danger-text); opacity: 0.9; margin: 0;">
+                                    Purges archived student logs, invigilator audit trails, and forensic video snapshots.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+                                <button type="button" class="btn btn-secondary btn-xs">Cancel</button>
+                                <button type="button" class="btn btn-danger btn-xs" data-modal-target="demo-modal-confirm">
+                                    <i data-lucide="trash-2" class="lucide-icon icon-xs"></i>
+                                    <span>Purge Records</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==========================================================================
+                 SECTION 5: FORM CONTROLS & VALIDATION
+                 ========================================================================== -->
+            <section id="forms" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">5. Form Controls &amp; Validation</h2>
+                    <p class="text-caption">Accessible inputs, textareas, selects, checkboxes, radios, switches, and validation states.</p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-5);">
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Standard Text Input <span class="req-star">*</span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="e.g. Computer Science &amp; Engineering">
+                            <span class="form-hint">Enter the full formal academic department name.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Password with Reveal Button
+                            </label>
+                            <div class="password-input-group">
+                                <input type="password" id="demo-pwd-field" class="form-control" placeholder="••••••••••••">
+                                <button type="button" class="password-toggle-btn" onclick="window.togglePasswordVisibility('demo-pwd-field', this)" aria-label="Toggle password visibility">
+                                    <i data-lucide="eye" class="lucide-icon icon-xs"></i>
+                                </button>
+                            </div>
+                            <span class="form-hint">Toggle visibility with the eye icon.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2col">
+                        <div class="form-group">
+                            <label class="form-label">Custom Select Menu</label>
+                            <select class="form-select">
+                                <option value="mcq">Multiple Choice Question (Single Select)</option>
+                                <option value="multi">Multiple Choice Question (Multi-Select)</option>
+                                <option value="true_false">True / False</option>
+                                <option value="short">Short Answer Response</option>
+                                <option value="essay">Descriptive / Essay Evaluation</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Number Input</label>
+                            <input type="number" class="form-control" value="60" min="5" max="300" step="5">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Textarea Field</label>
+                        <textarea class="form-textarea" placeholder="Enter detailed candidate examination guidelines or rubric criteria..."></textarea>
+                    </div>
+
+                    <!-- Interactive Validation Demo -->
+                    <div class="card" style="background-color: var(--bg-subtle); border-color: var(--border-default); margin-top: var(--space-4);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2);">
+                            <span class="heading-5" style="margin: 0;">Interactive Validation State Demo</span>
+                            <button type="button" class="btn btn-secondary btn-xs" id="demo-toggle-validation-btn">
+                                <i data-lucide="refresh-cw" class="lucide-icon icon-xs"></i>
+                                <span>Toggle Valid / Invalid</span>
+                            </button>
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label">Candidate Roll Code</label>
+                            <input type="text" id="demo-validation-input" class="form-control is-valid" value="EPS-2026-CS104">
+                            <span id="demo-validation-feedback" class="form-success-msg">
+                                <i data-lucide="check-circle" class="lucide-icon icon-xs"></i> Examination candidate code verified.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Checkboxes, Radios & Switches -->
+                    <h3 class="heading-5" style="margin-top: var(--space-6); margin-bottom: var(--space-3);">Selection Controls</h3>
+                    <div style="display: flex; gap: var(--space-8); flex-wrap: wrap;">
+                        <!-- Checkboxes -->
+                        <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                            <span class="text-caption" style="font-weight: 700;">Checkboxes</span>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="form-checkbox" checked>
+                                <span>Camera stream mandatory</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="form-checkbox">
+                                <span>Microphone monitoring</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" class="form-checkbox" disabled checked>
+                                <span>Fullscreen locked (Disabled)</span>
+                            </label>
+                        </div>
+
+                        <!-- Radios -->
+                        <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                            <span class="text-caption" style="font-weight: 700;">Radio Buttons</span>
+                            <label class="radio-label">
+                                <input type="radio" name="demo-radio" class="form-radio" checked>
+                                <span>Single Attempt Permitted</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="demo-radio" class="form-radio">
+                                <span>Multiple Retakes Allowed</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="demo-radio" class="form-radio" disabled>
+                                <span>Continuous Invigilation (Disabled)</span>
+                            </label>
+                        </div>
+
+                        <!-- Switches -->
+                        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+                            <span class="text-caption" style="font-weight: 700;">iOS-Style Switches</span>
+                            <label class="switch-label">
+                                <span class="form-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </span>
+                                <span>Shuffle Questions</span>
+                            </label>
+                            <label class="switch-label">
+                                <span class="form-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </span>
+                                <span>Negative Marking (-0.25)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 6: TABLES & TELEMETRY
+                 ========================================================================== -->
+            <section id="tables" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">6. Tables &amp; Candidate Telemetry</h2>
+                    <p class="text-caption">Demonstrating all four semantic status levels across examination candidate records.</p>
+                </div>
+
+                <div class="table-container">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">
+                                    <input type="checkbox" class="form-checkbox" aria-label="Select all rows">
+                                </th>
+                                <th class="th-sortable" data-sort-order="asc">
+                                    <span class="th-sortable-inner">
+                                        <span>Candidate</span>
+                                        <span class="sort-indicator"><i data-lucide="chevron-up" class="lucide-icon icon-xs"></i></span>
+                                    </span>
+                                </th>
+                                <th>Roll Number</th>
+                                <th>Proctoring Status</th>
+                                <th>Incident Severity</th>
+                                <th>Score</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- GREEN: SAFE / SUCCESS ROW -->
+                            <tr>
+                                <td><input type="checkbox" class="form-checkbox"></td>
+                                <td>
+                                    <div style="font-weight: 600;">Alex Morgan</div>
+                                    <div class="text-caption">CSE-4A &bull; In Progress</div>
+                                </td>
+                                <td class="text-mono">2026-CS-041</td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--green status-dot--pulse"></span>
+                                        <span style="color: var(--color-success-text); font-weight: 600;">Feed Active (1 Face)</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--success">
+                                        <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                                        <span>Safe &bull; Normal Status</span>
+                                    </span>
+                                </td>
+                                <td style="font-weight: 700; color: var(--color-success-text);">94 / 100</td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-secondary btn-xs">Inspect</button>
+                                </td>
+                            </tr>
+
+                            <!-- ORANGE: WARNING / ALERT ROW -->
+                            <tr>
+                                <td><input type="checkbox" class="form-checkbox"></td>
+                                <td>
+                                    <div style="font-weight: 600;">David Zhao</div>
+                                    <div class="text-caption">CSE-4B &bull; In Progress</div>
+                                </td>
+                                <td class="text-mono">2026-CS-088</td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--orange"></span>
+                                        <span style="color: var(--color-warning-text); font-weight: 600;">Latency Alert (520ms)</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--warning">
+                                        <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                        <span>Warning &bull; Gaze Shift</span>
+                                    </span>
+                                </td>
+                                <td style="font-weight: 700; color: var(--color-warning-text);">78 / 100</td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-warning btn-xs">
+                                        <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                        <span>Review</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- RED: CRITICAL / DANGER ROW -->
+                            <tr>
+                                <td><input type="checkbox" class="form-checkbox"></td>
+                                <td>
+                                    <div style="font-weight: 600;">Sophia Patel</div>
+                                    <div class="text-caption">IT-3A &bull; Flagged</div>
+                                </td>
+                                <td class="text-mono">2026-IT-014</td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--red status-dot--pulse"></span>
+                                        <span style="color: var(--color-danger-text); font-weight: 600;">Feed Breach (Multi-Face)</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--danger">
+                                        <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                        <span>Critical &bull; Tab Breach</span>
+                                    </span>
+                                </td>
+                                <td style="font-weight: 700; color: var(--color-danger-text);">Locked / Review</td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-danger btn-xs">
+                                        <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                        <span>Audit Flag</span>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- BLUE: INFORMATION ROW -->
+                            <tr>
+                                <td><input type="checkbox" class="form-checkbox"></td>
+                                <td>
+                                    <div style="font-weight: 600;">Elena Rostova</div>
+                                    <div class="text-caption">ECE-2B &bull; Scheduled</div>
+                                </td>
+                                <td class="text-mono">2026-EC-009</td>
+                                <td>
+                                    <span class="status-indicator">
+                                        <span class="status-dot status-dot--blue"></span>
+                                        <span style="color: var(--color-info-text); font-weight: 600;">In Waiting Room</span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge--info">
+                                        <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                                        <span>Info &bull; Pre-Flight Check</span>
+                                    </span>
+                                </td>
+                                <td class="text-caption">Not Started</td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-secondary btn-xs">
+                                        <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                                        <span>Guidance</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Table Pagination Component -->
+                    <div class="pagination-container">
+                        <span class="text-caption">Showing 1 to 4 of 142 examination submissions</span>
+                        <ul class="pagination">
+                            <li class="page-item disabled"><button type="button" class="page-link" disabled>&laquo;</button></li>
+                            <li class="page-item active"><button type="button" class="page-link">1</button></li>
+                            <li class="page-item"><button type="button" class="page-link">2</button></li>
+                            <li class="page-item"><button type="button" class="page-link">3</button></li>
+                            <li class="page-item"><button type="button" class="page-link">&raquo;</button></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 7: CARDS & BENTO DISPLAY
+                 ========================================================================== -->
+            <section id="cards" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">7. Cards &amp; Bento Display</h2>
+                    <p class="text-caption">Clean surfaces and high-density metric cards with zero decorative gradient clutter.</p>
+                </div>
+
+                <div class="grid grid-cols-3" style="margin-bottom: var(--space-5);">
+                    <!-- Metric Card 1: Safe Status -->
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <span class="stat-card__label">Active Examinations</span>
+                            <div class="stat-card__icon">
+                                <i data-lucide="activity" class="lucide-icon icon-sm"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card__value">4</div>
+                        <div class="stat-card__footer">
+                            <span class="status-dot status-dot--green status-dot--pulse"></span>
+                            <span>142 concurrent candidates</span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card 2: Warning Status -->
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <span class="stat-card__label">Pending Grading</span>
+                            <div class="stat-card__icon" style="color: var(--color-warning);">
+                                <i data-lucide="clock" class="lucide-icon icon-sm"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card__value" style="color: var(--color-warning);">28</div>
+                        <div class="stat-card__footer">
+                            <span class="badge badge--warning">
+                                <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                <span>Attention Needed</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Metric Card 3: Danger Status -->
+                    <div class="stat-card">
+                        <div class="stat-card__top">
+                            <span class="stat-card__label">Flagged Violations</span>
+                            <div class="stat-card__icon" style="color: var(--color-danger);">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-sm"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card__value" style="color: var(--color-danger);">3</div>
+                        <div class="stat-card__footer">
+                            <span class="badge badge--danger">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                <span>Critical Action</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Card Example -->
+                <div class="card card--interactive">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Interactive Card (Hover Lift Effect)</h3>
+                            <div class="card-subtitle">Elevates smoothly by -2px with box-shadow lift</div>
+                        </div>
+                        <span class="badge badge--primary">Clickable</span>
+                    </div>
+                    <p class="text-body" style="margin: 0 0 var(--space-3) 0;">
+                        Used for exam selection tiles, question bank modules, and candidate inspection cards.
+                    </p>
+                    <div style="display: flex; gap: var(--space-2);">
+                        <button type="button" class="btn btn-secondary btn-sm">Explore Section</button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 8: BADGES & STATUS INDICATORS
+                 ========================================================================== -->
+            <section id="badges" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">8. Badges &amp; Status Indicators</h2>
+                    <p class="text-caption">
+                        Color is never the sole indicator: every element combines a dedicated semantic token, high-contrast text, and an explicit icon.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3 class="heading-5" style="margin-bottom: var(--space-3);">Semantic Badges (Icon + Descriptive Label)</h3>
+                    <div class="edf-component-row">
+                        <!-- RED -->
+                        <span class="badge badge--danger">
+                            <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                            <span>Critical: Multiple Faces</span>
+                        </span>
+
+                        <!-- ORANGE -->
+                        <span class="badge badge--warning">
+                            <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                            <span>Warning: Network Latency</span>
+                        </span>
+
+                        <!-- GREEN -->
+                        <span class="badge badge--success">
+                            <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                            <span>Safe: Identity Verified</span>
+                        </span>
+
+                        <!-- BLUE -->
+                        <span class="badge badge--info">
+                            <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                            <span>Info: Waiting Room Open</span>
+                        </span>
+
+                        <span class="badge badge--primary">Primary Tag</span>
+                        <span class="badge badge--neutral">Archived State</span>
+                    </div>
+
+                    <h3 class="heading-5" style="margin-top: var(--space-5); margin-bottom: var(--space-3);">Live Telemetry Status Indicators</h3>
+                    <div class="edf-component-row">
+                        <!-- RED -->
+                        <div class="status-indicator">
+                            <span class="status-dot status-dot--red status-dot--pulse"></span>
+                            <span style="color: var(--color-danger-text); font-weight: 600;">Feed Interrupted / Violation</span>
+                        </div>
+
+                        <!-- ORANGE -->
+                        <div class="status-indicator">
+                            <span class="status-dot status-dot--orange"></span>
+                            <span style="color: var(--color-warning-text); font-weight: 600;">Suspicious Gaze / High Ping</span>
+                        </div>
+
+                        <!-- GREEN -->
+                        <div class="status-indicator">
+                            <span class="status-dot status-dot--green status-dot--pulse"></span>
+                            <span style="color: var(--color-success-text); font-weight: 600;">Active Video Stream OK</span>
+                        </div>
+
+                        <!-- BLUE -->
+                        <div class="status-indicator">
+                            <span class="status-dot status-dot--blue"></span>
+                            <span style="color: var(--color-info-text); font-weight: 600;">Candidate Reading Rules</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 9: NAVIGATION, DROPDOWNS & TABS
+                 ========================================================================== -->
+            <section id="navigation" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">9. Navigation, Dropdowns &amp; Tabs</h2>
+                    <p class="text-caption">Accessible navigation primitives with smooth transition effects.</p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-5);">
+                    <h3 class="heading-5" style="margin-bottom: var(--space-3);">Breadcrumbs</h3>
+                    <nav class="breadcrumb" style="margin-bottom: var(--space-5);" aria-label="Breadcrumb">
+                        <span class="breadcrumb-item"><a href="#">EPS Institutional</a></span>
+                        <span class="text-muted">/</span>
+                        <span class="breadcrumb-item"><a href="#">Examinations</a></span>
+                        <span class="text-muted">/</span>
+                        <span class="breadcrumb-item is-current">Live Invigilation Session</span>
+                    </nav>
+
+                    <h3 class="heading-5" style="margin-bottom: var(--space-3);">Interactive Tabs</h3>
+                    <div data-tabs-container>
+                        <nav class="tabs-nav" aria-label="Demo Tabs">
+                            <button type="button" class="tab-link is-active" data-tab-target="tab-all-candidates" data-tab-group="demo-tabs">
+                                <i data-lucide="users" class="lucide-icon icon-xs"></i>
+                                <span>All Enrolled</span>
+                                <span class="badge badge--neutral">142</span>
+                            </button>
+                            <button type="button" class="tab-link" data-tab-target="tab-flagged" data-tab-group="demo-tabs">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs" style="color:var(--color-danger);"></i>
+                                <span>Critical Anomalies</span>
+                                <span class="badge badge--danger">3</span>
+                            </button>
+                            <button type="button" class="tab-link" data-tab-target="tab-review" data-tab-group="demo-tabs">
+                                <i data-lucide="alert-triangle" class="lucide-icon icon-xs" style="color:var(--color-warning);"></i>
+                                <span>Pending Attention</span>
+                                <span class="badge badge--warning">7</span>
+                            </button>
+                            <button type="button" class="tab-link" data-tab-target="tab-completed" data-tab-group="demo-tabs">
+                                <i data-lucide="check-circle" class="lucide-icon icon-xs" style="color:var(--color-success);"></i>
+                                <span>Verified Submissions</span>
+                                <span class="badge badge--success">38</span>
+                            </button>
+                        </nav>
+
+                        <div id="tab-all-candidates" class="tab-content is-active" data-tab-group="demo-tabs">
+                            <p class="text-body" style="margin: 0;">Showing full roster of 142 candidates synchronized with live examination room.</p>
+                        </div>
+                        <div id="tab-flagged" class="tab-content" data-tab-group="demo-tabs">
+                            <p class="text-body" style="margin: 0; color: var(--color-danger-text); font-weight: 500;">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                3 candidates currently triggered critical browser or webcam anomaly events.
+                            </p>
+                        </div>
+                        <div id="tab-review" class="tab-content" data-tab-group="demo-tabs">
+                            <p class="text-body" style="margin: 0; color: var(--color-warning-text); font-weight: 500;">
+                                <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                                7 candidates flagged with connection instability or minor gaze deviation alerts.
+                            </p>
+                        </div>
+                        <div id="tab-completed" class="tab-content" data-tab-group="demo-tabs">
+                            <p class="text-body" style="margin: 0; color: var(--color-success-text); font-weight: 500;">
+                                <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                                38 candidates finalized their submissions and generated digital receipts.
+                            </p>
+                        </div>
+                    </div>
+
+                    <h3 class="heading-5" style="margin-top: var(--space-6); margin-bottom: var(--space-3);">Dropdown Menu</h3>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-secondary btn-sm" data-dropdown-toggle>
+                            <i data-lucide="settings" class="lucide-icon icon-xs"></i>
+                            <span>Exam Actions</span>
+                            <i data-lucide="chevron-down" class="lucide-icon icon-xs"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <button type="button" class="dropdown-item">
+                                <i data-lucide="eye" class="lucide-icon icon-xs"></i>
+                                <span>Preview as Student</span>
+                            </button>
+                            <button type="button" class="dropdown-item">
+                                <i data-lucide="download" class="lucide-icon icon-xs"></i>
+                                <span>Export Question CSV</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button type="button" class="dropdown-item dropdown-item--danger">
+                                <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                                <span>Force Lock Exam</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 10: MODALS, ALERTS & TOASTS
+                 ========================================================================== -->
+            <section id="overlays" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">10. Modals, Alerts &amp; Toast Notifications</h2>
+                    <p class="text-caption">Standardized banners and toast notifications reflecting EPS semantic rules.</p>
+                </div>
+
+                <div class="card" style="margin-bottom: var(--space-5);">
+                    <h3 class="heading-5" style="margin-bottom: var(--space-3);">Standard Alert Banners</h3>
+                    
+                    <!-- RED DANGER ALERT -->
+                    <div class="alert alert--danger">
+                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                            <i data-lucide="alert-octagon" class="lucide-icon icon-sm"></i>
+                            <span><strong>Critical Security Alert:</strong> Fullscreen mode exited. This violation has been flagged for invigilator review.</span>
+                        </div>
+                        <button type="button" class="alert-close-btn" aria-label="Close alert"><i data-lucide="x" class="lucide-icon icon-xs"></i></button>
+                    </div>
+
+                    <!-- ORANGE WARNING ALERT -->
+                    <div class="alert alert--warning">
+                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                            <i data-lucide="alert-triangle" class="lucide-icon icon-sm"></i>
+                            <span><strong>Connection Warning:</strong> Unstable internet connection detected. Answers are being queued locally.</span>
+                        </div>
+                        <button type="button" class="alert-close-btn" aria-label="Close alert"><i data-lucide="x" class="lucide-icon icon-xs"></i></button>
+                    </div>
+
+                    <!-- GREEN SUCCESS ALERT -->
+                    <div class="alert alert--success">
+                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                            <i data-lucide="check-circle" class="lucide-icon icon-sm"></i>
+                            <span><strong>Submission Confirmed:</strong> Your examination answers were recorded successfully. Digital receipt generated.</span>
+                        </div>
+                        <button type="button" class="alert-close-btn" aria-label="Close alert"><i data-lucide="x" class="lucide-icon icon-xs"></i></button>
+                    </div>
+
+                    <!-- BLUE INFO ALERT -->
+                    <div class="alert alert--info">
+                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                            <i data-lucide="info" class="lucide-icon icon-sm"></i>
+                            <span><strong>Examination Notice:</strong> Please ensure steady lighting and keep your camera centered at all times.</span>
+                        </div>
+                        <button type="button" class="alert-close-btn" aria-label="Close alert"><i data-lucide="x" class="lucide-icon icon-xs"></i></button>
+                    </div>
+
+                    <h3 class="heading-5" style="margin-top: var(--space-6); margin-bottom: var(--space-3);">Spawn Toast Notifications</h3>
+                    <div class="edf-component-row">
+                        <!-- GREEN -->
+                        <button type="button" class="btn btn-success btn-sm" onclick="EPSDesign.toast({ type: 'success', title: 'Submission Confirmed', message: 'Exam attempt finalized. Digital submission receipt generated.' })">
+                            <i data-lucide="check-circle" class="lucide-icon icon-xs"></i>
+                            <span>Success Toast (Green)</span>
+                        </button>
+                        
+                        <!-- ORANGE -->
+                        <button type="button" class="btn btn-warning btn-sm" onclick="EPSDesign.toast({ type: 'warning', title: 'Connection Alert', message: 'High network ping (520ms) detected. Switched to offline queue.' })">
+                            <i data-lucide="alert-triangle" class="lucide-icon icon-xs"></i>
+                            <span>Warning Toast (Orange)</span>
+                        </button>
+
+                        <!-- RED -->
+                        <button type="button" class="btn btn-danger btn-sm" onclick="EPSDesign.toast({ type: 'danger', title: 'Critical Anomaly Detected', message: 'Multiple faces detected in video feed. Flagged for human invigilator review.' })">
+                            <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                            <span>Danger Toast (Red)</span>
+                        </button>
+
+                        <!-- BLUE -->
+                        <button type="button" class="btn btn-info btn-sm" onclick="EPSDesign.toast({ type: 'info', title: 'Candidate Guidance', message: 'Examination room timer is server-authoritative.' })">
+                            <i data-lucide="info" class="lucide-icon icon-xs"></i>
+                            <span>Info Toast (Blue)</span>
+                        </button>
+                    </div>
+
+                    <h3 class="heading-5" style="margin-top: var(--space-6); margin-bottom: var(--space-3);">Interactive Modal Triggers</h3>
+                    <div class="edf-component-row">
+                        <button type="button" class="btn btn-primary" data-modal-target="demo-modal-standard">
+                            <i data-lucide="maximize-2" class="lucide-icon icon-xs"></i>
+                            <span>Open Standard Modal</span>
+                        </button>
+                        <button type="button" class="btn btn-danger" data-modal-target="demo-modal-confirm">
+                            <i data-lucide="alert-octagon" class="lucide-icon icon-xs"></i>
+                            <span>Open Dangerous Confirmation Dialog</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 11: SKELETON LOADERS & EMPTY / ERROR STATES
+                 ========================================================================== -->
+            <section id="skeletons" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">11. Skeletons, Empty &amp; Error States</h2>
+                    <p class="text-caption">Graceful loading placeholders and user-centric fallback states.</p>
+                </div>
+
+                <div class="grid grid-cols-2" style="margin-bottom: var(--space-5);">
+                    <!-- Skeleton Card -->
+                    <div class="card">
+                        <h3 class="heading-5" style="margin-bottom: var(--space-3);">Skeleton Shimmer Loading</h3>
+                        <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4);">
+                            <div class="skeleton skeleton-circle"></div>
+                            <div style="flex: 1;">
+                                <div class="skeleton skeleton-title"></div>
+                                <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 85%;"></div>
+                        <div class="skeleton skeleton-btn" style="margin-top: var(--space-4);"></div>
+                    </div>
+
+                    <!-- Error State Card (Red Semantic Border) -->
+                    <div class="error-state">
+                        <div class="error-state__title" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i data-lucide="alert-octagon" class="lucide-icon icon-sm"></i>
+                            <span>Critical Hardware Error</span>
+                        </div>
+                        <div class="error-state__desc">
+                            The webcam hardware feed could not be verified. Grant permissions in your browser or connect an external device to proceed.
+                        </div>
+                        <button type="button" class="btn btn-danger btn-sm">
+                            <i data-lucide="refresh-cw" class="lucide-icon icon-xs"></i>
+                            <span>Retry Hardware Check</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State Card -->
+                <div class="empty-state">
+                    <div class="empty-state__icon">
+                        <i data-lucide="inbox" class="lucide-icon icon-md"></i>
+                    </div>
+                    <div class="empty-state__title">No Scheduled Examinations Found</div>
+                    <div class="empty-state__desc">
+                        You have no examinations pending in the next 7 days. Check back when an academic instructor publishes your course syllabus schedule.
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <i data-lucide="calendar" class="lucide-icon icon-xs"></i>
+                        <span>View Semester Academic Calendar</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ==========================================================================
+                 SECTION 12: LUCIDE ICON SYSTEM GUIDELINES
+                 ========================================================================== -->
+            <section id="icons" class="edf-section">
+                <div class="edf-section-header">
+                    <h2 class="heading-2">12. Lucide Icon Conventions</h2>
+                    <p class="text-caption">Single unified icon library strictly rendered at standard scales and stroke widths.</p>
+                </div>
+
+                <div class="card">
+                    <div class="edf-component-row" style="align-items: center;">
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <i data-lucide="shield" class="lucide-icon icon-xs"></i>
+                            <span class="text-mono">icon-xs (14px)</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <i data-lucide="shield" class="lucide-icon icon-sm"></i>
+                            <span class="text-mono">icon-sm (16px)</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <i data-lucide="shield" class="lucide-icon icon-md"></i>
+                            <span class="text-mono">icon-md (20px)</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <i data-lucide="shield" class="lucide-icon icon-lg"></i>
+                            <span class="text-mono">icon-lg (24px)</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                            <i data-lucide="shield" class="lucide-icon icon-xl"></i>
+                            <span class="text-mono">icon-xl (32px)</span>
+                        </div>
+                    </div>
+
+                    <p class="text-caption" style="margin-top: var(--space-4);">
+                        Standard stroke width: <code class="text-mono">1.85px</code>. Icons must align vertically with text (<code class="text-mono">vertical-align: middle</code>). Icon-only buttons must provide explicit accessible tooltips.
+                    </p>
+                </div>
+            </section>
+
+    </main>
+</div>
+
+
+<!-- Floating Action Button for Theme Studio Drawer -->
+<button type="button" id="edf-drawer-toggle" class="btn btn-primary btn-sm edf-floating-trigger" title="Open Theme Studio Drawer" aria-label="Open Theme Studio Drawer">
+    <i data-lucide="sliders" class="lucide-icon icon-xs"></i>
+    <span>Theme Playground</span>
+</button>
+
+<!-- Off-Canvas Slide-Out Theme Studio Drawer -->
+<div id="edf-drawer-backdrop" class="edf-drawer-backdrop"></div>
+<aside id="edf-playground-drawer" class="edf-drawer" aria-label="Interactive Theme Playground Drawer">
+    <div class="edf-drawer__header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="sliders" class="lucide-icon icon-sm" style="color: var(--color-secondary);"></i>
+            <div>
+                <h3 class="heading-5" style="margin: 0; font-size: 15px;">Live Theme Studio</h3>
+                <div class="text-caption" style="font-size: 11px;">Real-time Non-Destructive Engine</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px;">
+            <button type="button" class="btn btn-ghost btn-xs" id="drawer-reset-btn" title="Reset all tokens">
+                <i data-lucide="rotate-ccw" class="lucide-icon icon-xs"></i>
+            </button>
+            <button type="button" class="btn btn-ghost btn-xs" id="edf-drawer-close" aria-label="Close drawer">
+                <i data-lucide="x" class="lucide-icon icon-sm"></i>
+            </button>
+        </div>
+    </div>
+    <div class="edf-drawer__body">
+        <p class="text-caption" style="margin-bottom: var(--space-4); line-height: 1.45;">
+            Mutating tokens below modifies CSS custom properties on <code class="text-mono">:root</code>. Every component on the page immediately reflects changes.
+        </p>
+        <div id="drawer-playground-controls"></div>
+    </div>
+    <div class="edf-drawer__footer">
+        <button type="button" class="btn btn-primary btn-sm" id="drawer-export-css-btn">
+            <i data-lucide="code" class="lucide-icon icon-xs"></i>
+            <span>Export CSS Variables</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="drawer-export-json-btn">
+            <i data-lucide="file-json" class="lucide-icon icon-xs"></i>
+            <span>Export JSON Schema</span>
+        </button>
+    </div>
+</aside>
+
+
+<!-- ==========================================================================
+     MODAL DIALOG TEMPLATES
+     ========================================================================== -->
+<!-- Standard Modal -->
+<div id="demo-modal-standard" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="standard-modal-title">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3 class="modal-title" id="standard-modal-title">Standard Examination Dialog</h3>
+            <button type="button" class="btn btn-ghost btn-xs" data-modal-close aria-label="Close dialog">
+                <i data-lucide="x" class="lucide-icon icon-sm"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>This is a standard modal dialog used for question previews, student assignment filters, and policy documentation.</p>
+            <p class="text-caption" style="margin: 0;">It includes an accessible backdrop with background blur, ESC-key dismiss, and click-outside dismissal.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-modal-close>Cancel</button>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-close>Save &amp; Continue</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Dialog -->
+<div id="demo-modal-confirm" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="modal-dialog" style="max-width: 440px;">
+        <div class="confirm-box">
+            <div class="confirm-box__icon confirm-box__icon--danger">
+                <i data-lucide="alert-octagon" class="lucide-icon icon-lg"></i>
+            </div>
+            <h3 class="heading-4" id="confirm-modal-title" style="margin-bottom: var(--space-2);">Force Lock Examination?</h3>
+            <p class="text-body" style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-5);">
+                This action will immediately conclude attempts for all 142 candidates currently in the examination room. All unsubmitted answers will be finalized automatically.
+            </p>
+            <div style="display: flex; gap: var(--space-2); justify-content: center;">
+                <button type="button" class="btn btn-secondary btn-sm" data-modal-close>Cancel &amp; Keep Active</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="EPSDesign.toast({ type: 'danger', title: 'Examination Locked', message: 'All active sessions finalized.' }); EPSDesign.closeModal('demo-modal-confirm');">
+                    Yes, Lock Examination
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/design.js' %}"></script>
+{% endblock %}

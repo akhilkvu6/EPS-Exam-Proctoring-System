@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Department Batches — EPS Faculty{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+
+    <!-- Header & Action Row -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="{% url 'teacher_dashboard' %}" class="btn btn-ghost btn-xs" style="padding: 4px 8px;">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                    <span>Dashboard</span>
+                </a>
+                <span class="badge badge--primary">Department: {{ teacher_dept|default:"All" }}</span>
+            </div>
+            <h1 class="heading-2" style="margin-top: 6px;">Academic Cohorts & Roll Allocations</h1>
+            <p class="text-caption">View active cohorts and visual roll number grids in your academic department.</p>
+        </div>
+
+        <div>
+            <a href="{% url 'teacher_batch_create' %}" class="btn btn-primary btn-sm">
+                <i data-lucide="plus-circle" class="lucide-icon icon-xs"></i>
+                <span>Create Department Batch</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Batches Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-5);">
+        {% for b in batches %}
+            <div class="card" style="padding: var(--space-5); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 class="heading-4" style="margin: 0; font-size: 17px;">{{ b.batch_name }}</h3>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ b.course.name }}</div>
+                        </div>
+                        {% if b.enrollment_status == 'open' %}
+                            <span class="badge badge--success">Open</span>
+                        {% else %}
+                            <span class="badge badge--neutral">{{ b.get_enrollment_status_display }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div style="margin-top: var(--space-4); padding: var(--space-3); background: var(--bg-surface-secondary); border-radius: var(--radius-sm);">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                            <span>Prefix Formula:</span>
+                            <code style="font-weight: 700; color: var(--color-primary-main, #2563EB);">{{ b.prefix }}</code>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px;">
+                            <span>Active Semester:</span>
+                            <strong>Semester {{ b.current_semester }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px;">
+                            <span>Capacity Range:</span>
+                            <span>{{ b.start_roll_number|stringformat:"02d" }} &ndash; {{ b.end_roll_number|stringformat:"02d" }} ({{ b.capacity }} seats)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: var(--space-5); border-top: 1px solid var(--border-color); padding-top: var(--space-4); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        <strong>{{ b.enrolled_students.count }}</strong> students registered
+                    </div>
+                    <a href="{% url 'teacher_batch_detail' b.id %}" class="btn btn-secondary btn-xs">
+                        <i data-lucide="grid" class="lucide-icon icon-xs"></i>
+                        <span>Inspect Roll Grid</span>
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="card" style="grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--text-muted);">
+                <i data-lucide="calendar-x" class="lucide-icon" style="width: 48px; height: 48px; opacity: 0.3; margin-bottom: 12px;"></i>
+                <div style="font-size: 16px; font-weight: 600;">No Batches Configured in {{ teacher_dept }}</div>
+                <p style="margin-top: 4px; font-size: 13px;">Create an academic batch to initiate automatic candidate roll number sequences.</p>
+                <a href="{% url 'teacher_batch_create' %}" class="btn btn-primary btn-sm" style="margin-top: 16px;">
+                    <i data-lucide="plus" class="lucide-icon icon-xs"></i>
+                    <span>Create Batch</span>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

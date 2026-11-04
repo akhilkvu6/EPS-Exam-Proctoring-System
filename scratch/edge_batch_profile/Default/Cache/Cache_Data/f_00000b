@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Batches & Roll Allocation — EPS Admin</title>
+    
+    <!-- Prevent Theme Flash -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('eps-theme') || 
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Design Tokens & School Component Styles -->
+    <link rel="stylesheet" href="/static/css/design-tokens.css">
+    <link rel="stylesheet" href="/static/css/bento.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    
+</head>
+<body>
+
+    <!-- Mobile Navigation Drawer Overlay Backdrop -->
+    <div id="sidebar-overlay" style="display: none; position: fixed; inset: 0; background: rgba(28, 25, 23, 0.4); z-index: 55; backdrop-filter: blur(2px);"></div>
+
+    
+        <!-- Application Shell -->
+        <div class="app-shell">
+            <!-- Warm Off-White Sidebar (#F3F1EB) -->
+            <aside class="app-sidebar" id="app-sidebar">
+                <div class="app-sidebar__header">
+                    <a href="/" class="app-sidebar__brand">
+                        <span class="brand-badge">EPS</span>
+                        <span class="app-sidebar__brand-text">Exam Proctoring</span>
+                    </a>
+                    <button type="button" id="sidebar-toggle" title="Collapse Sidebar" class="app-sidebar__toggle-btn" aria-label="Toggle Sidebar">
+                        <i data-lucide="chevrons-left" class="lucide-icon"></i>
+                    </button>
+                </div>
+
+                <nav class="app-sidebar__nav">
+                    
+                        <!-- Administrator Navigation -->
+                        <div class="nav-section-title">Overview</div>
+                        <a href="/accounts/admin/dashboard/" data-tooltip="Dashboard" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="shield" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Dashboard</span>
+                        </a>
+                        <a href="/accounts/admin/analytics/" data-tooltip="Analytics" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="bar-chart-2" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Analytics</span>
+                        </a>
+                        <a href="/accounts/admin/audit-logs/" data-tooltip="Audit Logs" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="list-ordered" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Audit Logs</span>
+                        </a>
+
+                        <div class="nav-section-title">User Directory</div>
+                        <a href="/accounts/admin/students/" data-tooltip="All Students" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="graduation-cap" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">All Students</span>
+                        </a>
+                        <a href="/accounts/admin/teachers/" data-tooltip="All Teachers" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="users" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">All Teachers</span>
+                        </a>
+                        <a href="/accounts/admin/student-approvals/" data-tooltip="Student Approvals" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="user-check" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Student Approvals</span>
+                        </a>
+                        <a href="/accounts/admin/teacher-approvals/" data-tooltip="Teacher Approvals" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="check-square" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Teacher Approvals</span>
+                        </a>
+                        <a href="/accounts/admin/suspended/" data-tooltip="Suspended Users" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="user-x" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Suspended</span>
+                        </a>
+                        <a href="/accounts/admin/approval-history/" data-tooltip="Approval History" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="history" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Approval History</span>
+                        </a>
+
+                        <div class="nav-section-title">Academic Setup</div>
+                        <a href="/accounts/admin/batches/" data-tooltip="Academic Batches" class="nav-item is-active">
+                            <span class="nav-item__icon"><i data-lucide="calendar-range" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Academic Batches</span>
+                        </a>
+                        <a href="/accounts/admin/roll-correction/" data-tooltip="Roll Correction" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="hash" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Roll Correction</span>
+                        </a>
+                        <a href="/accounts/admin/departments/" data-tooltip="Departments" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="building-2" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Departments</span>
+                        </a>
+                        <a href="/accounts/admin/classes/" data-tooltip="Classes" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="layers" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Classes</span>
+                        </a>
+
+                        <div class="nav-section-title">Exams & Proctoring</div>
+                        <a href="/exams/admin/all/" data-tooltip="All Exams" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="clipboard-list" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">All Exams</span>
+                        </a>
+                        <a href="/exams/admin/attempts/" data-tooltip="Exam Attempts" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="clipboard-check" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Exam Attempts</span>
+                        </a>
+                        <a href="/results/admin/overview/" data-tooltip="Results" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="award" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Results</span>
+                        </a>
+                        <a href="/exams/admin/proctoring/" data-tooltip="Live Monitoring" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="video" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Live Monitoring</span>
+                        </a>
+                        <a href="/exams/admin/incidents/" data-tooltip="Incidents" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="alert-triangle" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Incidents</span>
+                        </a>
+
+                        <div class="nav-section-title">Settings & Tools</div>
+                        <a href="/results/admin/export/" data-tooltip="Reports & Export" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="download" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Reports & Export</span>
+                        </a>
+                        <a href="/accounts/students/import/" data-tooltip="Excel Import" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="file-spreadsheet" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Excel Import</span>
+                        </a>
+                        <a href="/accounts/admin/policies/" data-tooltip="Exam Policies" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="sliders" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Exam Policies</span>
+                        </a>
+                        <a href="/accounts/admin/backup/" data-tooltip="Backup & Health" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="hard-drive" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Backup & Health</span>
+                        </a>
+                        <a href="/accounts/admin/security/" data-tooltip="Security" class="nav-item ">
+                            <span class="nav-item__icon"><i data-lucide="lock" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Security</span>
+                        </a>
+                        <a href="/admin/" target="_blank" data-tooltip="Django Admin" class="nav-item">
+                            <span class="nav-item__icon"><i data-lucide="external-link" class="lucide-icon"></i></span>
+                            <span class="nav-item__label">Django Admin</span>
+                        </a>
+                    
+
+                    <!-- Shared Account Section -->
+                    <div class="nav-section-title">Account</div>
+                    <a href="/accounts/profile/" data-tooltip="My Profile" class="nav-item ">
+                        <span class="nav-item__icon"><i data-lucide="user" class="lucide-icon"></i></span>
+                        <span class="nav-item__label">My Profile</span>
+                    </a>
+                    <a href="/accounts/change-password/" data-tooltip="Change Password" class="nav-item ">
+                        <span class="nav-item__icon"><i data-lucide="key" class="lucide-icon"></i></span>
+                        <span class="nav-item__label">Change Password</span>
+                    </a>
+                </nav>
+
+                <div class="app-sidebar__footer">
+                    <div class="user-avatar-circle">
+                        A
+                    </div>
+                    <div class="user-info-text" style="flex: 1 1 auto; overflow: hidden;">
+                        <div style="font-weight: 600; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-size: var(--font-size-sm);">
+                            admin
+                        </div>
+                        <div style="color: var(--text-muted); font-size: var(--font-size-xs);">
+                            Admin
+                        </div>
+                    </div>
+                    <a href="/accounts/logout/" title="Log Out" class="btn btn-ghost btn-xs" aria-label="Log out">
+                        <i data-lucide="log-out" class="lucide-icon" style="color: var(--danger);"></i>
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="app-main">
+                <!-- Header -->
+                <header class="app-header">
+                    <div class="app-header__left">
+                        <button type="button" id="mobile-menu-toggle" class="btn btn-ghost btn-sm" style="display: none;" aria-label="Open menu">
+                            <i data-lucide="menu" class="lucide-icon"></i>
+                        </button>
+                        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); color: var(--text-secondary);">
+                            <span style="font-weight: 700; color: var(--text-primary);">EPS</span>
+                            <span>/</span>
+                            <span>School Portal</span>
+                        </div>
+                    </div>
+
+                    <div class="app-header__right">
+                        <!-- Theme Toggle Button -->
+                        <button type="button" class="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                            <i data-lucide="sun-moon" class="lucide-icon"></i>
+                        </button>
+
+                        <!-- Notification Bell -->
+                        <a href="/accounts/notifications/" class="notification-bell-btn" title="Notifications" aria-label="Notifications">
+                            <i data-lucide="bell" class="lucide-icon"></i>
+                            
+                                <span class="notification-pill-badge">2</span>
+                            
+                        </a>
+
+                        <!-- User Profile Chip -->
+                        <div class="user-identity-chip">
+                            <span class="user-avatar-circle" style="width: 26px; height: 26px; font-size: 11px;">
+                                A
+                            </span>
+                            <span style="font-weight: 600; font-size: var(--font-size-sm); color: var(--text-primary);">
+                                admin
+                            </span>
+                            <span class="badge badge--neutral">
+                                Admin
+                            </span>
+                        </div>
+                    </div>
+                </header>
+    
+
+    <!-- Page Content & Alerts -->
+    <main class="app-content" >
+        
+
+        
+<div style="max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+
+    <!-- Header & Action Row -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="/accounts/admin/dashboard/" class="btn btn-ghost btn-xs" style="padding: 4px 8px;">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                    <span>Dashboard</span>
+                </a>
+                <span class="badge badge--primary">Academic Hierarchy</span>
+            </div>
+            <h1 class="heading-2" style="margin-top: 6px;">Academic Batch Management</h1>
+            <p class="text-caption">Define institutional batches, roll number sequence prefixes, and oversee visual seat allocations.</p>
+        </div>
+
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+            <a href="/accounts/admin/roll-correction/" class="btn btn-secondary btn-sm">
+                <i data-lucide="hash" class="lucide-icon icon-xs"></i>
+                <span>Roll Number Correction</span>
+            </a>
+            <a href="/accounts/admin/batches/create/" class="btn btn-primary btn-sm">
+                <i data-lucide="plus-circle" class="lucide-icon icon-xs"></i>
+                <span>Create Academic Batch</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid var(--color-primary-main, #2563EB);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Total Batches</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">2</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Active Academic Cohorts</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #4B5563;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Total Seat Capacity</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">120</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Configured Roll Positions</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid var(--color-success, #10B981);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Permanently Assigned</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--color-success, #10B981); margin-top: 4px;">0</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Approved Active Students</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid var(--color-warning, #F59E0B);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Pending Approval</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--color-warning, #F59E0B); margin-top: 4px;">0</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Awaiting Faculty Verification</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid var(--color-info, #0284C7);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Available Positions</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--color-info, #0284C7); margin-top: 4px;">120</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Open for Candidate Registration</div>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+        <form method="get" style="display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1 1 200px;">
+                <input type="text" name="search" value="" placeholder="Search batch name, code, prefix..." class="lp-input" style="height: 38px;">
+            </div>
+            <div style="flex: 1 1 180px;">
+                <select name="department" class="lp-select" style="height: 38px;">
+                    <option value="">All Departments</option>
+                    
+                        <option value="2" >Computer Applications (BCA)</option>
+                    
+                        <option value="1" >Computer Science (CS)</option>
+                    
+                </select>
+            </div>
+            <div style="flex: 1 1 180px;">
+                <select name="course" class="lp-select" style="height: 38px;">
+                    <option value="">All Courses</option>
+                    
+                        <option value="2" >B.Sc Computer Science (B.Sc CS)</option>
+                    
+                        <option value="1" >Bachelor of Computer Applications (BCA)</option>
+                    
+                </select>
+            </div>
+            <div style="flex: 1 1 140px;">
+                <select name="status" class="lp-select" style="height: 38px;">
+                    <option value="">All Statuses</option>
+                    <option value="open" >Open</option>
+                    <option value="closed" >Closed</option>
+                    <option value="archived" >Archived</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary btn-sm" style="height: 38px;">
+                <i data-lucide="filter" class="lucide-icon icon-xs"></i>
+                <span>Filter</span>
+            </button>
+            
+        </form>
+    </div>
+
+    <!-- Batches Master Table -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="heading-4" style="margin: 0;">Academic Batches Roster (2)</h2>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-surface-secondary); text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                        <th style="padding: 12px 16px;">Batch Name</th>
+                        <th style="padding: 12px 16px;">Prefix Formula</th>
+                        <th style="padding: 12px 16px;">Department / Course</th>
+                        <th style="padding: 12px 16px;">Semester</th>
+                        <th style="padding: 12px 16px;">Allocation Progress</th>
+                        <th style="padding: 12px 16px;">Status</th>
+                        <th style="padding: 12px 16px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 14px 16px;">
+                                <div style="font-weight: 700; color: var(--text-primary);">
+                                    <a href="/accounts/admin/batches/1/" style="color: inherit; text-decoration: none;">
+                                        2026 BCA
+                                    </a>
+                                </div>
+                                
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <code style="font-size: 12px; font-weight: 700; background: var(--bg-surface-secondary); padding: 3px 6px; border-radius: 4px; color: var(--color-primary-main, #2563EB);">
+                                    2026BCA
+                                </code>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                    Range: 01 - 60
+                                </div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <div style="font-size: 13px; font-weight: 600;">Bachelor of Computer Applications (BCA)</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Computer Applications</div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <span class="badge badge--primary">Sem 1 / 6</span>
+                            </td>
+                            <td style="padding: 14px 16px; min-width: 180px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span><strong>0</strong> assigned</span>
+                                    <span>60 cap</span>
+                                </div>
+                                <div style="height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; display: flex;">
+                                    <div style="width: calc((0 / 60) * 100%); background: #10B981;"></div>
+                                    <div style="width: calc((0 / 60) * 100%); background: #F59E0B;"></div>
+                                </div>
+                                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px;">
+                                    0 pending review
+                                </div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                
+                                    <span class="badge badge--success">Open</span>
+                                
+                            </td>
+                            <td style="padding: 14px 16px; text-align: right;">
+                                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                    <a href="/accounts/admin/batches/1/" class="btn btn-secondary btn-xs" title="View Roll Number Grid">
+                                        <i data-lucide="grid" class="lucide-icon icon-xs"></i>
+                                        <span>Roll Grid</span>
+                                    </a>
+                                    <a href="/accounts/admin/batches/1/promote/" class="btn btn-ghost btn-xs" title="Advance Semester">
+                                        <i data-lucide="arrow-up-right" class="lucide-icon icon-xs"></i>
+                                        <span>Promote</span>
+                                    </a>
+                                    <a href="/accounts/admin/batches/1/edit/" class="btn btn-ghost btn-xs" title="Edit Batch">
+                                        <i data-lucide="edit-2" class="lucide-icon icon-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 14px 16px;">
+                                <div style="font-weight: 700; color: var(--text-primary);">
+                                    <a href="/accounts/admin/batches/2/" style="color: inherit; text-decoration: none;">
+                                        2026 BSC CS
+                                    </a>
+                                </div>
+                                
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <code style="font-size: 12px; font-weight: 700; background: var(--bg-surface-secondary); padding: 3px 6px; border-radius: 4px; color: var(--color-primary-main, #2563EB);">
+                                    2026BSCCS
+                                </code>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                    Range: 01 - 60
+                                </div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <div style="font-size: 13px; font-weight: 600;">B.Sc Computer Science (BSCCS)</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Computer Science</div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <span class="badge badge--primary">Sem 1 / 6</span>
+                            </td>
+                            <td style="padding: 14px 16px; min-width: 180px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span><strong>0</strong> assigned</span>
+                                    <span>60 cap</span>
+                                </div>
+                                <div style="height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; display: flex;">
+                                    <div style="width: calc((0 / 60) * 100%); background: #10B981;"></div>
+                                    <div style="width: calc((0 / 60) * 100%); background: #F59E0B;"></div>
+                                </div>
+                                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px;">
+                                    0 pending review
+                                </div>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                
+                                    <span class="badge badge--success">Open</span>
+                                
+                            </td>
+                            <td style="padding: 14px 16px; text-align: right;">
+                                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                    <a href="/accounts/admin/batches/2/" class="btn btn-secondary btn-xs" title="View Roll Number Grid">
+                                        <i data-lucide="grid" class="lucide-icon icon-xs"></i>
+                                        <span>Roll Grid</span>
+                                    </a>
+                                    <a href="/accounts/admin/batches/2/promote/" class="btn btn-ghost btn-xs" title="Advance Semester">
+                                        <i data-lucide="arrow-up-right" class="lucide-icon icon-xs"></i>
+                                        <span>Promote</span>
+                                    </a>
+                                    <a href="/accounts/admin/batches/2/edit/" class="btn btn-ghost btn-xs" title="Edit Batch">
+                                        <i data-lucide="edit-2" class="lucide-icon icon-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    
+    <!-- Minimal Public Footer -->
+    <footer class="footer" style="padding: var(--space-6) var(--space-4); text-align: center; border-top: 1px solid var(--border-subtle); background-color: var(--bg-surface); color: var(--text-muted); font-size: var(--font-size-xs); transition: background-color var(--transition-normal);">
+        <p style="margin: 0; line-height: 1.5;">EPS &mdash; Examination Proctoring System &bull; &copy; 2026 All rights reserved.</p>
+    </footer>
+    
+
+    
+            </div><!-- close app-main -->
+        </div><!-- close app-shell -->
+    
+
+    <script src="/static/js/main.js"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
+    
+</body>
+</html>

@@ -1,12 +1,14 @@
 import csv
 import io
 import os
+import re
 from datetime import timedelta
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.views.decorators.http import require_GET
 from django.utils import timezone
 from django.db import transaction, connection
 from django.db.models import Q, Count, Avg, Max, Min
@@ -19,13 +21,15 @@ from openpyxl.utils import get_column_letter
 from exams.models import Exam, ExamAttempt, ProctoringIncident, Subject
 from results.models import Result
 from .models import (
-    User, TeacherProfile, StudentProfile, Department,
-    ClassGroup, Notification, ApprovalRecord, AuditLog
+    User, TeacherProfile, StudentProfile, Department, Course, StudentEnrollment,
+    ClassGroup, Notification, ApprovalRecord, AuditLog,
+    AcademicBatch, RollNumberReservation, StudentSemesterHistory
 )
 from .forms import (
     LoginForm, StudentRegistrationForm, TeacherRegistrationForm,
     InAppPasswordChangeForm, DepartmentForm, ClassGroupForm, InstitutionalPolicyForm,
-    StudentProfileEditForm, TeacherProfileEditForm, AdminProfileEditForm
+    StudentProfileEditForm, TeacherProfileEditForm, AdminProfileEditForm,
+    AcademicBatchForm, BatchSemesterPromotionForm, RollNumberCorrectionForm
 )
 from .policies import (
     get_institutional_policies, save_institutional_policies,
@@ -37,6 +41,11 @@ from .decorators import student_required, teacher_required, admin_required, log_
 def home(request):
     """Institutional landing page."""
     return render(request, 'home.html')
+
+
+def design_system(request):
+    """EPS Design Foundation (EDF) interactive showcase and design token playground."""
+    return render(request, 'design.html')
 
 
 def common_login(request):
@@ -55,58 +64,32 @@ def common_login(request):
             return redirect('account_status')
         elif request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff:
             return redirect('admin_dashboard')
-
-    is_dev_mode = getattr(settings, 'DEBUG', False)
-    initial_mode = request.GET.get('mode', 'login')
-    active_role = request.GET.get('role', 'student')
-    if active_role not in ('student', 'teacher'):
-        active_role = 'student'
-
-    student_form = StudentRegistrationForm()
-    teacher_form = TeacherRegistrationForm()
+        return redirect('home')
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            input_identifier = form.cleaned_data['username'].strip()
-            password = form.cleaned_data['password']
-
-            # Support login by username or institutional roll number
-            matched_student = StudentProfile.objects.filter(roll_number__iexact=input_identifier).select_related('user').first()
-            resolved_username = matched_student.user.username if matched_student else input_identifier
-
-            user = authenticate(request, username=resolved_username, password=password)
+            user = form.cleaned_data.get('authenticated_user')
+            if not user:
+                raw_identifier = form.cleaned_data.get('username', '').strip()
+                password = form.cleaned_data.get('password')
+                user = authenticate(request, username=raw_identifier, password=password)
 
             if user is not None:
                 if not user.is_active:
                     form.add_error(None, 'This account has been deactivated by administration.')
-                    return render(request, 'accounts/login.html', {
-                        'form': form,
-                        'student_form': student_form,
-                        'teacher_form': teacher_form,
-                        'initial_mode': 'login',
-                        'active_role': active_role,
-                        'is_dev_mode': is_dev_mode,
-                    })
+                    return render(request, 'accounts/login.html', {'form': form})
 
-                # Check suspension / approval status
                 status = user.get_status()
                 if status == 'suspended':
                     form.add_error(None, 'Your account has been suspended. Please contact the administrator.')
-                    return render(request, 'accounts/login.html', {
-                        'form': form,
-                        'student_form': student_form,
-                        'teacher_form': teacher_form,
-                        'initial_mode': 'login',
-                        'active_role': active_role,
-                        'is_dev_mode': is_dev_mode,
-                    })
+                    return render(request, 'accounts/login.html', {'form': form})
 
                 login(request, user)
-                if request.POST.get('remember_device'):
+                if form.cleaned_data.get('remember_me', False) or request.POST.get('remember_device'):
                     request.session.set_expiry(1209600)  # 2 weeks
                 else:
-                    request.session.set_expiry(0)  # browser close
+                    request.session.set_expiry(0)  # browser session
 
                 log_audit(user, 'USER_LOGIN', user, request, f"Successful login as {user.role}")
 
@@ -125,21 +108,13 @@ def common_login(request):
                     return redirect('admin_dashboard')
 
                 return redirect('home')
-
-            else:
-                form.add_error(None, 'Invalid username or password. Please verify your credentials.')
-                log_audit(None, 'FAILED_LOGIN_ATTEMPT', None, request, f"Failed attempt for username: {input_identifier}")
+        else:
+            raw_identifier = request.POST.get('username', '').strip()
+            log_audit(None, 'FAILED_LOGIN_ATTEMPT', None, request, f"Failed attempt for identifier: {raw_identifier}")
     else:
         form = LoginForm()
 
-    return render(request, 'accounts/login.html', {
-        'form': form,
-        'student_form': student_form,
-        'teacher_form': teacher_form,
-        'initial_mode': initial_mode,
-        'active_role': active_role,
-        'is_dev_mode': is_dev_mode,
-    })
+    return render(request, 'accounts/login.html', {'form': form})
 
 
 def student_login(request):
@@ -164,31 +139,39 @@ def user_logout(request):
 def central_register(request):
     """
     Central registration flow: One entry point, two roles (Student and Teacher).
-    Prompts: 'Which type of account do you need?' with interactive role selection.
+    Role selection cards for choosing between Student and Teacher,
+    backed by real database validation and institution enrollment verification.
     """
     if request.user.is_authenticated:
         return redirect('home')
 
-    is_dev_mode = getattr(settings, 'DEBUG', False)
-    active_role = request.POST.get('role') or request.GET.get('role', 'student')
-    if active_role not in ('student', 'teacher'):
-        active_role = 'student'
+    raw_role = request.POST.get("role") or request.GET.get("role", "")
+    role_locked = bool(raw_role in ("student", "teacher"))
+    active_role = raw_role if role_locked else ""
 
-    initial_mode = request.GET.get('mode', 'register')
-    login_form = LoginForm()
     student_form = StudentRegistrationForm()
     teacher_form = TeacherRegistrationForm()
+    form_errors = []
 
     if request.method == 'POST':
-        if active_role == 'student':
+        submitted_role = request.POST.get('role', 'student')
+        active_role = submitted_role
+        role_locked = True
+
+        if submitted_role == 'student':
             student_form = StudentRegistrationForm(request.POST)
             if student_form.is_valid():
                 user = student_form.save()
-                log_audit(user, 'STUDENT_REGISTERED', user, request, f"Student registered: {user.username}")
+                log_audit(user, 'STUDENT_REGISTERED', user, request, f"Student registered: {user.username} (Roll: {user.student_profile.roll_number})")
+
                 # In-app notification to department faculty
                 teachers = User.objects.filter(role='teacher', teacher_profile__verification_status='approved')
-                dept_teachers = teachers.filter(teacher_profile__department__iexact=user.student_profile.department)
-                target_teachers = dept_teachers if dept_teachers.exists() else teachers
+                if hasattr(user, 'student_profile') and user.student_profile.department:
+                    dept_teachers = teachers.filter(teacher_profile__department__iexact=user.student_profile.department)
+                    target_teachers = dept_teachers if dept_teachers.exists() else teachers
+                else:
+                    target_teachers = teachers
+
                 for t in target_teachers:
                     send_notification(
                         recipient=t,
@@ -199,17 +182,18 @@ def central_register(request):
                     )
                 return redirect('registration_success')
             else:
-                # Pre-fill teacher form with common fields to prevent data loss on role switch
-                teacher_form = TeacherRegistrationForm(initial={
-                    'full_name': request.POST.get('full_name', ''),
-                    'username': request.POST.get('username', ''),
-                    'department': request.POST.get('department', ''),
-                })
-        elif active_role == 'teacher':
+                for field, err_list in student_form.errors.items():
+                    for err in err_list:
+                        prefix = f"{student_form[field].label}: " if field != '__all__' and field in student_form.fields else ""
+                        form_errors.append(f"{prefix}{err}")
+
+        elif submitted_role == 'teacher':
             teacher_form = TeacherRegistrationForm(request.POST)
             if teacher_form.is_valid():
                 user = teacher_form.save()
-                log_audit(user, 'TEACHER_REGISTERED', user, request, f"Teacher registered: {user.username}")
+                log_audit(user, 'TEACHER_REGISTERED', user, request, f"Teacher registered: {user.username} (EmpID: {user.teacher_profile.employee_id})")
+
+                # In-app notification to administrators
                 admins = User.objects.filter(Q(role='admin') | Q(is_superuser=True) | Q(is_staff=True))
                 for a in admins:
                     send_notification(
@@ -221,20 +205,24 @@ def central_register(request):
                     )
                 return redirect('registration_success')
             else:
-                # Pre-fill student form with common fields to prevent data loss on role switch
-                student_form = StudentRegistrationForm(initial={
-                    'full_name': request.POST.get('full_name', ''),
-                    'username': request.POST.get('username', ''),
-                    'department': request.POST.get('department', ''),
-                })
+                for field, err_list in teacher_form.errors.items():
+                    for err in err_list:
+                        prefix = f"{teacher_form[field].label}: " if field != '__all__' and field in teacher_form.fields else ""
+                        form_errors.append(f"{prefix}{err}")
+
+    courses = Course.objects.all().order_by('name')
+    departments = Department.objects.all().order_by('name')
+    batches = AcademicBatch.objects.filter(is_active=True, enrollment_status='open').select_related('department', 'course').order_by('-admission_year', 'course_code', 'batch_name')
 
     return render(request, 'accounts/register.html', {
-        'form': login_form,
         'student_form': student_form,
         'teacher_form': teacher_form,
         'active_role': active_role,
-        'initial_mode': initial_mode,
-        'is_dev_mode': is_dev_mode,
+        'role_locked': role_locked,
+        'form_errors': form_errors,
+        'courses': courses,
+        'departments': departments,
+        'batches': batches,
     })
 
 
@@ -425,24 +413,32 @@ def teacher_dashboard(request):
     assigned_classes = teacher_profile.assigned_classes.all()
     now = timezone.now()
 
+    dept_query = (
+        Q(department__iexact=dept) |
+        Q(course__department__name__iexact=dept) |
+        Q(course__department__code__iexact=dept) |
+        Q(class_group__department__name__iexact=dept) |
+        Q(class_group__department__code__iexact=dept)
+    )
+
     if assigned_classes.exists():
         pending_students = StudentProfile.objects.filter(
-            Q(class_group__in=assigned_classes) | Q(department__iexact=dept),
+            Q(class_group__in=assigned_classes) | dept_query,
             verification_status='pending'
-        ).select_related('user', 'class_group')
+        ).select_related('user', 'class_group', 'course')
         approved_students = StudentProfile.objects.filter(
-            Q(class_group__in=assigned_classes) | Q(department__iexact=dept),
+            Q(class_group__in=assigned_classes) | dept_query,
             verification_status='approved'
-        ).select_related('user', 'class_group')
+        ).select_related('user', 'class_group', 'course')
     else:
         pending_students = StudentProfile.objects.filter(
-            department__iexact=dept,
+            dept_query,
             verification_status='pending'
-        ).select_related('user', 'class_group')
+        ).select_related('user', 'class_group', 'course')
         approved_students = StudentProfile.objects.filter(
-            department__iexact=dept,
+            dept_query,
             verification_status='approved'
-        ).select_related('user', 'class_group')
+        ).select_related('user', 'class_group', 'course')
 
     # Search filter on approved students
     q = request.GET.get('q', '').strip()
@@ -516,12 +512,17 @@ def review_student(request, student_id):
             messages.error(request, 'Access denied: Department authorization could not be verified.')
             return HttpResponseForbidden('Access denied: You are not authorized to review this student.')
 
-        # Department match check (by department name or linked class group department name/code)
+        # Department match check (by department name, linked class group, or course department)
         dept_match = (teacher_dept == student_dept)
         if not dept_match and student.class_group and student.class_group.department:
             class_dept_name = student.class_group.department.name.strip().lower()
             class_dept_code = student.class_group.department.code.strip().lower()
             if teacher_dept in (class_dept_name, class_dept_code):
+                dept_match = True
+        if not dept_match and student.course and student.course.department:
+            c_dept_name = student.course.department.name.strip().lower()
+            c_dept_code = student.course.department.code.strip().lower()
+            if teacher_dept in (c_dept_name, c_dept_code):
                 dept_match = True
 
         if not dept_match:
@@ -538,6 +539,17 @@ def review_student(request, student_id):
             student.reviewed_at = timezone.now()
             student.rejection_reason = ''
             student.save()
+
+            # Batch Roll Reservation transition: pending -> assigned
+            if student.batch and student.roll_sequence:
+                res = RollNumberReservation.objects.filter(batch=student.batch, roll_sequence=student.roll_sequence).first()
+                if res:
+                    res.status = 'assigned'
+                    res.student_profile = student
+                    res.expires_at = None
+                    res.save()
+            student.user.is_active = True
+            student.user.save()
 
             ApprovalRecord.objects.create(
                 applicant=student.user,
@@ -564,6 +576,18 @@ def review_student(request, student_id):
             student.rejection_reason = reason or 'Application rejected by department teacher.'
             student.save()
 
+            # Batch Roll Reservation transition: release reservation
+            if student.batch and student.roll_sequence:
+                res = RollNumberReservation.objects.filter(batch=student.batch, roll_sequence=student.roll_sequence).first()
+                if res:
+                    res.status = 'released'
+                    res.student_profile = None
+                    res.session_key = ''
+                    res.reserved_by_email = ''
+                    res.reserved_by_name = ''
+                    res.expires_at = None
+                    res.save()
+
             ApprovalRecord.objects.create(
                 applicant=student.user,
                 reviewed_by=teacher,
@@ -582,7 +606,10 @@ def review_student(request, student_id):
             )
             messages.warning(request, f"Student {student.user.username} has been rejected.")
 
-    return redirect('teacher_dashboard')
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or ''
+    if 'dashboard' in str(next_url):
+        return redirect('teacher_dashboard')
+    return redirect('teacher_student_approvals')
 
 
 @teacher_required
@@ -597,10 +624,12 @@ def teacher_student_approvals(request):
     if not dept:
         students_list = StudentProfile.objects.none()
     else:
-        pending_students = StudentProfile.objects.filter(verification_status='pending').select_related('user', 'class_group')
+        pending_students = StudentProfile.objects.filter(verification_status='pending').select_related('user', 'class_group', 'course', 'course__department')
         # Filter strictly within the teacher's department
         students_list = pending_students.filter(
             Q(department__iexact=dept) |
+            Q(course__department__name__iexact=dept) |
+            Q(course__department__code__iexact=dept) |
             Q(class_group__department__name__iexact=dept) |
             Q(class_group__department__code__iexact=dept)
         )
@@ -610,7 +639,8 @@ def teacher_student_approvals(request):
         students_list = students_list.filter(
             Q(full_name__icontains=q) |
             Q(roll_number__icontains=q) |
-            Q(user__username__icontains=q)
+            Q(user__username__icontains=q) |
+            Q(user__email__icontains=q)
         )
 
     return render(request, 'accounts/student_approvals.html', {
@@ -1291,6 +1321,18 @@ def admin_review_student(request, student_id):
             student_prof.reviewed_at = timezone.now()
             student_prof.rejection_reason = ''
             student_prof.save()
+
+            # Batch Roll Reservation transition: pending -> assigned
+            if student_prof.batch and student_prof.roll_sequence:
+                res = RollNumberReservation.objects.filter(batch=student_prof.batch, roll_sequence=student_prof.roll_sequence).first()
+                if res:
+                    res.status = 'assigned'
+                    res.student_profile = student_prof
+                    res.expires_at = None
+                    res.save()
+            student_prof.user.is_active = True
+            student_prof.user.save()
+
             ApprovalRecord.objects.create(
                 applicant=student_prof.user,
                 reviewed_by=request.user,
@@ -1314,6 +1356,18 @@ def admin_review_student(request, student_id):
             student_prof.reviewed_at = timezone.now()
             student_prof.rejection_reason = reason or 'Rejected by administrator.'
             student_prof.save()
+
+            # Batch Roll Reservation transition: release reservation
+            if student_prof.batch and student_prof.roll_sequence:
+                res = RollNumberReservation.objects.filter(batch=student_prof.batch, roll_sequence=student_prof.roll_sequence).first()
+                if res:
+                    res.status = 'released'
+                    res.student_profile = None
+                    res.session_key = ''
+                    res.reserved_by_email = ''
+                    res.reserved_by_name = ''
+                    res.expires_at = None
+                    res.save()
             ApprovalRecord.objects.create(
                 applicant=student_prof.user,
                 reviewed_by=request.user,
@@ -2113,3 +2167,733 @@ def import_students(request):
         'classes': classes,
         'import_summary': import_summary,
     })
+
+# ==============================================================================
+# REAL-TIME ASYNC VALIDATION APIS & ENROLLMENT ROSTER MANAGEMENT
+# ==============================================================================
+
+@require_GET
+def check_username_api(request):
+    """
+    Real-time debounced username availability endpoint.
+    Returns JSON: {'available': bool, 'message': str}
+    """
+    raw_username = request.GET.get('username', '').strip()
+    if not raw_username:
+        return JsonResponse({'available': False, 'message': 'Username is required.'}, status=400)
+
+    if len(raw_username) < 3:
+        return JsonResponse({'available': False, 'message': 'Username must be at least 3 characters.'})
+
+    if not re.match(r'^[a-zA-Z0-9_.-]+$', raw_username):
+        return JsonResponse({'available': False, 'message': 'Username can only contain letters, numbers, dots, hyphens, and underscores.'})
+
+    exists = User.objects.filter(username__iexact=raw_username).exists()
+    if exists:
+        return JsonResponse({'available': False, 'message': 'This username is already taken.'})
+    return JsonResponse({'available': True, 'message': 'Username is available.'})
+
+
+@require_GET
+def check_email_api(request):
+    """
+    Real-time debounced email availability endpoint.
+    Returns JSON: {'available': bool, 'message': str}
+    """
+    raw_email = request.GET.get('email', '').strip()
+    if not raw_email:
+        return JsonResponse({'available': False, 'message': 'Email address is required.'}, status=400)
+
+    if '@' not in raw_email or '.' not in raw_email.split('@')[-1]:
+        return JsonResponse({'available': False, 'message': 'Please enter a valid email address.'})
+
+    exists = User.objects.filter(email__iexact=raw_email).exists()
+    if exists:
+        return JsonResponse({'available': False, 'message': 'An account with this email address already exists.'})
+    return JsonResponse({'available': True, 'message': 'Email address is available.'})
+
+
+@require_GET
+def eligible_rolls_api(request):
+    """
+    Lookup eligible, un-registered student enrollment records for a given course.
+    Returns JSON: {'eligible_rolls': [{'roll_number': ..., 'masked_name': ..., 'semester': ...}]}
+    """
+    course_id = request.GET.get('course_id', '').strip()
+    qs = StudentEnrollment.objects.filter(is_active=True, is_registered=False)
+
+    if course_id:
+        if course_id.isdigit():
+            qs = qs.filter(course_id=int(course_id))
+        else:
+            qs = qs.filter(Q(course__code__iexact=course_id) | Q(course_name__iexact=course_id))
+
+    qs = qs.order_by('roll_number')[:100]
+
+    def _mask_name(name):
+        parts = name.split()
+        if not parts:
+            return 'Enrolled Candidate'
+        masked_parts = []
+        for p in parts:
+            if len(p) <= 2:
+                masked_parts.append(p)
+            else:
+                masked_parts.append(p[0] + ('*' * (len(p) - 2)) + p[-1])
+        return ' '.join(masked_parts)
+
+    results = []
+    for enr in qs:
+        results.append({
+            'roll_number': enr.roll_number,
+            'masked_name': _mask_name(enr.full_name),
+            'full_name': enr.full_name,
+            'semester': enr.semester,
+        })
+
+    return JsonResponse({'eligible_rolls': results})
+
+
+@admin_required
+def admin_enrollments(request):
+    """
+    Admin management view for institutional student enrollments.
+    Allows administrators to view eligible rolls, filter by course, and manually enroll new records.
+    """
+    courses = Course.objects.all().order_by('name')
+
+    if request.method == 'POST' and request.POST.get('add_enrollment'):
+        full_name = request.POST.get('full_name', '').strip()
+        roll_number = request.POST.get('roll_number', '').strip()
+        course_id = request.POST.get('course', '').strip()
+        semester = request.POST.get('semester', '1').strip()
+        email = request.POST.get('email', '').strip()
+
+        if not full_name or not roll_number or not course_id:
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('admin_enrollments')
+
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            messages.error(request, 'Invalid course selected.')
+            return redirect('admin_enrollments')
+
+        if StudentEnrollment.objects.filter(roll_number__iexact=roll_number).exists():
+            messages.error(request, f'Roll number "{roll_number}" is already enrolled in the master roster.')
+            return redirect('admin_enrollments')
+
+        enrollment = StudentEnrollment.objects.create(
+            roll_number=roll_number,
+            full_name=full_name,
+            email=email,
+            department=course.department,
+            course=course,
+            course_name=course.name,
+            semester=semester,
+            is_active=True,
+            is_registered=False
+        )
+
+        log_audit(request.user, 'ENROLLMENT_CREATED', None, request, f"Added enrollment: {roll_number} ({full_name})")
+        messages.success(request, f'Successfully enrolled {full_name} ({roll_number}).')
+        return redirect('admin_enrollments')
+
+    # Query enrollments
+    enrollments_qs = StudentEnrollment.objects.select_related('course', 'department', 'registered_student__user').all()
+    selected_course = request.GET.get('course', '').strip()
+    if selected_course and selected_course.isdigit():
+        enrollments_qs = enrollments_qs.filter(course_id=int(selected_course))
+
+    total_count = StudentEnrollment.objects.count()
+    unregistered_count = StudentEnrollment.objects.filter(is_registered=False, is_active=True).count()
+
+    context = {
+        'courses': courses,
+        'enrollments': enrollments_qs,
+        'total_count': total_count,
+        'unregistered_count': unregistered_count,
+    }
+    return render(request, 'accounts/admin_enrollments.html', context)
+
+
+# =====================================================================
+# Academic Batch Management & Automatic Roll Allocation APIs and Views
+# =====================================================================
+
+@require_GET
+def batch_roll_grid_api(request):
+    """
+    Returns real-time visual roll number grid and reservation metadata for a given batch.
+    Releases expired reservations and guarantees roll sequence integrity.
+    """
+    batch_id = request.GET.get('batch_id')
+    if not batch_id:
+        return JsonResponse({'success': False, 'error': 'batch_id parameter is required'}, status=400)
+
+    batch = AcademicBatch.objects.filter(id=batch_id, is_active=True).select_related('course', 'department').first()
+    if not batch:
+        return JsonResponse({'success': False, 'error': 'Academic batch not found or inactive'}, status=404)
+
+    # Release expired temporary reservations
+    now = timezone.now()
+    batch.roll_reservations.filter(status='reserved', expires_at__lt=now).update(
+        status='available', session_key='', reserved_by_email='', reserved_by_name='', expires_at=None
+    )
+
+    current_session = request.session.session_key or ''
+
+    # Ensure all sequence slots 1..capacity exist
+    existing_reservations = {r.roll_sequence: r for r in batch.roll_reservations.all()}
+    missing_slots = []
+    for seq in range(batch.start_roll_number, batch.end_roll_number + 1):
+        if seq not in existing_reservations:
+            reg_num = batch.generate_registration_number(seq)
+            missing_slots.append(RollNumberReservation(
+                batch=batch,
+                roll_sequence=seq,
+                registration_number=reg_num,
+                status='available'
+            ))
+    if missing_slots:
+        RollNumberReservation.objects.bulk_create(missing_slots)
+        existing_reservations = {r.roll_sequence: r for r in batch.roll_reservations.all()}
+
+    positions_data = []
+    pad_width = 3 if batch.capacity > 99 else 2
+    for seq in range(batch.start_roll_number, batch.end_roll_number + 1):
+        res = existing_reservations.get(seq)
+        status = res.status if res else 'available'
+        is_mine = bool(res and res.session_key and res.session_key == current_session and status == 'reserved')
+        is_selectable = (status in ['available', 'released']) or is_mine
+
+        positions_data.append({
+            'sequence': seq,
+            'label': f"{seq:0{pad_width}d}",
+            'registration_number': res.registration_number if res else batch.generate_registration_number(seq),
+            'status': status,
+            'status_display': res.get_status_display() if res else 'Available',
+            'is_mine': is_mine,
+            'is_selectable': is_selectable
+        })
+
+    summary_counts = batch.get_positions_summary()
+
+    return JsonResponse({
+        'success': True,
+        'batch': {
+            'id': batch.id,
+            'name': batch.batch_name,
+            'identifier': batch.batch_identifier,
+            'course_id': batch.course.id,
+            'course_name': batch.course.name,
+            'course_code': batch.course_code,
+            'department_id': batch.department.id,
+            'department_name': batch.department.name,
+            'prefix': batch.prefix,
+            'capacity': batch.capacity,
+            'start_roll_number': batch.start_roll_number,
+            'end_roll_number': batch.end_roll_number,
+            'current_semester': batch.current_semester,
+            'admission_semester': batch.admission_semester,
+            'enrollment_status': batch.enrollment_status,
+        },
+        'counts': summary_counts,
+        'positions': positions_data,
+    })
+
+
+def reserve_roll_api(request):
+    """
+    Temporarily holds a roll sequence for 30 minutes during registration.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST method required'}, status=405)
+
+    batch_id = request.POST.get('batch_id')
+    roll_sequence = request.POST.get('roll_sequence')
+    name = request.POST.get('name', '').strip()
+    email = request.POST.get('email', '').strip()
+
+    if not batch_id or not roll_sequence:
+        return JsonResponse({'success': False, 'error': 'batch_id and roll_sequence are required'}, status=400)
+
+    try:
+        roll_sequence = int(roll_sequence)
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False, 'error': 'Invalid roll_sequence'}, status=400)
+
+    batch = AcademicBatch.objects.filter(id=batch_id, is_active=True).first()
+    if not batch:
+        return JsonResponse({'success': False, 'error': 'Academic batch not found or inactive'}, status=404)
+
+    if roll_sequence < batch.start_roll_number or roll_sequence > batch.end_roll_number:
+        return JsonResponse({'success': False, 'error': f'Roll sequence must be between {batch.start_roll_number} and {batch.end_roll_number}'}, status=400)
+
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+
+    with transaction.atomic():
+        now = timezone.now()
+        # Clean expired
+        batch.roll_reservations.filter(status='reserved', expires_at__lt=now).update(
+            status='available', session_key='', reserved_by_email='', reserved_by_name='', expires_at=None
+        )
+
+        res, _ = RollNumberReservation.objects.select_for_update().get_or_create(
+            batch=batch,
+            roll_sequence=roll_sequence,
+            defaults={
+                'registration_number': batch.generate_registration_number(roll_sequence),
+                'status': 'available'
+            }
+        )
+
+        if res.status in ['assigned', 'pending']:
+            return JsonResponse({'success': False, 'error': f'Roll position {res.registration_number} is already occupied or pending review.'}, status=409)
+
+        if res.status == 'reserved' and res.session_key and res.session_key != session_key:
+            return JsonResponse({'success': False, 'error': f'Roll position {res.registration_number} is currently reserved by another student.'}, status=409)
+
+        # Release any other roll previously reserved in this batch by this same session
+        RollNumberReservation.objects.filter(batch=batch, session_key=session_key, status='reserved').exclude(id=res.id).update(
+            status='available', session_key='', reserved_by_email='', reserved_by_name='', expires_at=None
+        )
+
+        # Apply 30 minute reservation
+        res.status = 'reserved'
+        res.session_key = session_key
+        res.reserved_by_name = name
+        res.reserved_by_email = email
+        res.reserved_at = now
+        res.expires_at = now + timedelta(minutes=30)
+        res.save()
+
+        return JsonResponse({
+            'success': True,
+            'registration_number': res.registration_number,
+            'roll_sequence': roll_sequence,
+            'expires_at': res.expires_at.isoformat(),
+            'expires_in_seconds': 1800,
+            'message': f'Roll number {res.registration_number} temporarily held for 30 minutes.'
+        })
+
+
+@admin_required
+def admin_batches_list(request):
+    """
+    Administrator batch overview dashboard with KPI cards and department/course filters.
+    """
+    batches = AcademicBatch.objects.all().select_related('department', 'course').annotate(
+        total_reservations=Count('roll_reservations'),
+        assigned_count=Count('roll_reservations', filter=Q(roll_reservations__status='assigned')),
+        pending_count=Count('roll_reservations', filter=Q(roll_reservations__status='pending')),
+    ).order_by('-admission_year', 'course_code', 'batch_name')
+
+    dept_id = request.GET.get('department')
+    if dept_id and dept_id.isdigit():
+        batches = batches.filter(department_id=int(dept_id))
+    course_id = request.GET.get('course')
+    if course_id and course_id.isdigit():
+        batches = batches.filter(course_id=int(course_id))
+    status_filter = request.GET.get('status')
+    if status_filter:
+        batches = batches.filter(enrollment_status=status_filter)
+    search = request.GET.get('search', '').strip()
+    if search:
+        batches = batches.filter(
+            Q(batch_name__icontains=search) |
+            Q(course_code__icontains=search) |
+            Q(prefix__icontains=search) |
+            Q(batch_identifier__icontains=search)
+        )
+
+    all_batches = AcademicBatch.objects.all()
+    total_batches = all_batches.count()
+    total_capacity = sum(b.capacity for b in all_batches)
+    total_assigned = RollNumberReservation.objects.filter(status='assigned').count()
+    total_pending = RollNumberReservation.objects.filter(status='pending').count()
+    total_available = max(0, total_capacity - (total_assigned + total_pending))
+
+    departments = Department.objects.all().order_by('name')
+    courses = Course.objects.all().order_by('name')
+
+    return render(request, 'accounts/admin_batches.html', {
+        'batches': batches,
+        'total_batches': total_batches,
+        'total_capacity': total_capacity,
+        'total_assigned': total_assigned,
+        'total_pending': total_pending,
+        'total_available': total_available,
+        'departments': departments,
+        'courses': courses,
+        'selected_dept': dept_id,
+        'selected_course': course_id,
+        'selected_status': status_filter,
+        'search_query': search,
+    })
+
+
+@admin_required
+def admin_batch_create(request):
+    """
+    Create a new academic batch with auto-generated roll reservation matrix.
+    """
+    if request.method == 'POST':
+        form = AcademicBatchForm(request.POST, user=request.user)
+        if form.is_valid():
+            batch = form.save()
+            log_audit(request.user, 'BATCH_CREATED', None, request, f"Batch created: {batch.batch_name} (Prefix: {batch.prefix})")
+            messages.success(request, f"Academic Batch '{batch.batch_name}' created successfully with {batch.capacity} roll allocation positions.")
+            return redirect('admin_batch_detail', batch_id=batch.id)
+    else:
+        form = AcademicBatchForm(user=request.user)
+
+    return render(request, 'accounts/admin_batch_form.html', {
+        'form': form,
+        'is_edit': False,
+        'title': 'Create Academic Batch',
+    })
+
+
+@admin_required
+def admin_batch_detail(request, batch_id):
+    """
+    Batch detail page displaying visual 4-state roll allocation grid and enrolled student roster.
+    """
+    batch = get_object_or_404(AcademicBatch.objects.select_related('department', 'course'), id=batch_id)
+
+    # Clean expired
+    now = timezone.now()
+    batch.roll_reservations.filter(status='reserved', expires_at__lt=now).update(
+        status='available', session_key='', reserved_by_email='', reserved_by_name='', expires_at=None
+    )
+
+    summary = batch.get_positions_summary()
+    reservations = batch.roll_reservations.all().select_related('student_profile__user').order_by('roll_sequence')
+    enrolled_students = StudentProfile.objects.filter(batch=batch).select_related('user', 'class_group').order_by('roll_sequence')
+
+    return render(request, 'accounts/admin_batch_detail.html', {
+        'batch': batch,
+        'summary': summary,
+        'reservations': reservations,
+        'enrolled_students': enrolled_students,
+    })
+
+
+@admin_required
+def admin_batch_edit(request, batch_id):
+    """
+    Edit batch parameters with strict identity protection.
+    """
+    batch = get_object_or_404(AcademicBatch, id=batch_id)
+    if request.method == 'POST':
+        form = AcademicBatchForm(request.POST, instance=batch, user=request.user)
+        if form.is_valid():
+            batch = form.save()
+            log_audit(request.user, 'BATCH_UPDATED', None, request, f"Batch updated: {batch.batch_name}")
+            messages.success(request, f"Batch '{batch.batch_name}' updated successfully.")
+            return redirect('admin_batch_detail', batch_id=batch.id)
+    else:
+        form = AcademicBatchForm(instance=batch, user=request.user)
+
+    return render(request, 'accounts/admin_batch_form.html', {
+        'form': form,
+        'batch': batch,
+        'is_edit': True,
+        'title': f'Edit Batch: {batch.batch_name}',
+    })
+
+
+@admin_required
+def admin_batch_promote(request, batch_id):
+    """
+    Promote an academic batch and all its enrolled students to the next semester.
+    Preserves batch identity, roll numbers, and prefixes while recording semester history.
+    """
+    batch = get_object_or_404(AcademicBatch, id=batch_id)
+    if request.method == 'POST':
+        form = BatchSemesterPromotionForm(request.POST)
+        if form.is_valid():
+            target_sem = str(form.cleaned_data['target_semester'])
+            session = form.cleaned_data.get('academic_session', '')
+            reason = form.cleaned_data.get('reason', '')
+            old_sem = batch.current_semester
+
+            with transaction.atomic():
+                batch.current_semester = target_sem
+                batch.save()
+
+                students = StudentProfile.objects.filter(batch=batch)
+                updated_count = 0
+                for s in students:
+                    prev_s_sem = s.semester
+                    s.semester = target_sem
+                    s.save()
+                    StudentSemesterHistory.objects.create(
+                        student=s,
+                        batch=batch,
+                        previous_semester=prev_s_sem,
+                        new_semester=target_sem,
+                        academic_session=session,
+                        changed_by=request.user,
+                        reason=reason
+                    )
+                    updated_count += 1
+
+                StudentEnrollment.objects.filter(batch=batch).update(semester=target_sem)
+                log_audit(request.user, 'BATCH_SEMESTER_PROMOTED', None, request, f"Promoted {batch.batch_name} from Sem {old_sem} to Sem {target_sem} ({updated_count} students).")
+
+            messages.success(request, f"Batch '{batch.batch_name}' successfully advanced to Semester {target_sem}. {updated_count} students updated.")
+            return redirect('admin_batch_detail', batch_id=batch.id)
+    else:
+        current_num = int(batch.current_semester) if batch.current_semester.isdigit() else 1
+        next_sem = min(current_num + 1, batch.total_semesters)
+        form = BatchSemesterPromotionForm(initial={'target_semester': next_sem})
+
+    return render(request, 'accounts/admin_batch_promote.html', {
+        'batch': batch,
+        'form': form,
+    })
+
+
+@admin_required
+def admin_roll_correction(request, batch_id=None):
+    """
+    Controlled administrative roll number reassignment.
+    Atomically updates roll number, username, reservation, and enrollment with full audit log.
+    """
+    initial_batch = None
+    if batch_id:
+        initial_batch = get_object_or_404(AcademicBatch, id=batch_id)
+
+    if request.method == 'POST':
+        form = RollNumberCorrectionForm(request.POST)
+        if form.is_valid():
+            student = form.cleaned_data['student']
+            new_seq = form.cleaned_data['new_roll_sequence']
+            new_reg_num = form.cleaned_data['new_registration_number']
+            target_res = form.cleaned_data.get('target_reservation')
+            reason = form.cleaned_data['reason']
+            batch = student.batch
+
+            old_seq = student.roll_sequence
+            old_reg = student.roll_number
+            old_uname = student.user.username
+
+            with transaction.atomic():
+                # Release old reservation
+                if old_seq:
+                    old_res = RollNumberReservation.objects.filter(batch=batch, roll_sequence=old_seq).first()
+                    if old_res:
+                        old_res.status = 'released'
+                        old_res.student_profile = None
+                        old_res.session_key = ''
+                        old_res.reserved_by_name = ''
+                        old_res.reserved_by_email = ''
+                        old_res.expires_at = None
+                        old_res.save()
+
+                # Assign new reservation
+                if not target_res:
+                    target_res, _ = RollNumberReservation.objects.get_or_create(
+                        batch=batch,
+                        roll_sequence=new_seq,
+                        defaults={'registration_number': new_reg_num}
+                    )
+                target_res.status = 'assigned'
+                target_res.student_profile = student
+                target_res.session_key = ''
+                target_res.reserved_by_name = student.full_name
+                target_res.reserved_by_email = student.user.email
+                target_res.expires_at = None
+                target_res.save()
+
+                # Update student profile
+                student.roll_sequence = new_seq
+                student.roll_number = new_reg_num
+                student.save()
+
+                # Update user username
+                student.user.username = new_reg_num
+                student.user.save()
+
+                # Update StudentEnrollment
+                StudentEnrollment.objects.filter(roll_number=old_reg).update(
+                    roll_number=new_reg_num,
+                    roll_sequence=new_seq
+                )
+
+                # Audit Log
+                log_audit(
+                    request.user,
+                    'ROLL_NUMBER_CORRECTED',
+                    student.user,
+                    request,
+                    f"Roll corrected: {old_reg} -> {new_reg_num} (Seq {old_seq} -> {new_seq}). Reason: {reason}"
+                )
+
+                # In-app notification
+                send_notification(
+                    recipient=student.user,
+                    title="Institutional Roll Number Reassigned",
+                    message=f"Your official roll number and username have been reassigned to {new_reg_num}. Reason: {reason}",
+                    notification_type="general",
+                    link="/accounts/profile/"
+                )
+
+            messages.success(request, f"Roll number successfully corrected for {student.full_name}: {old_reg} -> {new_reg_num}.")
+            return redirect('admin_batch_detail', batch_id=batch.id)
+    else:
+        form = RollNumberCorrectionForm()
+        if initial_batch:
+            form.fields['student'].queryset = StudentProfile.objects.filter(batch=initial_batch).select_related('user', 'batch')
+
+    recent_corrections = AuditLog.objects.filter(action='ROLL_NUMBER_CORRECTED').select_related('actor', 'target_user').order_by('-created_at')[:10]
+
+    return render(request, 'accounts/admin_roll_correction.html', {
+        'form': form,
+        'initial_batch': initial_batch,
+        'recent_corrections': recent_corrections,
+    })
+
+
+@admin_required
+def admin_batch_export(request, batch_id):
+    """
+    Exports the academic batch allocation roster to Excel (.xlsx).
+    """
+    batch = get_object_or_404(AcademicBatch.objects.select_related('department', 'course'), id=batch_id)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = f"{batch.prefix} Roster"
+
+    title_font = Font(name='Calibri', size=14, bold=True, color='1A365D')
+    header_font = Font(name='Calibri', size=11, bold=True, color='FFFFFF')
+    header_fill = PatternFill(start_color='1E3A8A', end_color='1E3A8A', fill_type='solid')
+
+    ws.merge_cells('A1:G1')
+    ws['A1'] = f"EPS MASTER ENROLLMENT ROSTER — {batch.batch_name} ({batch.prefix})"
+    ws['A1'].font = title_font
+
+    headers = ['Roll Seq', 'Registration Number / Username', 'Full Name', 'Email Address', 'Semester', 'Status', 'Assigned Date']
+    ws.append([])
+    ws.append(headers)
+
+    for col_num in range(1, len(headers) + 1):
+        cell = ws.cell(row=3, column=col_num)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    reservations = batch.roll_reservations.all().select_related('student_profile__user').order_by('roll_sequence')
+    for r in reservations:
+        student = r.student_profile
+        uname = student.user.username if (student and student.user) else r.registration_number
+        fname = student.full_name if student else (r.reserved_by_name or '—')
+        email = student.user.email if (student and student.user) else (r.reserved_by_email or '—')
+        sem = student.semester if student else batch.current_semester
+        assigned_date = student.user.date_joined.strftime('%Y-%m-%d') if (student and student.user) else '—'
+
+        ws.append([
+            r.roll_sequence,
+            uname,
+            fname,
+            email,
+            f"Sem {sem}",
+            r.get_status_display(),
+            assigned_date
+        ])
+
+    for col in ws.columns:
+        max_len = max(len(str(cell.value or '')) for cell in col)
+        col_letter = get_column_letter(col[0].column)
+        ws.column_dimensions[col_letter].width = max(max_len + 4, 12)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="EPS_Batch_{batch.prefix}_Roster.xlsx"'
+    wb.save(response)
+    return response
+
+
+@teacher_required
+def teacher_batches_list(request):
+    """
+    Teacher batch view: Scoped strictly to teacher's assigned department.
+    """
+    teacher_prof = getattr(request.user, 'teacher_profile', None)
+    teacher_dept = (teacher_prof.department or '').strip() if teacher_prof else ''
+
+    matching_dept = Department.objects.filter(Q(name__iexact=teacher_dept) | Q(code__iexact=teacher_dept)).first()
+    if matching_dept:
+        batches = AcademicBatch.objects.filter(department=matching_dept)
+    else:
+        batches = AcademicBatch.objects.filter(department__name__iexact=teacher_dept)
+
+    batches = batches.select_related('department', 'course').order_by('-admission_year', 'course_code', 'batch_name')
+
+    return render(request, 'accounts/teacher_batches.html', {
+        'batches': batches,
+        'teacher_dept': teacher_dept,
+    })
+
+
+@teacher_required
+def teacher_batch_create(request):
+    """
+    Teacher batch creation: Strictly constrained to teacher's assigned department.
+    """
+    teacher_prof = getattr(request.user, 'teacher_profile', None)
+    teacher_dept = (teacher_prof.department or '').strip() if teacher_prof else ''
+
+    if request.method == 'POST':
+        form = AcademicBatchForm(request.POST, user=request.user)
+        if form.is_valid():
+            batch = form.save()
+            log_audit(request.user, 'BATCH_CREATED_TEACHER', None, request, f"Teacher created batch: {batch.batch_name}")
+            messages.success(request, f"Batch '{batch.batch_name}' created successfully with {batch.capacity} roll slots.")
+            return redirect('teacher_batch_detail', batch_id=batch.id)
+    else:
+        form = AcademicBatchForm(user=request.user)
+
+    return render(request, 'accounts/teacher_batch_form.html', {
+        'form': form,
+        'teacher_dept': teacher_dept,
+    })
+
+
+@teacher_required
+def teacher_batch_detail(request, batch_id):
+    """
+    Teacher batch detail: Departmental boundary enforcement and roll matrix inspection.
+    """
+    teacher_prof = getattr(request.user, 'teacher_profile', None)
+    teacher_dept = (teacher_prof.department or '').strip().lower() if teacher_prof else ''
+
+    batch = get_object_or_404(AcademicBatch.objects.select_related('department', 'course'), id=batch_id)
+
+    # Department boundary check for non-admins
+    is_admin = request.user.role == 'admin' or request.user.is_superuser or request.user.is_staff
+    if not is_admin:
+        dept_name = (batch.department.name or '').strip().lower()
+        dept_code = (batch.department.code or '').strip().lower()
+        if teacher_dept not in (dept_name, dept_code):
+            return HttpResponseForbidden("Access denied: You are not authorized to view batches outside your assigned department.")
+
+    now = timezone.now()
+    batch.roll_reservations.filter(status='reserved', expires_at__lt=now).update(
+        status='available', session_key='', reserved_by_email='', reserved_by_name='', expires_at=None
+    )
+
+    summary = batch.get_positions_summary()
+    reservations = batch.roll_reservations.all().select_related('student_profile__user').order_by('roll_sequence')
+    enrolled_students = StudentProfile.objects.filter(batch=batch).select_related('user', 'class_group').order_by('roll_sequence')
+
+    return render(request, 'accounts/teacher_batch_detail.html', {
+        'batch': batch,
+        'summary': summary,
+        'reservations': reservations,
+        'enrolled_students': enrolled_students,
+    })
+

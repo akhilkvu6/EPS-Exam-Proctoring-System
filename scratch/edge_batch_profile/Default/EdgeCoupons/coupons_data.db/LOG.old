@@ -1,0 +1,5 @@
+2026/11/04-23:34:26.343 d88 Creating DB c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_batch_profile\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/11/04-23:34:26.372 d88 Reusing MANIFEST c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_batch_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/11/04-23:34:26.840 4654 Level-0 table #5: started
+2026/11/04-23:34:26.845 4654 Level-0 table #5: 683273 bytes OK
+2026/11/04-23:34:26.847 4654 Delete type=0 #3

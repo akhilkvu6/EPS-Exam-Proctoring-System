@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ batch.batch_name }} — Roll Allocation Matrix — EPS Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Roll Allocation Matrix Grid Styling */
+.roll-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 10px;
+    margin-top: var(--space-4);
+}
+
+.roll-cell {
+    position: relative;
+    border-radius: var(--radius-md, 8px);
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    user-select: none;
+}
+
+.roll-cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.roll-cell__seq {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.1;
+    font-family: monospace;
+}
+
+.roll-cell__id {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: monospace;
+}
+
+.roll-cell__badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* 4-State Visual Indicators */
+.roll-cell--available {
+    border-color: #E2E8F0;
+    background: #FFFFFF;
+}
+.roll-cell--available:hover {
+    border-color: #3B82F6;
+}
+.roll-cell--available .roll-cell__seq { color: #1E293B; }
+.roll-cell--available .roll-cell__badge {
+    background: #F1F5F9;
+    color: #475569;
+}
+
+.roll-cell--reserved {
+    border-color: #FCD34D;
+    background: #FFFBEB;
+}
+.roll-cell--reserved .roll-cell__seq { color: #D97706; }
+.roll-cell--reserved .roll-cell__badge {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.roll-cell--pending {
+    border-color: #F59E0B;
+    background: #FEF3C7;
+}
+.roll-cell--pending .roll-cell__seq { color: #B45309; }
+.roll-cell--pending .roll-cell__badge {
+    background: #FDE68A;
+    color: #78350F;
+}
+
+.roll-cell--assigned {
+    border-color: #86EFAC;
+    background: #F0FDF4;
+}
+.roll-cell--assigned .roll-cell__seq { color: #15803D; }
+.roll-cell--assigned .roll-cell__badge {
+    background: #DCFCE7;
+    color: #166534;
+}
+
+.roll-cell--released {
+    border-color: #CBD5E1;
+    border-style: dashed;
+    background: #F8FAFC;
+}
+.roll-cell--released .roll-cell__seq { color: #64748B; }
+.roll-cell--released .roll-cell__badge {
+    background: #F1F5F9;
+    color: #64748B;
+}
+
+/* Legend items */
+.legend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm, 6px);
+}
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1280px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+
+    <!-- Header & Action Row -->
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="{% url 'admin_batches_list' %}" class="btn btn-ghost btn-xs" style="padding: 4px 8px;">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                    <span>All Batches</span>
+                </a>
+                <span class="badge badge--primary">{{ batch.course.name }}</span>
+                {% if batch.enrollment_status == 'open' %}
+                    <span class="badge badge--success">Open For Registration</span>
+                {% else %}
+                    <span class="badge badge--neutral">{{ batch.get_enrollment_status_display }}</span>
+                {% endif %}
+            </div>
+            <h1 class="heading-2" style="margin-top: 6px;">{{ batch.batch_name }}</h1>
+            <p class="text-caption">
+                Prefix: <code style="font-weight: 700; color: var(--color-primary-main, #2563EB);">{{ batch.prefix }}</code> &bull;
+                Range: {{ batch.start_roll_number|stringformat:"02d" }} to {{ batch.end_roll_number|stringformat:"02d" }} &bull;
+                Current: <strong>Semester {{ batch.current_semester }}</strong> (of {{ batch.total_semesters }}) &bull;
+                Dept: {{ batch.department.name }}
+            </p>
+        </div>
+
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+            <a href="{% url 'admin_batch_export' batch.id %}" class="btn btn-secondary btn-sm" title="Download Excel Roster">
+                <i data-lucide="download" class="lucide-icon icon-xs"></i>
+                <span>Export Roster (.xlsx)</span>
+            </a>
+            <a href="{% url 'admin_batch_roll_correction' batch.id %}" class="btn btn-secondary btn-sm">
+                <i data-lucide="hash" class="lucide-icon icon-xs"></i>
+                <span>Roll Correction</span>
+            </a>
+            <a href="{% url 'admin_batch_promote' batch.id %}" class="btn btn-primary btn-sm">
+                <i data-lucide="arrow-up-right" class="lucide-icon icon-xs"></i>
+                <span>Promote Semester</span>
+            </a>
+            <a href="{% url 'admin_batch_edit' batch.id %}" class="btn btn-ghost btn-sm">
+                <i data-lucide="edit" class="lucide-icon icon-xs"></i>
+                <span>Edit Batch</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="card" style="padding: var(--space-4);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Total Capacity</div>
+            <div style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">{{ batch.capacity }}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Configured Positions</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #10B981;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Permanently Assigned</div>
+            <div style="font-size: 26px; font-weight: 800; color: #10B981; margin-top: 4px;">{{ summary.assigned|default:0 }}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Active Verified Accounts</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #F59E0B;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Pending Review</div>
+            <div style="font-size: 26px; font-weight: 800; color: #F59E0B; margin-top: 4px;">{{ summary.pending|default:0 }}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Submitted Registrations</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #D97706;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Temp Reserved</div>
+            <div style="font-size: 26px; font-weight: 800; color: #D97706; margin-top: 4px;">{{ summary.reserved|default:0 }}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">30m Active Hold</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #0284C7;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Available Positions</div>
+            <div style="font-size: 26px; font-weight: 800; color: #0284C7; margin-top: 4px;">{{ summary.available|default:0 }}</div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">Open for Candidate Pick</div>
+        </div>
+    </div>
+
+    <!-- Section 1: Visual Roll Number Availability Grid -->
+    <div class="card" style="padding: var(--space-5); margin-bottom: var(--space-6);">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border-color);">
+            <div>
+                <h2 class="heading-4" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="grid" class="lucide-icon icon-sm" style="color: var(--color-primary-main, #2563EB);"></i>
+                    <span>Visual Roll Number Allocation Grid</span>
+                </h2>
+                <p class="text-caption" style="margin: 4px 0 0 0;">
+                    Click any roll number to inspect allocation details, temporary hold status, or student credentials.
+                </p>
+            </div>
+
+            <!-- 4-State Interactive Legend -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <div class="legend-pill" style="background: #F1F5F9; color: #475569;">
+                    <span class="legend-dot" style="background: #94A3B8;"></span>
+                    <span>Available ({{ summary.available }})</span>
+                </div>
+                <div class="legend-pill" style="background: #FFFBEB; color: #92400E;">
+                    <span class="legend-dot" style="background: #F59E0B;"></span>
+                    <span>Reserved ({{ summary.reserved }})</span>
+                </div>
+                <div class="legend-pill" style="background: #FEF3C7; color: #78350F;">
+                    <span class="legend-dot" style="background: #D97706;"></span>
+                    <span>Pending ({{ summary.pending }})</span>
+                </div>
+                <div class="legend-pill" style="background: #DCFCE7; color: #166534;">
+                    <span class="legend-dot" style="background: #10B981;"></span>
+                    <span>Assigned ({{ summary.assigned }})</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Matrix (1 to Capacity) -->
+        <div class="roll-grid">
+            {% for r in reservations %}
+                <div class="roll-cell roll-cell--{{ r.status }}"
+                     onclick="inspectRoll('{{ r.roll_sequence }}', '{{ r.registration_number }}', '{{ r.status }}', '{{ r.get_status_display }}', '{{ r.student_profile.full_name|default:r.reserved_by_name|default:'' }}', '{{ r.student_profile.user.email|default:r.reserved_by_email|default:'' }}', '{{ r.expires_at|date:'Y-m-d H:i:s'|default:'' }}')">
+                    <div class="roll-cell__seq">{{ r.roll_sequence|stringformat:"02d" }}</div>
+                    <div class="roll-cell__id">{{ r.registration_number }}</div>
+                    <span class="roll-cell__badge">
+                        {% if r.status == 'available' %}
+                            Avail
+                        {% elif r.status == 'reserved' %}
+                            Hold
+                        {% elif r.status == 'pending' %}
+                            Pending
+                        {% elif r.status == 'assigned' %}
+                            Assigned
+                        {% elif r.status == 'released' %}
+                            Released
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Section 2: Enrolled Students Roster -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h2 class="heading-4" style="margin: 0;">Enrolled Student Roster ({{ enrolled_students.count }})</h2>
+                <p class="text-caption" style="margin: 2px 0 0 0;">Permanent institutional student allocations in this cohort.</p>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-surface-secondary); text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                        <th style="padding: 12px 16px;">Seq</th>
+                        <th style="padding: 12px 16px;">Roll No / Username</th>
+                        <th style="padding: 12px 16px;">Full Name</th>
+                        <th style="padding: 12px 16px;">Email</th>
+                        <th style="padding: 12px 16px;">Semester</th>
+                        <th style="padding: 12px 16px;">Verification</th>
+                        <th style="padding: 12px 16px; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in enrolled_students %}
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 12px 16px; font-weight: 700; font-family: monospace;">
+                                {{ s.roll_sequence|stringformat:"02d" }}
+                            </td>
+                            <td style="padding: 12px 16px;">
+                                <code style="font-weight: 700; color: var(--color-primary-main, #2563EB);">
+                                    {{ s.roll_number }}
+                                </code>
+                            </td>
+                            <td style="padding: 12px 16px; font-weight: 600;">
+                                {{ s.full_name|default:s.user.get_full_name|default:s.user.username }}
+                            </td>
+                            <td style="padding: 12px 16px; color: var(--text-muted); font-size: 13px;">
+                                {{ s.user.email }}
+                            </td>
+                            <td style="padding: 12px 16px;">
+                                <span class="badge badge--primary">Sem {{ s.semester }}</span>
+                            </td>
+                            <td style="padding: 12px 16px;">
+                                {% if s.verification_status == 'approved' %}
+                                    <span class="badge badge--success">Approved</span>
+                                {% elif s.verification_status == 'pending' %}
+                                    <span class="badge badge--warning">Pending Review</span>
+                                {% else %}
+                                    <span class="badge badge--danger">{{ s.verification_status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 12px 16px; text-align: right;">
+                                <a href="{% url 'admin_student_detail' s.id %}" class="btn btn-ghost btn-xs">
+                                    <i data-lucide="eye" class="lucide-icon icon-xs"></i>
+                                    <span>Profile</span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" style="padding: 36px; text-align: center; color: var(--text-muted);">
+                                No student registrations approved in this batch yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal / Drawer for Roll Cell Inspection -->
+<div id="roll-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+    <div class="card" style="max-width: 440px; width: 100%; padding: var(--space-5); background: var(--bg-surface); border-radius: var(--radius-lg, 12px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="modal-seq-badge" style="font-size: 18px; font-weight: 800; font-family: monospace; background: var(--bg-surface-secondary); padding: 4px 8px; border-radius: 6px;">01</span>
+                <span id="modal-status-badge" class="badge">Available</span>
+            </div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="closeRollModal()">
+                <i data-lucide="x" class="lucide-icon icon-xs"></i>
+            </button>
+        </div>
+
+        <div style="margin-bottom: var(--space-4);">
+            <div class="text-caption">Official Registration Number & Username</div>
+            <div id="modal-reg-num" style="font-size: 20px; font-weight: 800; font-family: monospace; color: var(--color-primary-main, #2563EB); margin-top: 2px;">
+                2026BCA01
+            </div>
+        </div>
+
+        <div id="modal-student-info" style="border-top: 1px solid var(--border-color); padding-top: var(--space-3); margin-bottom: var(--space-4);">
+            <div class="text-caption">Allocated Candidate</div>
+            <div id="modal-student-name" style="font-weight: 700; margin-top: 2px;">None</div>
+            <div id="modal-student-email" style="font-size: 13px; color: var(--text-muted);">None</div>
+            <div id="modal-expires-row" style="font-size: 12px; color: #D97706; margin-top: 6px; display: none;">
+                Hold expires: <span id="modal-expires-val"></span>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="closeRollModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function inspectRoll(seq, regNum, status, statusDisplay, name, email, expires) {
+    document.getElementById('modal-seq-badge').textContent = String(seq).padStart(2, '0');
+    document.getElementById('modal-reg-num').textContent = regNum;
+
+    const badge = document.getElementById('modal-status-badge');
+    badge.textContent = statusDisplay;
+    badge.className = 'badge ' + (
+        status === 'assigned' ? 'badge--success' :
+        status === 'pending' ? 'badge--warning' :
+        status === 'reserved' ? 'badge--warning' :
+        'badge--neutral'
+    );
+
+    const nameEl = document.getElementById('modal-student-name');
+    const emailEl = document.getElementById('modal-student-email');
+    const expRow = document.getElementById('modal-expires-row');
+    const expVal = document.getElementById('modal-expires-val');
+
+    nameEl.textContent = name || 'No student assigned yet';
+    emailEl.textContent = email || 'Position is open for registration';
+
+    if (status === 'reserved' && expires) {
+        expRow.style.display = 'block';
+        expVal.textContent = expires;
+    } else {
+        expRow.style.display = 'none';
+    }
+
+    const modal = document.getElementById('roll-modal');
+    modal.style.display = 'flex';
+}
+
+function closeRollModal() {
+    document.getElementById('roll-modal').style.display = 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ batch.batch_name }} — Department Roll Grid — EPS Faculty{% endblock %}
+
+{% block extra_css %}
+<style>
+.roll-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 10px;
+    margin-top: var(--space-4);
+}
+.roll-cell {
+    position: relative;
+    border-radius: var(--radius-md, 8px);
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+}
+.roll-cell__seq {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.1;
+    font-family: monospace;
+}
+.roll-cell__id {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: monospace;
+}
+.roll-cell__badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.roll-cell--available { border-color: #E2E8F0; background: #FFFFFF; }
+.roll-cell--available .roll-cell__seq { color: #1E293B; }
+.roll-cell--available .roll-cell__badge { background: #F1F5F9; color: #475569; }
+
+.roll-cell--reserved { border-color: #FCD34D; background: #FFFBEB; }
+.roll-cell--reserved .roll-cell__seq { color: #D97706; }
+.roll-cell--reserved .roll-cell__badge { background: #FEF3C7; color: #92400E; }
+
+.roll-cell--pending { border-color: #F59E0B; background: #FEF3C7; }
+.roll-cell--pending .roll-cell__seq { color: #B45309; }
+.roll-cell--pending .roll-cell__badge { background: #FDE68A; color: #78350F; }
+
+.roll-cell--assigned { border-color: #86EFAC; background: #F0FDF4; }
+.roll-cell--assigned .roll-cell__seq { color: #15803D; }
+.roll-cell--assigned .roll-cell__badge { background: #DCFCE7; color: #166534; }
+
+.roll-cell--released { border-color: #CBD5E1; border-style: dashed; background: #F8FAFC; }
+.roll-cell--released .roll-cell__seq { color: #64748B; }
+.roll-cell--released .roll-cell__badge { background: #F1F5F9; color: #64748B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <a href="{% url 'teacher_batches_list' %}" class="btn btn-ghost btn-xs" style="padding: 4px 8px;">
+                    <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                    <span>Department Batches</span>
+                </a>
+                <span class="badge badge--primary">{{ batch.department.name }}</span>
+            </div>
+            <h1 class="heading-2" style="margin-top: 6px;">{{ batch.batch_name }}</h1>
+            <p class="text-caption">
+                Prefix: <code>{{ batch.prefix }}</code> &bull;
+                Course: {{ batch.course.name }} &bull;
+                Current: <strong>Semester {{ batch.current_semester }}</strong>
+            </p>
+        </div>
+
+        <div>
+            <a href="{% url 'teacher_student_approvals' %}" class="btn btn-primary btn-sm">
+                <i data-lucide="user-check" class="lucide-icon icon-xs"></i>
+                <span>Review Pending Student Approvals</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div class="card" style="padding: var(--space-4);">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Total Capacity</div>
+            <div style="font-size: 26px; font-weight: 800; margin-top: 4px;">{{ batch.capacity }}</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #10B981;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Assigned</div>
+            <div style="font-size: 26px; font-weight: 800; color: #10B981; margin-top: 4px;">{{ summary.assigned|default:0 }}</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #F59E0B;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Pending Approval</div>
+            <div style="font-size: 26px; font-weight: 800; color: #F59E0B; margin-top: 4px;">{{ summary.pending|default:0 }}</div>
+        </div>
+        <div class="card" style="padding: var(--space-4); border-left: 4px solid #0284C7;">
+            <div class="text-caption" style="font-weight: 700; text-transform: uppercase;">Available</div>
+            <div style="font-size: 26px; font-weight: 800; color: #0284C7; margin-top: 4px;">{{ summary.available|default:0 }}</div>
+        </div>
+    </div>
+
+    <!-- Roll Grid -->
+    <div class="card" style="padding: var(--space-5); margin-bottom: var(--space-6);">
+        <h2 class="heading-4" style="margin: 0 0 var(--space-4) 0;">Visual Roll Matrix</h2>
+        <div class="roll-grid">
+            {% for r in reservations %}
+                <div class="roll-cell roll-cell--{{ r.status }}">
+                    <div class="roll-cell__seq">{{ r.roll_sequence|stringformat:"02d" }}</div>
+                    <div class="roll-cell__id">{{ r.registration_number }}</div>
+                    <span class="roll-cell__badge">{{ r.get_status_display }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Enrolled Students -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-color);">
+            <h2 class="heading-4" style="margin: 0;">Enrolled Students ({{ enrolled_students.count }})</h2>
+        </div>
+        <table class="data-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--bg-surface-secondary); text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">
+                    <th style="padding: 12px 16px;">Seq</th>
+                    <th style="padding: 12px 16px;">Roll No / Username</th>
+                    <th style="padding: 12px 16px;">Full Name</th>
+                    <th style="padding: 12px 16px;">Email</th>
+                    <th style="padding: 12px 16px;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in enrolled_students %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 12px 16px; font-weight: 700; font-family: monospace;">{{ s.roll_sequence|stringformat:"02d" }}</td>
+                        <td style="padding: 12px 16px;"><code style="font-weight: 700;">{{ s.roll_number }}</code></td>
+                        <td style="padding: 12px 16px; font-weight: 600;">{{ s.full_name }}</td>
+                        <td style="padding: 12px 16px; color: var(--text-muted);">{{ s.user.email }}</td>
+                        <td style="padding: 12px 16px;">
+                            <span class="badge {% if s.verification_status == 'approved' %}badge--success{% else %}badge--warning{% endif %}">
+                                {{ s.get_verification_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 32px; text-align: center; color: var(--text-muted);">
+                            No students enrolled yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

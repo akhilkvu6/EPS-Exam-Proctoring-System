@@ -1,0 +1,39 @@
+2026-11-04 16:55:36.874: [INFO] CurrentProfilePath: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:55:36.874: [INFO] Profiles total count: 1
+2026-11-04 16:55:36.874: [INFO] Profile: name=Profile 1 path=c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default lastActive=null
+2026-11-04 16:55:36.874: [INFO] LastUsedProfileDir: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:55:36.874: [INFO] VisibilityChanged: 0
+2026-11-04 16:55:36.896: [INFO] OnDoneLoading sync enabled: 0
+2026-11-04 16:55:36.896: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-04 16:55:36.896: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-04 16:55:36.896: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-04 16:55:36.898: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-11-04 16:55:38.362: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 0
+2026-11-04 16:55:38.366: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-11-04 16:55:38.368: [INFO] Primary account changed.
+2026-11-04 16:55:38.368: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-11-04 16:55:38.380: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-11-04 16:55:38.395: [INFO] RecordSyncInitDuration has_sync_been_enabled: 0 state: 3
+2026-11-04 16:55:42.643: [INFO] Sync initialization duration: 4184ms
+2026-11-04 16:56:52.521: [INFO] CurrentProfilePath: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:56:52.521: [INFO] Profiles total count: 1
+2026-11-04 16:56:52.521: [INFO] Profile: name=Personal path=c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default lastActive=2026-11-04T16:55:36.883Z
+2026-11-04 16:56:52.521: [INFO] LastUsedProfileDir: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:56:52.521: [INFO] MostRecentlyActiveProfile: name=Personal path=c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default lastActive=2026-11-04T16:55:36.883Z
+2026-11-04 16:56:52.521: [INFO] VisibilityChanged: 0
+2026-11-04 16:56:52.545: [INFO] OnDoneLoading sync enabled: 1
+2026-11-04 16:56:52.545: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-04 16:56:52.545: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-04 16:56:52.545: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-04 16:56:52.680: [INFO] Sync initialization duration: 131ms
+2026-11-04 16:59:57.564: [INFO] CurrentProfilePath: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:59:57.564: [INFO] Profiles total count: 1
+2026-11-04 16:59:57.565: [INFO] Profile: name=Personal path=c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default lastActive=2026-11-04T16:56:52.536Z
+2026-11-04 16:59:57.565: [INFO] LastUsedProfileDir: c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default
+2026-11-04 16:59:57.565: [INFO] MostRecentlyActiveProfile: name=Personal path=c:\Users\akhil\OneDrive\Desktop\EPS-Exam-Proctoring-System\scratch\edge_auth_profile\Default lastActive=2026-11-04T16:56:52.536Z
+2026-11-04 16:59:57.565: [INFO] VisibilityChanged: 0
+2026-11-04 16:59:57.617: [INFO] OnDoneLoading sync enabled: 1
+2026-11-04 16:59:57.617: [INFO] BookmarkModelLoaded, ids_reassigned: 0
+2026-11-04 16:59:57.617: [INFO] BookmarksLoadDropped droppedNodes=0
+2026-11-04 16:59:57.617: [INFO] BookmarksSnapshot Startup total=0 bar=0 other=0 mobile=0 showBar=0 showBarNTP=1
+2026-11-04 16:59:57.713: [INFO] Sync initialization duration: 99ms

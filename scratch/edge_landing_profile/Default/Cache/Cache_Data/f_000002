@@ -1,0 +1,433 @@
+/* ==========================================================================
+   EPS (Exam Proctoring System) — Centralized Design Tokens
+   Single Source of Truth for Institutional UI / EDF (EPS Design Foundation)
+   High-Contrast Neutral Surface Foundation | Lucide Iconography | Inter Font
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ==========================================================================
+     1. TYPOGRAPHY TOKENS
+     ========================================================================== */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Font Size Scale */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.8125rem;  /* 13px */
+  --font-size-base: 0.875rem; /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+
+  /* Line Heights */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ==========================================================================
+     2. SPACING SCALE (4px / 8px Grid System)
+     ========================================================================== */
+  --space-0: 0px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ==========================================================================
+     3. LAYOUT & DIMENSIONS
+     ========================================================================== */
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 72px;
+  --header-height: 64px;
+  --container-max-width: 1360px;
+  --container-padding: var(--space-6);
+
+  /* ==========================================================================
+     4. GEOMETRY & BORDER RADIUS
+     ========================================================================== */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-control: 8px;      /* Buttons, form inputs, selectors */
+  --radius: 12px;
+  --radius-card: 16px;        /* Institutional cards & panels */
+  --radius-panel: 18px;
+  --radius-full: 9999px;      /* Avatars, pill badges, indicators */
+
+  /* ==========================================================================
+     5. ELEVATION & SHADOWS
+     ========================================================================== */
+  --shadow-xs: 0 1px 2px 0 rgba(28, 25, 23, 0.03);
+  --shadow-sm: 0 1px 3px 0 rgba(28, 25, 23, 0.04), 0 1px 2px -1px rgba(28, 25, 23, 0.03);
+  --shadow-md: 0 4px 10px -2px rgba(28, 25, 23, 0.05), 0 2px 6px -2px rgba(28, 25, 23, 0.03);
+  --shadow-lg: 0 10px 20px -3px rgba(28, 25, 23, 0.07), 0 4px 8px -3px rgba(28, 25, 23, 0.04);
+  --shadow-lift: 0 12px 24px -4px rgba(28, 25, 23, 0.08), 0 4px 8px -2px rgba(28, 25, 23, 0.03);
+
+  /* ==========================================================================
+     6. MOTION, TRANSITIONS & ANIMATIONS
+     ========================================================================== */
+  --transition-fast: 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  --anim-duration: 200ms;
+  --anim-easing: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ==========================================================================
+     7. Z-INDEX SCALE
+     ========================================================================== */
+  --z-base: 1;
+  --z-dropdown: 20;
+  --z-sticky: 30;
+  --z-header: 40;
+  --z-overlay: 50;
+  --z-sidebar: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+  --z-tooltip: 90;
+
+  /* ==========================================================================
+     8. LIGHT THEME COLOUR SYSTEM (Default Institutional Palette)
+     ========================================================================== */
+  /* Primary Action — BLUE (Official Default Primary) */
+  --color-primary: #2563EB;         /* Institutional Cobalt Blue 600 */
+  --color-primary-hover: #1D4ED8;   /* Blue 700 */
+  --color-primary-subtle: #EFF6FF;
+  --color-primary-contrast: #FFFFFF;
+  --color-primary-bg: #DBEAFE;      /* Blue 100 */
+  --color-primary-border: #BFDBFE;  /* Blue 200 */
+  --color-primary-text: #1E40AF;    /* Blue 800 */
+
+  /* Secondary Neutral Grey & Charcoal Brand */
+  --color-secondary: #57534E;       /* Stone 600 */
+  --color-secondary-hover: #44403C; /* Stone 700 */
+  --color-secondary-subtle: #F3F1EB;
+  --color-secondary-contrast: #FFFFFF;
+  --color-charcoal: #1C1917;        /* Stone 900 Brand Charcoal */
+
+  /* Canvas & Surfaces */
+  --bg-app: #FAFAF8;                /* Warm Neutral Canvas Backdrop */
+  --bg-surface: #FFFFFF;            /* Pure Clean White Surfaces & Cards */
+  --bg-surface-hover: #F6F5F0;
+  --bg-subtle: #F3F1EB;
+  --bg-muted: #E8E6DF;
+
+  /* Sidebar & Navigation */
+  --sidebar-bg: #F3F1EB;            /* Warm Off-White Sidebar (#F3F1EB) */
+  --sidebar-hover: #ECEAE3;
+  --sidebar-border: #E6E4DD;
+  --header-bg: #FFFFFF;
+  --header-border: #EBE8E1;
+
+  /* Text & Typography */
+  --text-primary: #1C1917;          /* Stone 900 */
+  --text-secondary: #57534E;        /* Stone 600 */
+  --text-muted: #78716C;            /* Stone 500 */
+  --text-inverse: #FFFFFF;
+
+  /* Borders */
+  --border-subtle: #EBE8E1;
+  --border-default: #E0DDD4;
+  --border-strong: #CDC9BD;
+  --border-focus: #1C1917;
+
+  /* ==========================================================================
+     OFFICIAL EPS SEMANTIC COLOUR SYSTEM (Light Theme)
+     Standardized Meanings:
+     1. RED    = Critical Proctoring Violations, Failed Security, Destructive Actions
+     2. ORANGE = Suspicious Behaviour, Connection Instability, Pending Attention, Deadlines
+     3. GREEN  = Normal Proctoring Status, Verified Identity, Approved Operations, Passed Checks
+     4. BLUE   = Guidance, Instructions, Informational Notifications, Neutral Emphasis
+     ========================================================================== */
+
+  /* 1. RED — CRITICAL / DANGER */
+  --color-danger: #DC2626;         /* Red 600 */
+  --color-danger-hover: #B91C1C;   /* Red 700 */
+  --color-danger-bg: #FEE2E2;      /* Red 100 */
+  --color-danger-border: #FECACA;  /* Red 200 */
+  --color-danger-text: #991B1B;    /* Red 800 (Contrast 7.1:1 on bg) */
+
+  /* 2. ORANGE — WARNING / ALERT */
+  --color-warning: #EA580C;        /* Orange 600 */
+  --color-warning-hover: #C2410C;  /* Orange 700 */
+  --color-warning-bg: #FFEDD5;     /* Orange 100 */
+  --color-warning-border: #FED7AA; /* Orange 200 */
+  --color-warning-text: #9A3412;   /* Orange 800 (Contrast 5.9:1 on bg) */
+
+  /* 3. GREEN — SAFE / SUCCESS */
+  --color-success: #16A34A;        /* Green 600 */
+  --color-success-hover: #15803D;  /* Green 700 */
+  --color-success-bg: #DCFCE7;     /* Green 100 */
+  --color-success-border: #BBF7D0; /* Green 200 */
+  --color-success-text: #166534;   /* Green 800 (Contrast 6.8:1 on bg) */
+
+  /* 4. BLUE — INFORMATION */
+  --color-info: #2563EB;           /* Blue 600 */
+  --color-info-hover: #1D4ED8;     /* Blue 700 */
+  --color-info-contrast: #FFFFFF;
+  --color-info-bg: #DBEAFE;        /* Blue 100 */
+  --color-info-border: #BFDBFE;    /* Blue 200 */
+  --color-info-text: #1E40AF;      /* Blue 800 (Contrast 7.3:1 on bg) */
+
+  --color-danger-contrast: #FFFFFF;
+  --color-warning-contrast: #FFFFFF;
+  --color-success-contrast: #FFFFFF;
+
+  /* Routine Neutral Buttons */
+  --neutral-btn-bg: #FFFFFF;
+  --neutral-btn-border: #E0DDD4;
+  --neutral-btn-hover: #F3F1EB;
+  --neutral-btn-text: #1C1917;
+
+  /* Button Focus Rings */
+  --btn-focus-ring: rgba(37, 99, 235, 0.4);
+  --btn-danger-focus-ring: rgba(220, 38, 38, 0.4);
+  --btn-success-focus-ring: rgba(22, 163, 74, 0.4);
+  --btn-warning-focus-ring: rgba(234, 88, 12, 0.4);
+  --btn-secondary-focus-ring: rgba(87, 83, 78, 0.3);
+
+  /* ==========================================================================
+     9. PASTEL FUNCTIONAL SYSTEM (Institutional Card Categorization)
+     ========================================================================== */
+  --pastel-blue-bg: #DCEBFA;
+  --pastel-blue-border: #C2DDF8;
+  --pastel-blue-text: #1E3A8A;
+  --pastel-blue-accent: #2563EB;
+  --pastel-blue-badge: #C6E0FA;
+
+  --pastel-lavender-bg: #E8DFFC;
+  --pastel-lavender-border: #D8C7FA;
+  --pastel-lavender-text: #4C1D95;
+  --pastel-lavender-accent: #7C3AED;
+  --pastel-lavender-badge: #DFD3FA;
+
+  --pastel-mint-bg: #D9F2E4;
+  --pastel-mint-border: #BEE7D0;
+  --pastel-mint-text: #14532D;
+  --pastel-mint-accent: #15803D;
+  --pastel-mint-badge: #C8EBD7;
+
+  --pastel-peach-bg: #FBE1D4;
+  --pastel-peach-border: #F7CBB6;
+  --pastel-peach-text: #7C2D12;
+  --pastel-peach-accent: #C2410C;
+  --pastel-peach-badge: #F5D3C2;
+
+  --pastel-yellow-bg: #FFF0BD;
+  --pastel-yellow-border: #FFE48F;
+  --pastel-yellow-text: #713F12;
+  --pastel-yellow-accent: #A16207;
+  --pastel-yellow-badge: #FCE8A9;
+
+  /* ==========================================================================
+     10. BACKWARD COMPATIBILITY ALIASES
+     ========================================================================== */
+  --success: var(--color-success);
+  --success-hover: var(--color-success-hover);
+  --success-surface: var(--color-success-bg);
+  --success-border: var(--color-success-border);
+  --success-text: var(--color-success-text);
+
+  --danger: var(--color-danger);
+  --danger-hover: var(--color-danger-hover);
+  --danger-surface: var(--color-danger-bg);
+  --danger-border: var(--color-danger-border);
+  --danger-text: var(--color-danger-text);
+
+  --warning: var(--color-warning);
+  --warning-hover: var(--color-warning-hover);
+  --warning-surface: var(--color-warning-bg);
+  --warning-border: var(--color-warning-border);
+  --warning-text: var(--color-warning-text);
+
+  --info: var(--color-info);
+  --info-hover: var(--color-info-hover);
+  --info-surface: var(--color-info-bg);
+  --info-border: var(--color-info-border);
+  --info-text: var(--color-info-text);
+
+  --eps-page-background: var(--bg-app);
+  --eps-surface: var(--bg-surface);
+  --eps-surface-muted: var(--bg-subtle);
+  --eps-text-primary: var(--text-primary);
+  --eps-text-secondary: var(--text-secondary);
+  --eps-text-muted: var(--text-muted);
+  --eps-border: var(--border-default);
+  --eps-border-subtle: var(--border-subtle);
+  --eps-radius-control: var(--radius-control);
+  --eps-radius-sm: var(--radius-sm);
+  --eps-radius-xs: var(--radius-xs);
+  --eps-sage-primary: var(--color-primary);
+  --eps-sage-secondary: var(--color-primary-hover);
+  --eps-mint-subtle: var(--pastel-mint-bg);
+  --eps-success: var(--color-success);
+  --eps-danger: var(--color-danger);
+  --eps-warning: var(--color-warning);
+  --eps-page-padding: var(--space-6);
+  --eps-transition-fast: var(--transition-fast);
+}
+
+/* ==========================================================================
+   11. DARK THEME SPECIFICATIONS (Calm Restrained Institutional Night Mode)
+   ========================================================================== */
+[data-theme="dark"] {
+  /* Primary Action — BLUE (Official Default Primary) */
+  --color-primary: #3B82F6;         /* Blue 500 */
+  --color-primary-hover: #2563EB;   /* Blue 600 */
+  --color-primary-subtle: #172554;
+  --color-primary-contrast: #FFFFFF;
+  --color-primary-bg: rgba(59, 130, 246, 0.16);
+  --color-primary-border: rgba(59, 130, 246, 0.38);
+  --color-primary-text: #93C5FD;
+
+  /* Secondary Neutral Grey & Brand Charcoal */
+  --color-secondary: #A8A29E;       /* Stone 400 */
+  --color-secondary-hover: #D6D3CD; /* Stone 300 */
+  --color-secondary-subtle: #24221F;
+  --color-secondary-contrast: #1C1917;
+  --color-charcoal: #F5F5F3;
+
+  /* Canvas & Surfaces */
+  --bg-app: #121110;
+  --bg-surface: #1C1A18;
+  --bg-surface-hover: #262421;
+  --bg-subtle: #24221F;
+  --bg-muted: #33302B;
+
+  /* Sidebar & Navigation */
+  --sidebar-bg: #1A1917;
+  --sidebar-hover: #262421;
+  --sidebar-border: #2C2925;
+  --header-bg: #1C1A18;
+  --header-border: #2C2925;
+
+  /* Text & Typography */
+  --text-primary: #F5F5F3;
+  --text-secondary: #D6D3CD;
+  --text-muted: #A8A29E;
+  --text-inverse: #1C1917;
+
+  /* Borders */
+  --border-subtle: #2C2925;
+  --border-default: #3D3934;
+  --border-strong: #57524A;
+  --border-focus: #F5F5F3;
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 10px -2px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.7);
+  --shadow-lift: 0 12px 24px -4px rgba(0, 0, 0, 0.8);
+
+  /* ==========================================================================
+     OFFICIAL EPS SEMANTIC COLOUR SYSTEM (Dark Theme)
+     ========================================================================== */
+  /* 1. RED — CRITICAL / DANGER */
+  --color-danger: #EF4444;         /* Red 500 */
+  --color-danger-hover: #DC2626;   /* Red 600 */
+  --color-danger-bg: rgba(239, 68, 68, 0.16);
+  --color-danger-border: rgba(239, 68, 68, 0.38);
+  --color-danger-text: #FCA5A5;    /* Red 300 */
+
+  /* 2. ORANGE — WARNING / ALERT */
+  --color-warning: #F97316;        /* Orange 500 */
+  --color-warning-hover: #EA580C;  /* Orange 600 */
+  --color-warning-contrast: #FFFFFF;
+  --color-warning-bg: rgba(249, 115, 22, 0.16);
+  --color-warning-border: rgba(249, 115, 22, 0.38);
+  --color-warning-text: #FDBA74;   /* Orange 300 */
+
+  /* 3. GREEN — SAFE / SUCCESS */
+  --color-success: #22C55E;        /* Green 500 */
+  --color-success-hover: #16A34A;  /* Green 600 */
+  --color-success-contrast: #FFFFFF;
+  --color-success-bg: rgba(34, 197, 94, 0.16);
+  --color-success-border: rgba(34, 197, 94, 0.38);
+  --color-success-text: #86EFAC;   /* Green 300 */
+
+  /* 4. BLUE — INFORMATION */
+  --color-info: #3B82F6;           /* Blue 500 */
+  --color-info-hover: #2563EB;     /* Blue 600 */
+  --color-info-contrast: #FFFFFF;
+  --color-info-bg: rgba(59, 130, 246, 0.16);
+  --color-info-border: rgba(59, 130, 246, 0.38);
+  --color-info-text: #93C5FD;      /* Blue 300 */
+
+  --color-danger-contrast: #FFFFFF;
+
+  /* Routine Neutral Button */
+  --neutral-btn-bg: #24221F;
+  --neutral-btn-border: #3D3934;
+  --neutral-btn-hover: #2E2B27;
+  --neutral-btn-text: #F5F5F3;
+
+  /* Button Focus Rings */
+  --btn-focus-ring: rgba(59, 130, 246, 0.55);
+  --btn-danger-focus-ring: rgba(239, 68, 68, 0.55);
+  --btn-success-focus-ring: rgba(34, 197, 94, 0.55);
+  --btn-warning-focus-ring: rgba(249, 115, 22, 0.55);
+  --btn-secondary-focus-ring: rgba(168, 162, 158, 0.45);
+
+  /* Pastel Adaptations in Dark */
+  --pastel-blue-bg: #172554;
+  --pastel-blue-border: #1E3A8A;
+  --pastel-blue-text: #BFDBFE;
+  --pastel-blue-accent: #60A5FA;
+  --pastel-blue-badge: #1E3A8A;
+
+  --pastel-lavender-bg: #2E1065;
+  --pastel-lavender-border: #3B0764;
+  --pastel-lavender-text: #DDD6FE;
+  --pastel-lavender-accent: #A78BFA;
+  --pastel-lavender-badge: #4C1D95;
+
+  --pastel-mint-bg: #052E16;
+  --pastel-mint-border: #064E3B;
+  --pastel-mint-text: #BBF7D0;
+  --pastel-mint-accent: #34D399;
+  --pastel-mint-badge: #14532D;
+
+  --pastel-peach-bg: #431407;
+  --pastel-peach-border: #7C2D12;
+  --pastel-peach-text: #FED7AA;
+  --pastel-peach-accent: #FB923C;
+  --pastel-peach-badge: #7C2D12;
+
+  --pastel-yellow-bg: #422006;
+  --pastel-yellow-border: #713F12;
+  --pastel-yellow-text: #FEF08A;
+  --pastel-yellow-accent: #FACC15;
+  --pastel-yellow-badge: #713F12;
+}
+
+/* ==========================================================================
+   12. ACCESSIBILITY: REDUCED MOTION SPECIFICATION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

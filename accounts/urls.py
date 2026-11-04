@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     # Common Authentication & Registration
+    path('design/', views.design_system, name='design_system'),
     path('login/', views.common_login, name='common_login'),
     path('logout/', views.user_logout, name='user_logout'),
     path('register/', views.central_register, name='register'),
@@ -15,6 +16,31 @@ urlpatterns = [
     # In-App Notification Center
     path('notifications/', views.notifications_list, name='notifications_list'),
     path('notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
+
+    # Real-Time Async Validation APIs
+    path('api/check-username/', views.check_username_api, name='check_username_api'),
+    path('api/check-email/', views.check_email_api, name='check_email_api'),
+    path('api/eligible-rolls/', views.eligible_rolls_api, name='eligible_rolls_api'),
+    path('api/batch-roll-grid/', views.batch_roll_grid_api, name='batch_roll_grid_api'),
+    path('api/reserve-roll/', views.reserve_roll_api, name='reserve_roll_api'),
+
+    # Administrator Portal: Academic Batch Management & Roll Allocation
+    path('admin/batches/', views.admin_batches_list, name='admin_batches_list'),
+    path('admin/batches/create/', views.admin_batch_create, name='admin_batch_create'),
+    path('admin/batches/<int:batch_id>/', views.admin_batch_detail, name='admin_batch_detail'),
+    path('admin/batches/<int:batch_id>/edit/', views.admin_batch_edit, name='admin_batch_edit'),
+    path('admin/batches/<int:batch_id>/promote/', views.admin_batch_promote, name='admin_batch_promote'),
+    path('admin/batches/<int:batch_id>/export/', views.admin_batch_export, name='admin_batch_export'),
+    path('admin/roll-correction/', views.admin_roll_correction, name='admin_roll_correction'),
+    path('admin/batches/<int:batch_id>/roll-correction/', views.admin_roll_correction, name='admin_batch_roll_correction'),
+
+    # Teacher Portal: Academic Batch Management
+    path('teacher/batches/', views.teacher_batches_list, name='teacher_batches_list'),
+    path('teacher/batches/create/', views.teacher_batch_create, name='teacher_batch_create'),
+    path('teacher/batches/<int:batch_id>/', views.teacher_batch_detail, name='teacher_batch_detail'),
+
+    # Administrator Portal: Student Enrollment Master Roster
+    path('admin/enrollments/', views.admin_enrollments, name='admin_enrollments'),
 
     # Student URLs (Legacy & Direct)
     path('student/register/', views.student_register, name='student_register'),

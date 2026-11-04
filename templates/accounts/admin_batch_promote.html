@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Promote Semester: {{ batch.batch_name }} — EPS Admin{% endblock %}
+
+{% block content %}
+<div style="max-width: 760px; margin: 0 auto; padding: var(--space-6) var(--space-4);">
+
+    <!-- Header & Breadcrumbs -->
+    <div style="margin-bottom: var(--space-6);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <a href="{% url 'admin_batch_detail' batch.id %}" class="btn btn-ghost btn-xs" style="padding: 4px 8px;">
+                <i data-lucide="arrow-left" class="lucide-icon icon-xs"></i>
+                <span>{{ batch.batch_name }}</span>
+            </a>
+            <span class="badge badge--primary">Semester Advancement</span>
+        </div>
+        <h1 class="heading-2" style="margin-top: 6px;">Batch Semester Promotion</h1>
+        <p class="text-caption">
+            Advance the current active semester for all enrolled students in <strong>{{ batch.batch_name }}</strong>.
+        </p>
+    </div>
+
+    <!-- Preservation Notice Alert -->
+    <div class="alert alert--info" style="margin-bottom: var(--space-5); padding: var(--space-4); border-radius: var(--radius-md); background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; display: flex; align-items: flex-start; gap: 12px;">
+        <i data-lucide="shield-check" class="lucide-icon icon-md" style="flex-shrink: 0; margin-top: 2px;"></i>
+        <div style="font-size: 13px; line-height: 1.5;">
+            <strong>Batch Identity & Roll Numbers are Permanent:</strong>
+            Promoting a batch advances the semester from <strong>Sem {{ batch.current_semester }}</strong> while keeping all student registration numbers
+            (e.g., <code>{{ batch.prefix }}01</code>) and usernames completely unchanged. A formal audit entry will be recorded in
+            each student's <code>StudentSemesterHistory</code>.
+        </div>
+    </div>
+
+    <div class="card" style="padding: var(--space-6);">
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+
+                <!-- Current Semester & Target Semester -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div>
+                        <label class="form-label" style="font-weight: 600; margin-bottom: 6px; display: block;">
+                            Current Active Semester
+                        </label>
+                        <input type="text" class="lp-input" value="Semester {{ batch.current_semester }}" disabled style="background: var(--bg-surface-secondary);">
+                    </div>
+                    <div>
+                        <label for="target-semester-input" class="form-label" style="font-weight: 600; margin-bottom: 6px; display: block;">
+                            Target Semester <span style="color: var(--color-danger);">*</span>
+                        </label>
+                        {{ form.target_semester }}
+                        <small style="color: var(--text-muted); font-size: 11px;">Maximum: Semester {{ batch.total_semesters }}</small>
+                        {% if form.target_semester.errors %}
+                            <div style="color: var(--color-danger); font-size: 12px; margin-top: 4px;">{{ form.target_semester.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Academic Session / Term -->
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 6px; display: block;">
+                        Academic Session / Term
+                    </label>
+                    {{ form.academic_session }}
+                    <small style="color: var(--text-muted); font-size: 11px;">e.g., 2026-2027 Even Semester Term</small>
+                </div>
+
+                <!-- Reason / Notes -->
+                <div>
+                    <label class="form-label" style="font-weight: 600; margin-bottom: 6px; display: block;">
+                        Promotion Justification / Examination Board Resolution
+                    </label>
+                    {{ form.reason }}
+                </div>
+
+            </div>
+
+            <!-- Affected Students Preview -->
+            <div style="margin-top: var(--space-6); padding: var(--space-4); background: var(--bg-surface-secondary); border-radius: var(--radius-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-muted);">
+                        Enrolled Cohort Size
+                    </span>
+                    <span class="badge badge--primary">{{ batch.enrolled_students.count }} Students</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0 0 0;">
+                    All active student accounts enrolled in this cohort will immediately be promoted to the selected semester upon confirmation.
+                </p>
+            </div>
+
+            <div style="margin-top: var(--space-6); display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3);">
+                <a href="{% url 'admin_batch_detail' batch.id %}" class="btn btn-secondary btn-sm">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i data-lucide="arrow-up-right" class="lucide-icon icon-xs"></i>
+                    <span>Execute Semester Promotion</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

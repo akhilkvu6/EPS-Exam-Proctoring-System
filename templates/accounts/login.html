@@ -3,6 +3,127 @@
 
 {% block title %}Sign In — EPS Examination Proctoring System{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}">
+{% endblock %}
+
 {% block content %}
-    {% include 'accounts/auth_unified.html' %}
+<div class="eps-auth-wrapper">
+    <div class="auth-card" role="main" aria-labelledby="signin-title">
+        
+        <!-- Header Section -->
+        <div class="auth-header">
+            <div class="auth-logo-badge">EPS</div>
+            <h1 class="auth-title" id="signin-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to access your examination portal.</p>
+        </div>
+
+        <!-- Server Error / Message Display -->
+        {% if form.errors %}
+            <div class="auth-alert auth-alert--danger" role="alert">
+                <i data-lucide="alert-circle" class="lucide-icon icon-sm" style="flex-shrink: 0; margin-top: 1px;"></i>
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div><strong>{{ field.label }}:</strong> {{ error }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="auth-alert {% if message.tags == 'error' %}auth-alert--danger{% else %}auth-alert--success{% endif %}" role="status">
+                    <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}" class="lucide-icon icon-sm" style="flex-shrink: 0; margin-top: 1px;"></i>
+                    <div>{{ message }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Unified Single Login Form (Exactly 2 Primary Fields) -->
+        <form method="post" action="{% url 'common_login' %}" novalidate id="eps-login-form">
+            {% csrf_token %}
+
+            <!-- Field 1: Username or Email -->
+            <div class="auth-form-group">
+                <label for="login-identifier-input" class="auth-label">
+                    <span>Username or Email Address</span>
+                    <span class="required-dot">*</span>
+                </label>
+                <div class="auth-input-wrapper">
+                    <span class="auth-input-icon">
+                        <i data-lucide="user" class="lucide-icon icon-sm"></i>
+                    </span>
+                    <input type="text"
+                           name="username"
+                           id="login-identifier-input"
+                           class="lp-input"
+                           placeholder="Enter your username or institutional email"
+                           value="{{ form.username.value|default:'' }}"
+                           autocomplete="username"
+                           required
+                           autofocus>
+                </div>
+            </div>
+
+            <!-- Field 2: Password -->
+            <div class="auth-form-group">
+                <div class="auth-label">
+                    <label for="login-password-input">Password</label>
+                    <a href="javascript:void(0)" 
+                       onclick="alert('Please contact your institutional EPS administrator to reset your account password.')"
+                       style="font-size: 12px; color: var(--auth-text-muted); text-decoration: underline; font-weight: 500;">
+                        Forgot password?
+                    </a>
+                </div>
+                <div class="auth-input-wrapper">
+                    <span class="auth-input-icon">
+                        <i data-lucide="lock" class="lucide-icon icon-sm"></i>
+                    </span>
+                    <input type="password"
+                           name="password"
+                           id="login-password-input"
+                           class="lp-input"
+                           placeholder="Enter your password"
+                           autocomplete="current-password"
+                           required>
+                    <button type="button" 
+                            class="password-toggle-btn" 
+                            data-target="login-password-input" 
+                            aria-label="Toggle password visibility">
+                        <i data-lucide="eye" class="lucide-icon icon-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Remember Me Control -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; font-size: 13px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; color: var(--auth-text-secondary);">
+                    <input type="checkbox" name="remember_me" id="login-remember-me" checked style="accent-color: var(--auth-btn-primary-bg);">
+                    <span>Remember this device for 14 days</span>
+                </label>
+            </div>
+
+            <!-- Primary CTA Button -->
+            <button type="submit" class="auth-submit-btn" id="login-submit-btn">
+                <span>Sign In to EPS</span>
+                <i data-lucide="log-in" class="lucide-icon icon-sm"></i>
+            </button>
+        </form>
+
+        <!-- Prompt to Create Account -->
+        <div class="auth-footer-prompt">
+            <span>Don't have an account?</span>
+            <a href="{% url 'register' %}" class="auth-footer-link">Create Account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}
