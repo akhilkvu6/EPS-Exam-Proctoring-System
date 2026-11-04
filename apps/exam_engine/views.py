@@ -143,6 +143,35 @@ def api_get_timer(request, attempt_id):
     })
 
 
+from apps.exam_engine.services.autosave import process_batch_answer_sync
+
+
+@login_required
+@active_user_required
+@require_POST
+def api_batch_sync_answers(request, attempt_id):
+    """
+    Dual-layer batch synchronization endpoint for flushed client offline journals.
+    Guarantees concurrency-safe transactional updates with status reporting.
+    """
+    attempt = get_object_or_404(ExamAttempt, id=attempt_id, student=request.user)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return HttpResponseBadRequest("Invalid JSON body.")
+
+    updates = payload.get("updates", [])
+    if not isinstance(updates, list):
+        return HttpResponseBadRequest("Updates must be a list.")
+
+    success, results, message = process_batch_answer_sync(attempt, updates)
+    if not success:
+        return JsonResponse({"error": message}, status=403)
+
+    return JsonResponse({"status": "synchronized", "results": results, "message": message})
+
+
 @login_required
 @active_user_required
 @require_POST

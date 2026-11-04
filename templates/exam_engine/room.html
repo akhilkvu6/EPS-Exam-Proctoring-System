@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load static %}
 
 {% block title %}Exam Room | {{ exam.title }}{% endblock %}
 
@@ -98,6 +99,9 @@
 
     <!-- Right Controls -->
     <div style="display: flex; align-items: center; gap: var(--space-3);">
+      <span id="network-status-badge" class="badge" style="font-size: 11px; padding: 4px 8px; background-color: rgba(34, 197, 94, 0.15); color: #22c55e;">
+        🟢 Connected & Saved
+      </span>
       {% if calculator_enabled %}
         <button type="button" class="btn btn-secondary" onclick="toggleCalculator()" style="font-size: 12px; padding: 6px 10px;">
           🧮 Calculator
@@ -276,8 +280,11 @@
   </div>
 </div>
 
+<script src="{% static 'js/exam_autosave.js' %}"></script>
 <script>
   const ATTEMPT_ID = "{{ attempt.id }}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+  const autosaveEngine = new ExamAutosaveEngine(ATTEMPT_ID, CSRF_TOKEN);
   let currentOrder = 1;
   const totalQuestions = {{ total_questions }};
   let remainingSeconds = parseInt(document.getElementById('exam-timer').getAttribute('data-seconds'), 10);
@@ -389,12 +396,17 @@
     const qid = card.getAttribute('data-qid');
     const answer = getAnswerPayload(currentOrder);
 
+    // Queue in dual-layer autosave engine
+    if (window.autosaveEngine) {
+      window.autosaveEngine.queueAnswer(qid, answer, 5);
+    }
+
     try {
       const resp = await fetch(`/exam/api/${ATTEMPT_ID}/questions/${qid}/save/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': '{{ csrf_token }}',
+          'X-CSRFToken': CSRF_TOKEN,
         },
         body: JSON.stringify({ answer: answer, time_spent_seconds: 5 }),
       });

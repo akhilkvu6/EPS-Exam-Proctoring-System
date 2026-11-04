@@ -176,6 +176,54 @@ class ExamEngineTests(TestCase):
         self.assertIsNotNone(attempt.submitted_at)
         self.assertEqual(len(attempt.submission_hash), 64)
 
+    def test_batch_sync_answers_api(self):
+        """Tests dual-layer offline journal flush via batch sync endpoint."""
+        attempt = start_or_resume_attempt(self.exam, self.student_harry)
+        att_q = attempt.attempt_questions.first()
+
+        self.client.force_login(self.student_harry)
+        url = reverse("exam_engine:api_batch_sync", args=[attempt.id])
+
+        payload = {
+            "updates": [
+                {
+                    "question_id": str(att_q.id),
+                    "answer": {"selected_option_ids": [self.opt1.id]},
+                    "time_spent_seconds": 25,
+                },
+                {
+                    "question_id": "00000000-0000-0000-0000-000000000000",
+                    "answer": {"text": "dummy"},
+                    "time_spent_seconds": 5,
+                },
+            ]
+        }
+        resp = self.client.post(url, data=json.dumps(payload), content_type="application/json")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data["status"], "synchronized")
+
+        att_q.refresh_from_db()
+        self.assertTrue(att_q.is_answered)
+        self.assertEqual(att_q.time_spent_seconds, 25)
+
+    def test_batch_sync_rejected_when_expired(self):
+        """Tests batch sync rejected and auto-submitted when authoritative timer is expired."""
+        attempt = start_or_resume_attempt(self.exam, self.student_harry)
+        att_q = attempt.attempt_questions.first()
+
+        attempt.expires_at = timezone.now() - timedelta(seconds=2)
+        attempt.save(update_fields=["expires_at"])
+
+        self.client.force_login(self.student_harry)
+        url = reverse("exam_engine:api_batch_sync", args=[attempt.id])
+        payload = {"updates": [{"question_id": str(att_q.id), "answer": {"text": "Late answer"}}]}
+        resp = self.client.post(url, data=json.dumps(payload), content_type="application/json")
+        self.assertEqual(resp.status_code, 403)
+
+        attempt.refresh_from_db()
+        self.assertEqual(attempt.status, AttemptStatus.AUTO_SUBMITTED)
+
     def test_idor_protection_isolation(self):
         """Ensures Candidate B cannot view, save answers, or submit Candidate A's attempt."""
         attempt = start_or_resume_attempt(self.exam, self.student_harry)
