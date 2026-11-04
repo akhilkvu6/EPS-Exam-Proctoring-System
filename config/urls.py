@@ -21,6 +21,7 @@ urlpatterns = [
     path("proctoring/", include("apps.proctoring.urls", namespace="proctoring")),
     path("incidents/", include("apps.incidents.urls", namespace="incidents")),
     path("evaluation/", include("apps.evaluation.urls", namespace="evaluation")),
+    path("results/", include("apps.results.urls", namespace="results")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

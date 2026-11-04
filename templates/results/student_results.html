@@ -1,0 +1,87 @@
+{% extends "base/base.html" %}
+
+{% block title %}My Academic Results | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top bar -->
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'student:dashboard' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
+      ← Back to Student Workspace
+    </a>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+      🎓 Official Academic Results & Transcripts
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      Access your verified scorecards, performance metrics, and cryptographically stamped PDF certificates.
+    </p>
+  </div>
+
+  {% if results %}
+    <div class="card" style="overflow: hidden; padding: 0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+          <tr>
+            <th style="padding: var(--space-3) var(--space-4);">Subject</th>
+            <th style="padding: var(--space-3) var(--space-4);">Examination</th>
+            <th style="padding: var(--space-3) var(--space-4);">Score / Max</th>
+            <th style="padding: var(--space-3) var(--space-4);">Grade</th>
+            <th style="padding: var(--space-3) var(--space-4);">Verdict</th>
+            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Scorecard</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); color: var(--color-accent);">
+                {{ r.examination.subject.code }}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4);">
+                <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary);">
+                  {{ r.examination.title }}
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary);">
+                  Published: {{ r.published_at|date:"M d, Y" }}
+                </div>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">
+                {{ r.total_score }} / {{ r.maximum_score }} ({{ r.percentage }}%)
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-bold);">
+                <span class="badge" style="font-size: 12px; background-color: var(--bg-surface-secondary);">
+                  {{ r.grade_letter }}
+                </span>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4);">
+                {% if r.is_passed %}
+                  <span style="color: #22c55e; font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">✓ PASS</span>
+                {% else %}
+                  <span style="color: #ef4444; font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">✕ FAIL</span>
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
+                <a href="{% url 'results:scorecard' r.id %}" class="btn btn-secondary" style="font-size: 12px; padding: 4px 8px;">
+                  View
+                </a>
+                <a href="{% url 'results:download_pdf' r.id %}" class="btn btn-primary" style="font-size: 12px; padding: 4px 8px;" target="_blank">
+                  📄 PDF
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: var(--space-12);">
+      <div style="font-size: 48px; margin-bottom: var(--space-2);">🎓</div>
+      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Published Results Available
+      </h3>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
+        Your completed examinations are currently undergoing institutional evaluation. Results will appear here upon formal publication.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

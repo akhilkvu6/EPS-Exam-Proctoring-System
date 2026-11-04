@@ -1,0 +1,110 @@
+{% extends "base/base.html" %}
+
+{% block title %}Scorecard | {{ result.examination.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <a href="{% url 'results:my_results' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to My Results
+    </a>
+    <div style="display: flex; gap: var(--space-2);">
+      <a href="{% url 'results:download_pdf' result.id %}" class="btn btn-primary" style="font-size: var(--font-size-xs);" target="_blank">
+        📥 Download Verified PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Scorecard Certificate Card -->
+  <div class="card" style="padding: var(--space-8); border-top: 4px solid var(--color-accent);">
+    <div style="text-align: center; margin-bottom: var(--space-6); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-4);">
+      <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); letter-spacing: 0.1em; color: var(--color-accent); text-transform: uppercase; margin-bottom: var(--space-1);">
+        EPS Phoenix Institutional Academy
+      </div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--space-1);">
+        Official Verified Examination Scorecard
+      </h1>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-xs);">
+        Examination: <strong>{{ result.examination.title }} ({{ result.examination.code }})</strong>
+      </p>
+    </div>
+
+    <!-- Student & Academic Details Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); background-color: var(--bg-surface-secondary); padding: var(--space-5); border-radius: var(--radius-md); font-size: var(--font-size-xs); margin-bottom: var(--space-6);">
+      <div>
+        <div style="color: var(--text-secondary);">Candidate Full Name</div>
+        <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-top: 2px;">
+          {{ result.student.get_full_name|default:result.student.username }}
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Official Roll Number</div>
+        <div style="font-family: monospace; font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-top: 2px;">
+          {{ result.student.student_profile.roll_number|default:"PENDING" }}
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Subject Course</div>
+        <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-top: 2px;">
+          {{ result.examination.subject.code }} — {{ result.examination.subject.name }}
+        </div>
+      </div>
+      <div>
+        <div style="color: var(--text-secondary);">Academic Cohort</div>
+        <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-top: 2px;">
+          {{ result.examination.batch.name }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Big Score / Performance Hero -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); text-align: center; background-color: var(--bg-surface-secondary); padding: var(--space-6); border-radius: var(--radius-md); margin-bottom: var(--space-6);">
+      <div>
+        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+          {{ result.total_score }}
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+          Score (of {{ result.maximum_score }})
+        </div>
+      </div>
+      <div>
+        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+          {{ result.percentage }}%
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Percentage</div>
+      </div>
+      <div>
+        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
+          {{ result.grade_letter }}
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Grade Letter</div>
+      </div>
+      <div>
+        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: {% if result.is_passed %}#22c55e{% else %}#ef4444{% endif %};">
+          {% if result.is_passed %}PASS{% else %}FAIL{% endif %}
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Final Verdict</div>
+      </div>
+    </div>
+
+    <!-- Cryptographic Verification Box -->
+    <div style="background-color: #0f172a; padding: var(--space-5); border-radius: var(--radius-md); text-align: left; margin-bottom: var(--space-6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+        <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase; font-weight: var(--font-weight-bold);">
+          🔒 Cryptographic SHA-256 Verification Fingerprint
+        </span>
+        <span style="color: #22c55e; font-size: 11px; font-weight: var(--font-weight-bold);">
+          ✓ Authenticity Validated
+        </span>
+      </div>
+      <div style="font-family: monospace; font-size: 12px; color: #38bdf8; word-break: break-all; line-height: 1.4; margin-bottom: var(--space-2);">
+        {{ result.verification_hash }}
+      </div>
+      <div style="font-size: 11px; color: #64748b;">
+        Public verification link: <a href="{% url 'results:public_verify' result.id %}" style="color: #38bdf8; text-decoration: underline;">Verify online</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

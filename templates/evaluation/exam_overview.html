@@ -14,8 +14,16 @@
       <form method="post">
         {% csrf_token %}
         <input type="hidden" name="run_autograder" value="1">
-        <button type="submit" class="btn btn-primary" style="font-size: 12px;">
-          ⚡ Run Auto-Grader for Cohort
+        <button type="submit" class="btn btn-secondary" style="font-size: 12px;">
+          ⚡ Run Auto-Grader
+        </button>
+      </form>
+
+      <!-- Publish Official Results -->
+      <form method="post" action="{% url 'results:publish_results' exam.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary" style="font-size: 12px;" onclick="return confirm('Publish official results for this examination? Scorecards and PDF transcripts will become active for students.');">
+          🚀 Publish Official Results
         </button>
       </form>
     </div>

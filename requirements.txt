@@ -16,3 +16,6 @@ whitenoise>=6.8.0
 
 # Image Processing (Question diagrams, visual prompts, proctoring media)
 Pillow>=10.4.0
+
+# PDF Scorecard & Verification Transcript Generation
+reportlab>=4.2.0
