@@ -16,6 +16,7 @@ urlpatterns = [
     path("admissions/", include("apps.admissions.urls", namespace="admissions")),
     path("academics/", include("apps.academics.urls", namespace="academics")),
     path("questions/", include("apps.question_bank.urls", namespace="question_bank")),
+    path("examinations/", include("apps.examinations.urls", namespace="examinations")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

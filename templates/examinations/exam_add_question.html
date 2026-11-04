@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+
+{% block title %}Attach Question | {{ exam.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 700px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
+      ← Back to {{ exam.code }}
+    </a>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+      Attach Question to {{ section.title }}
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      Select an assessment item authored for <strong>{{ exam.subject.code }} - {{ exam.subject.name }}</strong>. Its exact snapshot will be permanently frozen.
+    </p>
+  </div>
+
+  <div class="card" style="padding: var(--space-6);">
+    <form method="post">
+      {% csrf_token %}
+      <div style="margin-bottom: var(--space-4);">
+        <label class="form-label" for="{{ form.question.id_for_label }}">Select Question from Subject Bank *</label>
+        {{ form.question }}
+        {% if form.question.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.question.errors }}</div>{% endif %}
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-6);">
+        <div>
+          <label class="form-label" for="{{ form.marks.id_for_label }}">Override Marks (Leave blank for default)</label>
+          {{ form.marks }}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.negative_marks.id_for_label }}">Override Negative Marks (Optional)</label>
+          {{ form.negative_marks }}
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+        <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Lock Snapshot & Attach →</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

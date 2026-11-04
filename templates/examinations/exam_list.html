@@ -1,0 +1,116 @@
+{% extends "base/base.html" %}
+
+{% block title %}Examinations & Scheduling | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <div>
+      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        📝 Examination Operations & Scheduling
+      </h1>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+        Schedule, configure sections, attach version-locked question snapshots, and manage candidate rosters.
+      </p>
+    </div>
+    <a href="{% url 'examinations:exam_create' %}" class="btn btn-primary">
+      + Schedule New Examination
+    </a>
+  </div>
+
+  <!-- Status Filter Bar -->
+  <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
+    <form method="get" style="display: flex; gap: var(--space-3); align-items: center;">
+      <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary);">
+        Filter Status:
+      </label>
+      <select name="status" class="form-select" style="max-width: 250px;">
+        <option value="">All Operational Statuses</option>
+        {% for code, label in statuses %}
+          <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-secondary">Filter</button>
+      {% if selected_status %}
+        <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary" style="color: var(--text-tertiary);">Reset</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Examinations Table -->
+  {% if exams %}
+    <div class="card" style="overflow: hidden; padding: 0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+          <tr>
+            <th style="padding: var(--space-3) var(--space-4);">Code</th>
+            <th style="padding: var(--space-3) var(--space-4);">Title</th>
+            <th style="padding: var(--space-3) var(--space-4);">Subject & Cohort</th>
+            <th style="padding: var(--space-3) var(--space-4);">Window & Duration</th>
+            <th style="padding: var(--space-3) var(--space-4);">Total Marks</th>
+            <th style="padding: var(--space-3) var(--space-4);">Status</th>
+            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for exam in exams %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); white-space: nowrap;">
+                <span style="display: inline-block; padding: 2px 6px; border-radius: var(--radius-sm); background-color: var(--bg-surface-secondary); color: var(--text-primary); font-size: 11px;">
+                  {{ exam.code }}
+                </span>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4);">
+                <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary);">
+                  <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: inherit; text-decoration: none;">
+                    {{ exam.title }}
+                  </a>
+                </div>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
+                <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-accent);">
+                  {{ exam.subject.code }} - {{ exam.subject.name }}
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary);">
+                  Cohort: {{ exam.batch.name }}
+                </div>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap; font-size: var(--font-size-xs);">
+                <div>{{ exam.start_window|date:"M d, Y H:i" }}</div>
+                <div style="color: var(--text-secondary);">Timer: {{ exam.duration_minutes }} mins</div>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap; font-weight: var(--font-weight-semibold);">
+                {{ exam.total_marks }} pts
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
+                <span class="badge" style="font-size: 11px;">
+                  {{ exam.get_status_display }}
+                </span>
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
+                <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">
+                  Manage
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: var(--space-12);">
+      <div style="font-size: 48px; margin-bottom: var(--space-2);">📋</div>
+      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Examinations Scheduled
+      </h3>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto var(--space-4) auto;">
+        No examination schedules exist matching your active filter.
+      </p>
+      <a href="{% url 'examinations:exam_create' %}" class="btn btn-primary">
+        + Schedule First Examination
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+
+{% block title %}Validate & Publish | {{ exam.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; padding-top: var(--space-12); padding-bottom: var(--space-12);">
+  <div class="card" style="padding: var(--space-8); text-align: center;">
+    <div style="font-size: 48px; margin-bottom: var(--space-3);">🚀</div>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      Publish Examination?
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-6); line-height: 1.5;">
+      Publishing <strong>"{{ exam.title }}" ({{ exam.code }})</strong> will lock the question snapshots and auto-provision candidate eligibility for all students enrolled in <strong>Cohort: {{ exam.batch.name }}</strong>.
+    </p>
+
+    <div style="background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md); text-align: left; font-size: var(--font-size-xs); margin-bottom: var(--space-6);">
+      <div style="margin-bottom: 6px;">● Subject: <strong>{{ exam.subject.code }} - {{ exam.subject.name }}</strong></div>
+      <div style="margin-bottom: 6px;">● Total Configured Marks: <strong>{{ exam.total_marks }} pts</strong></div>
+      <div style="margin-bottom: 6px;">● Scheduled Window: <strong>{{ exam.start_window|date:"M d, Y H:i" }} — {{ exam.end_window|date:"M d, Y H:i" }}</strong></div>
+      <div>● Proctoring Protocol: <strong>{% if exam.strict_proctoring %}Intelligent Full AI & Browser Lock{% else %}Standard Delivery{% endif %}</strong></div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div style="display: flex; justify-content: center; gap: var(--space-3);">
+        <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary" style="padding: var(--space-2) var(--space-6);">
+          Confirm & Publish Examination
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base/base.html" %}
+
+{% block title %}Schedule Examination | EPS Phoenix{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'examinations:exam_list' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
+      ← Back to Examinations
+    </a>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+      Schedule New Examination
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      Establish academic parameters, delivery windows, proctoring security rules, and timer constraints.
+    </p>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Core Identification -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        1. Academic Scoping & Identity
+      </h2>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.title.id_for_label }}">Examination Title *</label>
+          {{ form.title }}
+          {% if form.title.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.title.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.code.id_for_label }}">Exam Code *</label>
+          {{ form.code }}
+          {% if form.code.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.code.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.subject.id_for_label }}">Academic Subject *</label>
+          {{ form.subject }}
+          {% if form.subject.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.subject.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.batch.id_for_label }}">Target Academic Cohort / Batch *</label>
+          {{ form.batch }}
+          {% if form.batch.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.batch.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheduling & Windows -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        2. Delivery Window & Duration
+      </h2>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.start_window.id_for_label }}">Window Start (Earliest Entry) *</label>
+          {{ form.start_window }}
+          {% if form.start_window.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.start_window.errors }}</div>{% endif %}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.end_window.id_for_label }}">Window End (Absolute Deadline) *</label>
+          {{ form.end_window }}
+          {% if form.end_window.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.end_window.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4);">
+        <div>
+          <label class="form-label" for="{{ form.duration_minutes.id_for_label }}">Duration (Minutes) *</label>
+          {{ form.duration_minutes }}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.pass_percentage.id_for_label }}">Passing Mark (%) *</label>
+          {{ form.pass_percentage }}
+        </div>
+        <div>
+          <label class="form-label" for="{{ form.allow_late_join_minutes.id_for_label }}">Late Entry Window (Mins)</label>
+          {{ form.allow_late_join_minutes }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Engine & Proctoring Controls -->
+    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
+        3. Delivery Engine & Proctoring Rules
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-4);">
+        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+          {{ form.shuffle_questions }}
+          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
+            Shuffle Questions per Candidate
+          </span>
+        </label>
+        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+          {{ form.shuffle_options }}
+          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
+            Shuffle Options per Question
+          </span>
+        </label>
+        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+          {{ form.strict_proctoring }}
+          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
+            Enforce Intelligent Proctoring (Full-screen, tab monitoring & AI computer vision)
+          </span>
+        </label>
+        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+          {{ form.calculator_enabled }}
+          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
+            Enable In-Browser Scientific Calculator
+          </span>
+        </label>
+      </div>
+
+      <div>
+        <label class="form-label" for="{{ form.instructions.id_for_label }}">Candidate Instructions & Rules</label>
+        {{ form.instructions }}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+      <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" style="padding: var(--space-3) var(--space-6);">
+        Save & Proceed to Question Setup →
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

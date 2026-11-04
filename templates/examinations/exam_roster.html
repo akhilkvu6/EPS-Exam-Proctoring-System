@@ -1,0 +1,90 @@
+{% extends "base/base.html" %}
+
+{% block title %}Candidate Roster | {{ exam.code }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <!-- Top bar -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
+      ← Back to {{ exam.code }} Workspace
+    </a>
+    <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
+      Cohort: {{ exam.batch.name }}
+    </span>
+  </div>
+
+  <div style="margin-bottom: var(--space-6);">
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+      👥 Candidate Examination Roster
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      Official roster of provisioned examinees eligible to take <strong>{{ exam.title }}</strong>.
+    </p>
+  </div>
+
+  <!-- Roster Table -->
+  {% if candidates %}
+    <div class="card" style="overflow: hidden; padding: 0;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+          <tr>
+            <th style="padding: var(--space-3) var(--space-4);">Roll Number</th>
+            <th style="padding: var(--space-3) var(--space-4);">Student Name</th>
+            <th style="padding: var(--space-3) var(--space-4);">Username</th>
+            <th style="padding: var(--space-3) var(--space-4);">Eligibility</th>
+            <th style="padding: var(--space-3) var(--space-4);">Extra Time</th>
+            <th style="padding: var(--space-3) var(--space-4);">Assigned At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in candidates %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); white-space: nowrap;">
+                {{ c.student.student_profile.roll_number|default:"PENDING" }}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); color: var(--text-primary);">
+                {{ c.student.get_full_name|default:c.student.username }}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); color: var(--text-secondary); font-size: var(--font-size-xs);">
+                @{{ c.student.username }}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
+                {% if c.is_eligible %}
+                  <span style="color: #22c55e; font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs);">
+                    ✓ Eligible
+                  </span>
+                {% else %}
+                  <span style="color: #ef4444; font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs);">
+                    ✕ Disqualified
+                  </span>
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs);">
+                {% if c.extra_time_minutes > 0 %}
+                  <span class="badge" style="background-color: #fef08a; color: #854d0e;">+{{ c.extra_time_minutes }} mins</span>
+                {% else %}
+                  Standard
+                {% endif %}
+              </td>
+              <td style="padding: var(--space-3) var(--space-4); color: var(--text-secondary); font-size: 11px; white-space: nowrap;">
+                {{ c.assigned_at|date:"M d, Y" }}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: var(--space-12);">
+      <div style="font-size: 48px; margin-bottom: var(--space-2);">👥</div>
+      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        No Candidates Enrolled Yet
+      </h3>
+      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
+        Candidates will be automatically provisioned from academic batch enrollments when this examination is published.
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

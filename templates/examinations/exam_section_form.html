@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+
+{% block title %}Add Section | {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
+  <div style="margin-bottom: var(--space-6);">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
+      ← Back to {{ exam.code }}
+    </a>
+    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+      Add Exam Section
+    </h1>
+    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
+      Partition the examination into structured sections (e.g. MCQ, Short Answer, Analytical Problems).
+    </p>
+  </div>
+
+  <div class="card" style="padding: var(--space-6);">
+    <form method="post">
+      {% csrf_token %}
+      <div style="margin-bottom: var(--space-4);">
+        <label class="form-label" for="{{ form.title.id_for_label }}">Section Title *</label>
+        {{ form.title }}
+        {% if form.title.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.title.errors }}</div>{% endif %}
+      </div>
+
+      <div style="margin-bottom: var(--space-4);">
+        <label class="form-label" for="{{ form.order.id_for_label }}">Section Order Index *</label>
+        {{ form.order }}
+      </div>
+
+      <div style="margin-bottom: var(--space-6);">
+        <label class="form-label" for="{{ form.instructions.id_for_label }}">Section-Specific Candidate Instructions (Optional)</label>
+        {{ form.instructions }}
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+        <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save Section</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

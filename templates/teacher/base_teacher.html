@@ -38,9 +38,9 @@
       <a href="{% url 'question_bank:question_list' %}" class="nav-link {% if 'question_bank' in request.resolver_match.app_names or 'question' in request.resolver_match.url_name %}active{% endif %}">
         📚 Question Bank
       </a>
-      <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 9">
-        📝 Examinations (Phase 9)
-      </span>
+      <a href="{% url 'examinations:exam_list' %}" class="nav-link {% if 'examinations' in request.resolver_match.app_names or 'exam' in request.resolver_match.url_name %}active{% endif %}">
+        📝 Examinations
+      </a>
       <span class="nav-link" style="opacity: 0.6; cursor: not-allowed;" title="Scheduled for Phase 14">
         👁️ Proctoring & Incidents (Phase 14)
       </span>
