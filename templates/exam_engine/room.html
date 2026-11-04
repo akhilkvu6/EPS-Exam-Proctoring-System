@@ -280,11 +280,35 @@
   </div>
 </div>
 
+<!-- Fullscreen Mandatory Enforcement Overlay -->
+<div id="fullscreen-warning-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: var(--space-6);">
+  <div style="font-size: 56px; margin-bottom: var(--space-3);">⚠️</div>
+  <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2); color: #f87171;">
+    Fullscreen Mode Required
+  </h2>
+  <p style="max-width: 500px; color: #cbd5e1; font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
+    You have exited full-screen mode. Institutional proctoring mandates an uninhibited single-window environment. Departure durations are audited.
+  </p>
+  <button type="button" class="btn btn-primary" onclick="requestExamFullscreen()" style="padding: var(--space-3) var(--space-8); font-size: var(--font-size-base);">
+    Resume Fullscreen Examination →
+  </button>
+</div>
+
 <script src="{% static 'js/exam_autosave.js' %}"></script>
+<script src="{% static 'js/browser_proctoring.js' %}"></script>
 <script>
   const ATTEMPT_ID = "{{ attempt.id }}";
   const CSRF_TOKEN = "{{ csrf_token }}";
   const autosaveEngine = new ExamAutosaveEngine(ATTEMPT_ID, CSRF_TOKEN);
+  const proctoringEngine = new BrowserProctoringEngine(ATTEMPT_ID, CSRF_TOKEN, {{ strict_proctoring|yesno:"true,false" }});
+
+  function requestExamFullscreen() {
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen();
+    }
+  }
   let currentOrder = 1;
   const totalQuestions = {{ total_questions }};
   let remainingSeconds = parseInt(document.getElementById('exam-timer').getAttribute('data-seconds'), 10);
