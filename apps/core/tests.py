@@ -42,6 +42,21 @@ class CoreViewsTests(TestCase):
         self.assertIn("PLATFORM_VERSION", response.context)
         self.assertEqual(response.context["PLATFORM_NAME"], "EPS Phoenix")
 
+    def test_index_view_authenticated_roles(self):
+        """Verify the landing page navbar renders correctly for all authenticated roles."""
+        from apps.accounts.models import User
+
+        for role in ["ADMIN", "TEACHER", "STUDENT"]:
+            user = User.objects.create_user(
+                username=f"user_{role.lower()}",
+                password="password123",
+                role=role,
+            )
+            self.client.force_login(user)
+            response = self.client.get(reverse("core:index"))
+            self.assertEqual(response.status_code, 200)
+            self.client.logout()
+
 
 class CoreSettingsTests(TestCase):
     def test_installed_apps_includes_core(self):
