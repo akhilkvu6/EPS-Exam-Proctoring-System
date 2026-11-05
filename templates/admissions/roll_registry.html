@@ -3,70 +3,79 @@
 {% block title %}Official Roll Number Ledger — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div class="card">
-    <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Immutable Audit Ledger
+        </div>
+        <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
           Official Roll Number Allocation Ledger
         </h1>
-        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-          Section 8.5: Immutable audit ledger certifying sequential roll allocation, verification tickets, and authorizing authorities.
+        <p class="text-xs text-zinc-500 mt-1">
+          Cryptographically recorded, sequential roll number registry guaranteeing race-free student identification.
         </p>
       </div>
 
-      <!-- Search input -->
-      <form method="get" style="display: flex; gap: var(--space-2);">
+      <form method="get" class="flex items-center gap-2">
         <input 
           type="text" 
           name="q" 
           value="{{ search_query }}" 
-          placeholder="Search roll, app ref, or candidate..." 
-          class="form-input" 
-          style="width: 260px; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
-        <button type="submit" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
+          placeholder="Search roll, app ref, or name..." 
+          class="form-control-precision text-xs py-1.5 px-3 w-56 sm:w-64 rounded-lg">
+        <button type="submit" class="btn-brand text-xs py-1.5 px-3">
           Search
         </button>
+        {% if search_query %}
+          <a href="{% url 'admissions:roll_registry' %}" class="btn-ghost text-xs py-1.5 px-2">Reset</a>
+        {% endif %}
       </form>
     </div>
+  </div>
 
+  <!-- Registry Table -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
     {% if records %}
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
           <thead>
-            <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-              <th style="padding: var(--space-3);">Official Roll</th>
-              <th style="padding: var(--space-3);">Candidate Name</th>
-              <th style="padding: var(--space-3);">App Ref</th>
-              <th style="padding: var(--space-3);">Authorized By</th>
-              <th style="padding: var(--space-3);">Verification Ticket</th>
-              <th style="padding: var(--space-3); text-align: right;">Timestamp</th>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Official Roll</th>
+              <th class="py-3 px-4">Candidate Name</th>
+              <th class="py-3 px-4">Dossier Ref</th>
+              <th class="py-3 px-4">Authorized Authority</th>
+              <th class="py-3 px-4">Verification Ticket</th>
+              <th class="py-3 px-4 text-right">Allocation Time</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="divide-y divide-zinc-100">
             {% for r in records %}
-              <tr style="border-bottom: 1px solid var(--border-default);">
-                <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-success-fg);">
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-emerald-600 text-sm">
                   {{ r.allocated_roll_number }}
                 </td>
-                <td style="padding: var(--space-3);">
-                  <strong>{{ r.student_profile.user.get_full_name|default:r.student_profile.user.username }}</strong>
-                  <div style="font-size: 11px; color: var(--text-tertiary);">{{ r.student_profile.course_name }}</div>
+                <td class="py-3 px-4">
+                  <div class="font-bold text-zinc-900">{{ r.student_profile.user.get_full_name|default:r.student_profile.user.username }}</div>
+                  <div class="text-[11px] text-zinc-500">{{ r.student_profile.course_name }}</div>
                 </td>
-                <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--color-accent);">
+                <td class="py-3 px-4 font-mono font-bold text-[#ea580c]">
                   {{ r.student_profile.registration_number }}
                 </td>
-                <td style="padding: var(--space-3); font-size: var(--font-size-xs);">
+                <td class="py-3 px-4">
                   {% if r.allocated_by %}
-                    @{{ r.allocated_by.username }}
+                    <span class="font-mono text-zinc-800">@{{ r.allocated_by.username }}</span>
                   {% else %}
-                    <span style="color: var(--text-tertiary);">System</span>
+                    <span class="text-zinc-400 italic">System Automation</span>
                   {% endif %}
                 </td>
-                <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-size: 10px; color: var(--text-secondary);">
+                <td class="py-3 px-4 font-mono text-[11px] text-zinc-500">
                   {{ r.allocation_ticket_id }}
                 </td>
-                <td style="padding: var(--space-3); text-align: right; font-size: var(--font-size-xs); color: var(--text-secondary);">
+                <td class="py-3 px-4 text-right font-mono text-[11px] text-zinc-500">
                   {{ r.created_at|date:"Y-m-d H:i" }}
                 </td>
               </tr>
@@ -75,10 +84,8 @@
         </table>
       </div>
     {% else %}
-      <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
-        <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-          No roll allocation ledger records found.
-        </p>
+      <div class="p-12 text-center text-xs text-zinc-400">
+        No roll allocation records logged.
       </div>
     {% endif %}
   </div>

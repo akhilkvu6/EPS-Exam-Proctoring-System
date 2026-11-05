@@ -3,37 +3,50 @@
 {% block title %}Examinations Portal — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block student_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        Examinations Register
-      </h1>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        Active, scheduled, and past institutional examinations assigned to your academic enrollment.
-      </p>
-    </div>
+<div class="space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+      Examinations Register
+    </h1>
+    <p class="text-xs text-zinc-500 mt-1">
+      Active, upcoming, and past institutional examinations assigned to your academic enrollment cohort.
+    </p>
   </div>
 
   {% if exams %}
-    <!-- Exam list dynamically rendered when exams are scheduled -->
-    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+    <div class="space-y-4">
       {% for exam in exams %}
-        <div class="card" style="padding: var(--space-4);">
-          <!-- Exam item content -->
+        <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs hover:shadow-md transition-shadow border-t-2 border-t-[#ea580c] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+                {{ exam.code }}
+              </span>
+              <span class="font-bold text-sm text-zinc-900">{{ exam.title }}</span>
+            </div>
+            <div class="text-xs text-zinc-500 font-mono">
+              {{ exam.subject.code }} &bull; Window: {{ exam.start_window|date:"M d, H:i" }} &rarr; {{ exam.end_window|date:"M d, H:i" }}
+            </div>
+          </div>
+          <div>
+            <a href="{% url 'exam_engine:exam_lobby' exam.id %}" class="btn-brand text-xs py-1.5 px-4 font-bold">
+              Enter Lobby &rarr;
+            </a>
+          </div>
         </div>
       {% endfor %}
     </div>
   {% else %}
-    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-lg);">
-      <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">📝</div>
-      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-        No Active Examinations Scheduled
-      </h3>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); max-width: 440px; margin: 0 auto var(--space-4) auto;">
-        You have no examinations currently in progress. Examination timetables and access codes will be scheduled by your course invigilators in Phase 10.
-      </p>
-      <a href="{% url 'student:dashboard' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Back to Dashboard</a>
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-12 text-center text-xs text-zinc-400 shadow-2xs">
+      <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+        📝
+      </div>
+      <div class="font-bold text-zinc-800 text-sm mb-1">No Active Examinations Scheduled</div>
+      <p class="text-zinc-500 max-w-sm mx-auto mb-4">You have no examinations currently active. Examination timetables and proctoring entry lobbies are published here by your course invigilators.</p>
+      <a href="{% url 'student:dashboard' %}" class="btn-secondary text-xs">
+        Return to Dashboard
+      </a>
     </div>
   {% endif %}
 </div>

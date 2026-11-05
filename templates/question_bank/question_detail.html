@@ -1,159 +1,130 @@
 {% extends "base/base.html" %}
 
-{% block title %}{{ question.title }} | Question Detail{% endblock %}
+{% block title %}{{ question.title }} — Question Detail — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 900px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Top bar -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <a href="{% url 'question_bank:question_list' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
-      ← Back to Question Bank
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Top Navigation & Actions -->
+  <div class="flex items-center justify-between">
+    <a href="{% url 'question_bank:question_list' %}" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-[#ea580c] font-semibold transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      <span>Back to Question Bank</span>
     </a>
-    <div style="display: flex; gap: var(--space-2);">
-      <a href="{% url 'question_bank:question_duplicate' question.pk %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">
+
+    <div class="flex items-center gap-2">
+      <a href="{% url 'question_bank:question_duplicate' question.pk %}" class="btn-secondary text-xs">
         Clone
       </a>
-      <a href="{% url 'question_bank:question_edit' question.pk %}" class="btn btn-primary" style="font-size: var(--font-size-xs);">
+      <a href="{% url 'question_bank:question_edit' question.pk %}" class="btn-brand text-xs">
         Edit (v{{ question.version }})
       </a>
     </div>
   </div>
 
-  <!-- Question Overview Card -->
-  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
-      <div>
-        <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent); font-weight: var(--font-weight-bold); margin-right: var(--space-2);">
+  <!-- Question Detail Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 sm:p-8 shadow-2xs border-t-2 border-t-[#ea580c] space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
           {{ question.subject.code }}
         </span>
-        <span class="badge">
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 text-zinc-700">
           {{ question.get_question_type_display }}
         </span>
-        <span class="badge">
-          {{ question.get_difficulty_display }}
-        </span>
-        <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 6px; border-radius: 4px; margin-left: var(--space-2);">
-          Snapshot Version v{{ question.version }}
+        {% if question.difficulty == 'EASY' %}
+          <span class="status-pill-emerald">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Easy
+          </span>
+        {% elif question.difficulty == 'MEDIUM' %}
+          <span class="status-pill-amber">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            Medium
+          </span>
+        {% else %}
+          <span class="status-pill-rose">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+            Hard
+          </span>
+        {% endif %}
+        <span class="font-mono text-[11px] text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200/60">
+          Snapshot v{{ question.version }}
         </span>
       </div>
-      <div style="font-size: var(--font-size-sm); color: var(--text-secondary); text-align: right;">
-        Marks: <strong>+{{ question.default_marks }}</strong> / Penalty: <strong>-{{ question.negative_marks }}</strong>
+
+      <div class="font-mono text-xs text-zinc-600">
+        Marks: <strong class="text-emerald-600">+{{ question.default_marks }}</strong> / Penalty: <strong class="text-rose-600">-{{ question.negative_marks }}</strong>
       </div>
     </div>
 
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); color: var(--text-primary);">
-      {{ question.title }}
-    </h1>
-
-    <div style="font-size: var(--font-size-base); line-height: 1.6; color: var(--text-primary); margin-bottom: var(--space-6); white-space: pre-wrap; background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md);">{{ question.content }}</div>
+    <div>
+      <h1 class="text-xl font-bold text-zinc-900 tracking-tight mb-3">
+        {{ question.title }}
+      </h1>
+      <div class="p-4 bg-zinc-50 border border-zinc-200/70 rounded-xl text-zinc-900 leading-relaxed font-sans text-sm whitespace-pre-wrap">
+        {{ question.content }}
+      </div>
+    </div>
 
     {% if question.image %}
-      <div style="margin-bottom: var(--space-6); text-align: center;">
-        <img src="{{ question.image.url }}" alt="Question Figure" style="max-width: 100%; max-height: 400px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <div class="text-center p-3 bg-zinc-50 rounded-xl border border-zinc-200/70">
+        <img src="{{ question.image.url }}" alt="Question Figure" class="max-w-full max-h-96 mx-auto rounded-lg border border-zinc-200">
       </div>
     {% endif %}
 
-    <!-- Options Section -->
+    <!-- Options List -->
     {% if options %}
-      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: var(--space-3);">
-        Configured Options & Answer Keys
-      </h3>
-      <div style="display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-6);">
-        {% for opt in options %}
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid {% if opt.is_correct %}#22c55e{% else %}var(--border-color){% endif %}; background-color: {% if opt.is_correct %}rgba(34, 197, 94, 0.08){% else %}var(--bg-surface-secondary){% endif %};">
-            <div style="display: flex; align-items: center; gap: var(--space-3);">
-              <span style="font-weight: var(--font-weight-bold); color: var(--text-secondary);">{{ forloop.counter }}.</span>
-              <span style="color: var(--text-primary);">{{ opt.option_text }}</span>
+      <div class="space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500">
+          Configured Options & Answer Keys
+        </h3>
+        <div class="space-y-2">
+          {% for opt in options %}
+            <div class="flex items-center justify-between p-3 rounded-lg border {% if opt.is_correct %}border-emerald-200 bg-emerald-50/50 text-emerald-950 font-medium{% else %}border-zinc-200 bg-white text-zinc-800{% endif %} text-xs">
+              <div class="flex items-center gap-3">
+                <span class="font-mono font-bold text-zinc-400 w-5">{{ forloop.counter }}.</span>
+                <span>{{ opt.option_text }}</span>
+              </div>
+              {% if opt.is_correct %}
+                <span class="status-pill-emerald text-[11px]">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Correct Key
+                </span>
+              {% endif %}
             </div>
-            {% if opt.is_correct %}
-              <span style="color: #22c55e; font-weight: var(--font-weight-bold); font-size: var(--font-size-xs);">
-                ✓ Correct Key
-              </span>
-            {% endif %}
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
       </div>
     {% endif %}
 
-    <!-- Numerical validation details -->
+    <!-- Numerical validation -->
     {% if question.question_type == 'NUMERICAL' %}
-      <div style="background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-6);">
-        <h4 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-          Numerical Validation Parameters
-        </h4>
-        <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-          Target Value: <strong>{{ question.numerical_target }}</strong> (± {{ question.numerical_tolerance }} tolerance window)
+      <div class="p-4 bg-orange-50/50 border border-orange-200/80 rounded-xl text-xs space-y-1">
+        <h4 class="font-bold text-orange-950 uppercase tracking-wider text-[11px]">Numerical Engine Validation</h4>
+        <div class="font-mono text-zinc-700">
+          Target: <strong class="text-zinc-900">{{ question.numerical_target }}</strong> (&plusmn; {{ question.numerical_tolerance }} window)
         </div>
       </div>
     {% endif %}
 
     <!-- Solution / Rubric details -->
     {% if question.explanation %}
-      <div style="margin-bottom: var(--space-4);">
-        <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--space-1);">
-          Post-Exam Model Solution / Explanation
-        </h4>
-        <div style="font-size: var(--font-size-sm); color: var(--text-secondary); background: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+      <div class="space-y-1.5">
+        <h4 class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Model Solution / Explanation</h4>
+        <div class="p-3 bg-zinc-50 rounded-lg border border-zinc-200/70 text-xs text-zinc-700">
           {{ question.explanation }}
         </div>
       </div>
     {% endif %}
 
     {% if question.rubric %}
-      <div style="margin-bottom: var(--space-4);">
-        <h4 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); margin-bottom: var(--space-1);">
-          Evaluation Rubric
-        </h4>
-        <div style="font-size: var(--font-size-sm); color: var(--text-secondary); background: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+      <div class="space-y-1.5">
+        <h4 class="text-[11px] font-bold uppercase tracking-wider text-zinc-400">Evaluation Rubric</h4>
+        <div class="p-3 bg-zinc-50 rounded-lg border border-zinc-200/70 text-xs text-zinc-700 whitespace-pre-wrap">
           {{ question.rubric }}
         </div>
       </div>
     {% endif %}
-  </div>
-
-  <!-- Candidate Delivery Security Inspection Card -->
-  <div class="card" style="padding: var(--space-6); border-left: 4px solid var(--color-accent); margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
-      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--text-primary);">
-        🛡️ Candidate Security & Delivery Simulation
-      </h3>
-      <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
-        Zero-Leakage Verified
-      </span>
-    </div>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
-      Below is the exact payload sent to candidates during an active examination. Note that solution keys, correct flags, rubrics, and explanations are securely stripped.
-    </p>
-    <pre style="background-color: #0f172a; color: #38bdf8; padding: var(--space-4); border-radius: var(--radius-md); font-size: 11px; overflow-x: auto; line-height: 1.4;">{{ student_safe_data|pprint }}</pre>
-  </div>
-
-  <!-- Version Snapshots History -->
-  <div class="card" style="padding: var(--space-6);">
-    <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">
-      🔒 Immutable Version Snapshot Registry
-    </h3>
-    <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-xs);">
-      <thead>
-        <tr style="text-align: left; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-          <th style="padding: 8px 0;">Version</th>
-          <th style="padding: 8px 0;">Snapshot ID</th>
-          <th style="padding: 8px 0;">Captured At</th>
-          <th style="padding: 8px 0; text-align: right;">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for snap in snapshots %}
-          <tr style="border-bottom: 1px solid var(--border-color);">
-            <td style="padding: 8px 0; font-weight: var(--font-weight-bold);">v{{ snap.version }}</td>
-            <td style="padding: 8px 0; font-family: monospace; color: var(--text-secondary);">{{ snap.id }}</td>
-            <td style="padding: 8px 0; color: var(--text-secondary);">{{ snap.created_at|date:"M d, Y H:i" }}</td>
-            <td style="padding: 8px 0; text-align: right;">
-              <span style="color: #22c55e; font-weight: var(--font-weight-semibold);">Locked & Immutable</span>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </div>
 </div>
 {% endblock %}

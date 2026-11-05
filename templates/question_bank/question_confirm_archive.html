@@ -1,23 +1,29 @@
 {% extends "base/base.html" %}
 
-{% block title %}Archive Question | EPS Phoenix{% endblock %}
+{% block title %}Archive Question — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 500px; padding-top: var(--space-12); padding-bottom: var(--space-12);">
-  <div class="card" style="padding: var(--space-6); text-align: center;">
-    <div style="font-size: 40px; margin-bottom: var(--space-3);">📦</div>
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-      Archive Question?
+<div class="max-w-md mx-auto px-4 py-16 text-center">
+  <div class="bg-white border border-zinc-200/90 rounded-2xl p-8 shadow-2xs border-t-4 border-t-[#ea580c]">
+    <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-2xs">
+      📦
+    </div>
+
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight mb-2">
+      Archive Question Item?
     </h1>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
-      Are you sure you want to archive <strong>"{{ question.title }}"</strong>? Archived questions will no longer appear in future exam authoring pickers. Existing exam snapshots referencing this item remain intact.
+    
+    <p class="text-xs text-zinc-600 leading-relaxed mb-6">
+      Are you sure you want to archive <strong class="text-zinc-900">"{{ question.title }}"</strong>? Archived questions will no longer appear in exam authoring item pickers. Existing exam snapshots referencing this item remain fully locked and intact.
     </p>
 
     <form method="post">
       {% csrf_token %}
-      <div style="display: flex; justify-content: center; gap: var(--space-3);">
-        <a href="{% url 'question_bank:question_list' %}" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-danger" style="background-color: var(--color-error); color: white; border: none; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: var(--font-weight-semibold); cursor: pointer;">
+      <div class="flex items-center justify-center gap-3">
+        <a href="{% url 'question_bank:question_list' %}" class="btn-secondary text-xs">
+          Cancel
+        </a>
+        <button type="submit" class="btn-destructive text-xs">
           Confirm Archive
         </button>
       </div>

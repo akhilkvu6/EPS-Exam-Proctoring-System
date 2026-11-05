@@ -3,45 +3,89 @@
 {% block title %}Institutional Portal — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-10); padding-bottom: var(--space-12);">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
   <!-- Hero Section -->
-  <div style="text-align: center; max-width: 760px; margin: 0 auto var(--space-10) auto;">
-    <div style="display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); background-color: var(--color-accent-subtle); color: var(--color-accent); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); margin-bottom: var(--space-4);">
-      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-success);"></span>
-      Institutional System Online &bull; v{{ PLATFORM_VERSION }}
+  <div class="text-center max-w-3xl mx-auto mb-12">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-[#c2410c] text-xs font-semibold tracking-wide mb-5 border border-orange-200/80 shadow-2xs">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="font-mono text-[11px] uppercase tracking-wider">Node Operational</span>
+      <span class="text-orange-300">|</span>
+      <span>v{{ PLATFORM_VERSION }} Release</span>
     </div>
-    <h1 style="font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); letter-spacing: -0.025em; line-height: 1.15; margin-bottom: var(--space-3);">
+    
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-zinc-900 tracking-tight leading-tight mb-4">
       {{ INSTITUTION_NAME }}
     </h1>
-    <p style="font-size: var(--font-size-lg); color: var(--text-secondary); line-height: var(--line-height-relaxed);">
-      EPS Phoenix is a secure, server-authoritative online examination delivery and intelligent proctoring platform designed for institutional integrity.
+    
+    <p class="text-base sm:text-lg text-zinc-600 leading-relaxed font-normal">
+      High-integrity, server-authoritative examination delivery and real-time intelligent proctoring telemetry built for institutional governance.
     </p>
   </div>
 
-  <!-- Workspace Grid -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-10);">
+  <!-- Key Metrics Ribbon -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Architecture</div>
+      <div class="text-xl font-extrabold text-zinc-900 font-mono tracking-tight">Zero-Egress</div>
+      <div class="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Client-side ML Edge
+      </div>
+    </div>
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Time Sync</div>
+      <div class="text-xl font-extrabold text-zinc-900 font-mono tracking-tight">Server Auth</div>
+      <div class="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Drift-immune clock
+      </div>
+    </div>
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Admissions Lock</div>
+      <div class="text-xl font-extrabold text-zinc-900 font-mono tracking-tight">SELECT FOR UPDATE</div>
+      <div class="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Race-free Roll Allocation
+      </div>
+    </div>
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Security Seal</div>
+      <div class="text-xl font-extrabold text-zinc-900 font-mono tracking-tight">SHA-256</div>
+      <div class="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Cryptographic Receipts
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
     {% for ws in workspaces %}
-      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between border-t-2 border-t-[#ea580c] relative group">
         <div>
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
-            <span style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-accent);">
+          <div class="flex items-center justify-between gap-2 mb-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wider uppercase bg-orange-50 text-[#c2410c] border border-orange-200">
               {{ ws.badge }}
             </span>
-            <span style="font-size: var(--font-size-xs); padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--bg-tertiary); color: var(--text-tertiary);">
-              Role: {{ ws.role }}
+            <span class="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+              {{ ws.role }}
             </span>
           </div>
-          <h2 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+          
+          <h2 class="text-xl font-bold text-zinc-900 tracking-tight mb-2 group-hover:text-[#ea580c] transition-colors">
             {{ ws.title }}
           </h2>
-          <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-normal); margin-bottom: var(--space-6);">
+          
+          <p class="text-sm text-zinc-600 leading-relaxed mb-6">
             {{ ws.description }}
           </p>
         </div>
 
         <div>
-          <a href="{{ ws.url }}" class="btn btn-primary" style="width: 100%;">
-            Enter {{ ws.title }} &rarr;
+          <a href="{{ ws.url }}" class="btn-brand w-full justify-center">
+            <span>Enter {{ ws.title }}</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
           </a>
         </div>
       </div>
@@ -49,13 +93,29 @@
   </div>
 
   <!-- Key Architecture Principles Banner -->
-  <div class="card" style="background-color: var(--bg-secondary); border-left: 4px solid var(--color-accent);">
-    <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-      Enterprise Engineering & Security Governance
-    </h3>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-relaxed);">
-      EPS Phoenix enforces server-authoritative timer synchronization, transactional roll number allocation locks, zero continuous video recording, client-side MediaPipe/ONNX event metadata tracking, and deterministic evaluation workflows.
-    </p>
+  <div class="bg-gradient-to-r from-orange-50/70 via-white to-orange-50/40 border border-orange-200/80 rounded-xl p-6 shadow-2xs relative overflow-hidden border-l-4 border-l-[#ea580c]">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2 mb-1.5">
+          <svg class="w-5 h-5 text-[#ea580c]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+          <h3 class="text-base font-bold text-zinc-900 tracking-tight">
+            Institutional Engineering & Security Governance
+          </h3>
+        </div>
+        <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+          EPS Phoenix enforces server-authoritative timer synchronization, transactional roll number allocation locks, zero continuous video recording, client-side MediaPipe/ONNX event metadata tracking, and deterministic evaluation workflows.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="{% url 'student:register' %}" class="btn-secondary text-xs">
+          Candidate Portal
+        </a>
+        <a href="{% url 'accounts:login' %}" class="btn-brand text-xs">
+          Sign In
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

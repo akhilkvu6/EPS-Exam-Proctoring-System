@@ -3,18 +3,36 @@
 {% block title %}Access Denied — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 540px; text-align: center; padding-top: var(--space-12); padding-bottom: var(--space-12);">
-  <div class="card" style="padding: var(--space-8);">
-    <div style="font-size: 3rem; margin-bottom: var(--space-2); color: var(--color-danger);">🛡️</div>
-    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3);">
+<div class="max-w-lg mx-auto px-4 py-16 text-center">
+  <div class="bg-white border border-zinc-200/90 rounded-2xl p-8 shadow-2xs border-t-4 border-t-[#ea580c]">
+    <div class="w-14 h-14 rounded-2xl bg-orange-50 text-[#ea580c] border border-orange-200 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-2xs">
+      🛡️
+    </div>
+
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 text-orange-800 text-xs font-semibold tracking-wide mb-3 border border-orange-200">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
+      <span>ROLE BOUNDARY INTERCEPT</span>
+    </div>
+
+    <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight mb-2">
       Workspace Access Denied
     </h1>
-    <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-6);">
-      You do not possess the required institutional role or academic scoping permissions to access this endpoint. All actions and unauthorized attempts are logged for security compliance.
+    
+    <p class="text-sm text-zinc-600 leading-relaxed mb-6">
+      You do not possess the required institutional role or academic scoping permissions to access this endpoint. All unauthorized access attempts are recorded in the security audit ledger.
     </p>
-    <div style="display: flex; justify-content: center; gap: var(--space-3);">
-      <a href="{% url 'core:index' %}" class="btn btn-secondary">Platform Home</a>
-      <a href="{% url 'accounts:logout' %}" class="btn btn-primary">Switch Account</a>
+
+    <div class="flex items-center justify-center gap-3">
+      <a href="{% url 'core:index' %}" class="btn-secondary text-xs">
+        Platform Home
+      </a>
+      <a href="{% url 'accounts:logout' %}" class="btn-brand text-xs">
+        Switch Account
+      </a>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-zinc-100 font-mono text-[11px] text-zinc-400">
+      Node: EPS-RBAC-GATEWAY &bull; Session IP Logged
     </div>
   </div>
 </div>

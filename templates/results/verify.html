@@ -1,58 +1,61 @@
 {% extends "base/base.html" %}
 
-{% block title %}Verify Certificate | EPS Phoenix{% endblock %}
+{% block title %}Verify Certificate — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 650px; padding-top: var(--space-12); padding-bottom: var(--space-12);">
-  <div class="card" style="padding: var(--space-8); text-align: center; border-top: 4px solid #22c55e;">
-    <div style="width: 56px; height: 56px; border-radius: 50%; background-color: rgba(34, 197, 94, 0.15); color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto var(--space-3) auto;">
+<div class="max-w-xl mx-auto px-4 py-16 text-center">
+  <div class="bg-white border border-zinc-200/90 rounded-2xl p-8 sm:p-10 shadow-2xs border-t-4 border-t-emerald-500 space-y-6">
+    <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto text-3xl font-bold shadow-2xs">
       ✓
     </div>
 
-    <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); color: #22c55e; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-1);">
-      Official Institutional Registry
+    <div>
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold tracking-wide mb-2 border border-emerald-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span class="font-mono">OFFICIAL INSTITUTIONAL REGISTRY</span>
+      </div>
+      <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
+        Academic Certificate Verified
+      </h1>
+      <p class="text-xs text-zinc-500 mt-1">
+        The examination credential referenced below has been authenticated against the EPS Phoenix cryptographic ledger.
+      </p>
     </div>
-    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-      Academic Certificate Verified
-    </h1>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
-      The examination credential referenced below has been authenticated against EPS Phoenix's cryptographic ledger.
-    </p>
 
-    <!-- Details -->
-    <div style="background-color: var(--bg-surface-secondary); padding: var(--space-5); border-radius: var(--radius-md); text-align: left; font-size: var(--font-size-xs); margin-bottom: var(--space-6);">
-      <div style="margin-bottom: 8px;">
-        <span style="color: var(--text-secondary);">Candidate:</span>
-        <strong style="color: var(--text-primary);">{{ result.student.get_full_name|default:result.student.username }}</strong>
+    <!-- Verification Details -->
+    <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-5 text-left font-mono text-xs space-y-2">
+      <div class="flex justify-between border-b border-zinc-200/60 pb-2">
+        <span class="text-zinc-500 font-sans">Candidate:</span>
+        <span class="font-bold text-zinc-900 font-sans">{{ result.student.get_full_name|default:result.student.username }}</span>
       </div>
-      <div style="margin-bottom: 8px;">
-        <span style="color: var(--text-secondary);">Official Roll Number:</span>
-        <strong style="color: var(--text-primary); font-family: monospace;">{{ result.student.student_profile.roll_number|default:"PENDING" }}</strong>
+      <div class="flex justify-between border-b border-zinc-200/60 pb-2">
+        <span class="text-zinc-500 font-sans">Roll Number:</span>
+        <span class="font-bold text-emerald-600">{{ result.student.student_profile.roll_number|default:"PENDING" }}</span>
       </div>
-      <div style="margin-bottom: 8px;">
-        <span style="color: var(--text-secondary);">Examination:</span>
-        <strong style="color: var(--text-primary);">{{ result.examination.title }} ({{ result.examination.code }})</strong>
+      <div class="flex justify-between border-b border-zinc-200/60 pb-2">
+        <span class="text-zinc-500 font-sans">Examination:</span>
+        <span class="font-bold text-zinc-900 font-sans">{{ result.examination.title }} ({{ result.examination.code }})</span>
       </div>
-      <div style="margin-bottom: 8px;">
-        <span style="color: var(--text-secondary);">Academic Subject:</span>
-        <strong style="color: var(--text-primary);">{{ result.examination.subject.code }} — {{ result.examination.subject.name }}</strong>
+      <div class="flex justify-between border-b border-zinc-200/60 pb-2">
+        <span class="text-zinc-500 font-sans">Academic Subject:</span>
+        <span class="font-bold text-zinc-900 font-sans">{{ result.examination.subject.code }} — {{ result.examination.subject.name }}</span>
       </div>
-      <div style="margin-bottom: 8px;">
-        <span style="color: var(--text-secondary);">Awarded Score & Grade:</span>
-        <strong style="color: var(--color-accent);">{{ result.total_score }} / {{ result.maximum_score }} ({{ result.percentage }}% — Grade {{ result.grade_letter }})</strong>
+      <div class="flex justify-between border-b border-zinc-200/60 pb-2">
+        <span class="text-zinc-500 font-sans">Awarded Grade:</span>
+        <span class="font-bold text-[#ea580c]">{{ result.total_score }} / {{ result.maximum_score }} ({{ result.percentage }}% &bull; Grade {{ result.grade_letter }})</span>
       </div>
-      <div>
-        <span style="color: var(--text-secondary);">Official Publication Date:</span>
-        <strong style="color: var(--text-primary);">{{ result.published_at|date:"F d, Y" }}</strong>
+      <div class="flex justify-between">
+        <span class="text-zinc-500 font-sans">Publication Date:</span>
+        <span class="font-bold text-zinc-700 font-sans">{{ result.published_at|date:"F d, Y" }}</span>
       </div>
     </div>
 
     <!-- SHA-256 Stamp -->
-    <div style="background-color: #0f172a; padding: var(--space-4); border-radius: var(--radius-md); text-align: left;">
-      <div style="color: #94a3b8; font-size: 10px; text-transform: uppercase; margin-bottom: 2px;">
+    <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-xl text-left space-y-1">
+      <div class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
         SHA-256 Digital Verification Fingerprint
       </div>
-      <div style="font-family: monospace; font-size: 11px; color: #38bdf8; word-break: break-all;">
+      <div class="font-mono text-xs text-orange-400 break-all select-all">
         {{ result.verification_hash }}
       </div>
     </div>

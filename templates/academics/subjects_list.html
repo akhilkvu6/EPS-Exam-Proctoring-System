@@ -3,46 +3,69 @@
 {% block title %}Curriculum Subjects — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
-    <div class="card">
-      <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-          Curriculum Subjects & Papers
-        </h1>
-        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-          Academic modules mapped to degree programs and semester levels for examination scheduling.
-        </p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Academic Hierarchy Subnav -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+    <a href="{% url 'academics:departments_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Departments
+    </a>
+    <a href="{% url 'academics:courses_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Degree Programs
+    </a>
+    <a href="{% url 'academics:batches_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Academic Batches
+    </a>
+    <a href="{% url 'academics:subjects_list' %}" class="px-3.5 py-1.5 rounded-full font-bold bg-[#ea580c] text-white shadow-2xs">
+      Subjects & Papers
+    </a>
+    <a href="{% url 'academics:teacher_assignments' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Faculty Scoping
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Subjects Table -->
+    <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs border-t-2 border-t-[#ea580c]">
+      <div class="section-header">
+        <div>
+          <h1 class="text-base font-bold text-zinc-900 tracking-tight">Curriculum Subjects & Papers</h1>
+          <p class="text-xs text-zinc-500">Academic modules mapped to degree programs and semester levels</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c]">
+          {{ subjects|length }} Papers
+        </span>
       </div>
 
       {% if subjects %}
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-                <th style="padding: var(--space-3);">Code</th>
-                <th style="padding: var(--space-3);">Subject Name</th>
-                <th style="padding: var(--space-3);">Course Program</th>
-                <th style="padding: var(--space-3);">Semester</th>
-                <th style="padding: var(--space-3); text-align: right;">Credits</th>
+              <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                <th class="py-3 px-4">Code</th>
+                <th class="py-3 px-4">Subject Title</th>
+                <th class="py-3 px-4">Program</th>
+                <th class="py-3 px-4">Semester</th>
+                <th class="py-3 px-4 text-right">Credits</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-zinc-100">
               {% for s in subjects %}
-                <tr style="border-bottom: 1px solid var(--border-default);">
-                  <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+                <tr class="hover:bg-zinc-50/80 transition-colors">
+                  <td class="py-3 px-4 font-mono font-bold text-[#ea580c]">
                     {{ s.code }}
                   </td>
-                  <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                  <td class="py-3 px-4 font-bold text-zinc-900">
                     {{ s.name }}
                   </td>
-                  <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
+                  <td class="py-3 px-4 text-zinc-600">
                     {{ s.course.code }}
                   </td>
-                  <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--color-accent);">
-                    Sem {{ s.semester_number }}
+                  <td class="py-3 px-4 font-mono text-xs">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-orange-50 text-[#c2410c]">
+                      Sem {{ s.semester_number }}
+                    </span>
                   </td>
-                  <td style="padding: var(--space-3); text-align: right; font-weight: var(--font-weight-bold);">
+                  <td class="py-3 px-4 text-right font-mono font-bold text-zinc-800">
                     {{ s.credits }}
                   </td>
                 </tr>
@@ -51,47 +74,69 @@
           </table>
         </div>
       {% else %}
-        <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
+        <div class="p-10 text-center text-xs text-zinc-400">
           No curriculum subjects registered yet.
-        </p>
+        </div>
       {% endif %}
     </div>
 
     <!-- Create Subject Panel (Staff Only) -->
     {% if user.is_staff %}
-      <div class="card">
-        <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
-          Add Curriculum Subject
-        </h2>
-        <form method="post" novalidate>
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs border-t-2 border-t-[#ea580c] h-fit">
+        <div class="pb-3 mb-4 border-b border-zinc-100 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-orange-100 text-[#ea580c] flex items-center justify-center font-bold text-xs">+</div>
+          <div>
+            <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Add Curriculum Subject</h2>
+            <p class="text-[11px] text-zinc-500">Register exam paper syllabus</p>
+          </div>
+        </div>
+
+        <form method="post" novalidate class="space-y-3.5">
           {% csrf_token %}
-          <div class="form-group">
-            <label for="{{ form.course.id_for_label }}" class="form-label">Degree Course *</label>
+          <div>
+            <label for="{{ form.course.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+              Degree Course <span class="text-rose-500">*</span>
+            </label>
             {{ form.course }}
-            {% if form.course.errors %}<div class="form-error">{{ form.course.errors.0 }}</div>{% endif %}
+            {% if form.course.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.course.errors.0 }}</div>{% endif %}
           </div>
-          <div class="form-group">
-            <label for="{{ form.code.id_for_label }}" class="form-label">Subject Code *</label>
+
+          <div>
+            <label for="{{ form.code.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+              Subject Code <span class="text-rose-500">*</span>
+            </label>
             {{ form.code }}
-            {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+            {% if form.code.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.code.errors.0 }}</div>{% endif %}
           </div>
-          <div class="form-group">
-            <label for="{{ form.name.id_for_label }}" class="form-label">Subject Title *</label>
+
+          <div>
+            <label for="{{ form.name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+              Subject Title <span class="text-rose-500">*</span>
+            </label>
             {{ form.name }}
-            {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+            {% if form.name.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.name.errors.0 }}</div>{% endif %}
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2);">
-            <div class="form-group">
-              <label for="{{ form.semester_number.id_for_label }}" class="form-label">Semester</label>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label for="{{ form.semester_number.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+                Semester
+              </label>
               {{ form.semester_number }}
             </div>
-            <div class="form-group">
-              <label for="{{ form.credits.id_for_label }}" class="form-label">Credits</label>
+
+            <div>
+              <label for="{{ form.credits.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+                Credits
+              </label>
               {{ form.credits }}
             </div>
           </div>
-          <div style="margin-top: var(--space-6);">
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Subject &rarr;</button>
+
+          <div class="pt-2">
+            <button type="submit" class="btn-brand w-full justify-center py-2.5 text-xs font-bold shadow-xs">
+              Create Subject &rarr;
+            </button>
           </div>
         </form>
       </div>

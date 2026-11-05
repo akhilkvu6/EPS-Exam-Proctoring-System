@@ -5,96 +5,209 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} — {{ INSTITUTION_NAME }}</title>
+  <title>{% block title %}{{ PLATFORM_NAME }}{% endblock %} • {{ INSTITUTION_NAME }}</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans (UI) & JetBrains Mono (Telemetry/Codes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN with Forms & Container Queries -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              500: '#f97316',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <!-- Early Theme Bootstrapper to prevent FOUC -->
   <script src="{% static 'js/theme.js' %}"></script>
 
-  <!-- Enterprise Design Tokens and Core Layout -->
+  <!-- Centralized Vigilant Precision Tokens and Fallback Styles -->
   <link rel="stylesheet" href="{% static 'css/design-tokens.css' %}">
   {% block extra_css %}{% endblock %}
 </head>
-<body>
-  <!-- Header / Navigation -->
-  <header class="app-header">
-    <div class="brand-container">
-      <div class="brand-logo-badge" aria-hidden="true">P</div>
-      <div class="brand-text">
-        <a href="{% url 'core:index' %}" class="brand-title">{{ PLATFORM_NAME }}</a>
-        <span class="brand-subtitle">{{ INSTITUTION_NAME }}</span>
+<body class="bg-[#fafafa] text-zinc-800 antialiased min-h-screen flex flex-col font-sans selection:bg-brand-100 selection:text-brand-800">
+  <!-- BEGIN: Top Navigation Bar (Vigilant Precision Gradient) -->
+  <header class="bg-gradient-to-r from-[#c2410c] via-[#ea580c] to-[#f97316] text-white shadow-md sticky top-0 z-30" data-purpose="primary-navbar">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-6">
+          <a href="{% url 'core:index' %}" class="flex items-center gap-3 text-white no-underline">
+            <div class="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center text-white border border-white/30 shadow-xs">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+              </svg>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-sm tracking-tight text-white">{{ PLATFORM_NAME }}</span>
+              <span class="text-xs text-orange-200 font-normal">/</span>
+              <span class="text-xs text-orange-100 font-medium">
+                {% block workspace_title %}
+                  {% if user.is_authenticated %}
+                    {% if user.role == 'ADMIN' %}Institutional Admin{% elif user.role == 'TEACHER' %}Faculty Workspace{% else %}Student Workspace{% endif %}
+                  {% else %}
+                    {{ INSTITUTION_NAME }}
+                  {% endif %}
+                {% endblock %}
+              </span>
+            </div>
+          </a>
+
+          <nav class="hidden md:flex items-center gap-1.5 pl-4 border-l border-white/25">
+            {% block header_nav %}
+              {% if user.is_authenticated %}
+                {% if user.role == 'ADMIN' %}
+                  <a href="{% url 'administration:dashboard' %}" class="px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs transition">Dashboard</a>
+                  <a href="{% url 'administration:users_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Directory</a>
+                  <a href="{% url 'administration:escalated_admissions' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Escalations</a>
+                  <a href="{% url 'academics:departments_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Hierarchy</a>
+                  <a href="{% url 'administration:audit_logs' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Audit Logs</a>
+                {% elif user.role == 'TEACHER' %}
+                  <a href="{% url 'teacher:dashboard' %}" class="px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs transition">Dashboard</a>
+                  <a href="{% url 'teacher:admission_queue' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Admissions</a>
+                  <a href="{% url 'question_bank:question_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Question Bank</a>
+                  <a href="{% url 'examinations:exam_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Examinations</a>
+                {% else %}
+                  <a href="{% url 'student:dashboard' %}" class="px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs transition">Dashboard</a>
+                  <a href="{% url 'student:academics' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">My Academics</a>
+                  <a href="{% url 'student:exams_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">My Exams</a>
+                  <a href="{% url 'results:my_results' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">Results</a>
+                {% endif %}
+              {% else %}
+                <a href="{% url 'core:index' %}" class="px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs transition">Home</a>
+                <a href="{% url 'core:health_check' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 transition rounded-md">System Health</a>
+              {% endif %}
+            {% endblock %}
+          </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Search in directory or header -->
+          <div class="relative hidden sm:block w-48 lg:w-64">
+            <input class="w-full pl-8 pr-3 py-1.5 text-xs bg-white/15 text-white placeholder-orange-200 border border-white/25 rounded-md focus:bg-white focus:text-zinc-900 focus:placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-white transition" placeholder="Search..." type="text"/>
+            <svg class="w-3.5 h-3.5 text-orange-200 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </div>
+
+          <!-- Quick Theme Switcher (System / Light / Dark) -->
+          <button 
+            id="theme-toggle-btn" 
+            class="px-2.5 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/15 rounded-md transition border border-white/20 flex items-center gap-1.5"
+            title="Toggle Theme"
+            onclick="toggleThemeCycle()">
+            🌓 Theme
+          </button>
+
+          {% if user.is_authenticated %}
+            <!-- Appearance Customizer Link -->
+            <a href="{% url 'appearance:settings' %}" class="p-1.5 text-orange-100 hover:text-white hover:bg-white/15 rounded-md transition" title="Appearance Settings">
+              🎨
+            </a>
+
+            <!-- Notification Bell -->
+            <a href="{% url 'notifications:list' %}" class="relative p-1.5 text-orange-100 hover:text-white hover:bg-white/15 rounded-md transition" title="Notifications">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+              </svg>
+              {% if unread_notifications_count > 0 %}
+                <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-400 ring-2 ring-[#ea580c]"></span>
+              {% endif %}
+            </a>
+
+            <!-- User Avatar & Profile Pill -->
+            <div class="flex items-center gap-2 pl-3 border-l border-white/25">
+              <div class="w-7 h-7 rounded-full bg-white text-[#ea580c] font-bold text-xs flex items-center justify-center shadow-xs">
+                {{ user.username|slice:":2"|upper }}
+              </div>
+              <div class="hidden lg:block text-left text-white leading-tight">
+                <span class="text-xs font-semibold block">{{ user.get_full_name|default:user.username }}</span>
+                <span class="text-[10px] text-orange-100 font-medium font-mono">{{ user.role }}</span>
+              </div>
+              <a href="/accounts/logout/" class="ml-1 p-1.5 text-orange-100 hover:text-white hover:bg-white/15 rounded-md transition" title="Logout session">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+                </svg>
+              </a>
+            </div>
+          {% else %}
+            <a href="/accounts/login/" class="px-3.5 py-1.5 text-xs font-semibold text-[#ea580c] bg-white hover:bg-orange-50 rounded-md shadow-xs transition">
+              Sign In
+            </a>
+          {% endif %}
+        </div>
       </div>
     </div>
-
-    <nav aria-label="Main Navigation">
-      <ul class="nav-links">
-        {% block header_nav %}
-          <li><a href="{% url 'core:index' %}" class="nav-link">Home</a></li>
-          <li><a href="{% url 'core:health_check' %}" class="nav-link">System Health</a></li>
-        {% endblock %}
-      </ul>
-    </nav>
-
-    <div style="display: flex; align-items: center; gap: var(--space-3);">
-      <!-- Quick Theme Switcher (System / Light / Dark) -->
-      <button 
-        id="theme-toggle-btn" 
-        class="btn btn-secondary" 
-        style="padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);"
-        title="Toggle Appearance Theme"
-        onclick="toggleThemeCycle()">
-        🌓 Theme
-      </button>
-
-      {% if user.is_authenticated %}
-        <a href="{% url 'appearance:settings' %}" class="btn btn-secondary" style="padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);" title="Appearance Customization">
-          🎨
-        </a>
-        <a href="{% url 'notifications:list' %}" class="btn btn-secondary" style="position: relative; padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs);" title="Notifications">
-          🔔
-          {% if unread_notifications_count > 0 %}
-            <span style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; border-radius: 50%; font-size: 10px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-              {{ unread_notifications_count }}
-            </span>
-          {% endif %}
-        </a>
-        <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-          {{ user.get_full_name|default:user.username }}
-        </span>
-        <a href="/accounts/logout/" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Sign Out</a>
-      {% else %}
-        <a href="/accounts/login/" class="btn btn-primary" style="font-size: var(--font-size-xs);">Sign In</a>
-      {% endif %}
-    </div>
   </header>
+  <!-- END: Top Navigation Bar -->
 
-  <!-- Messages / Flash Alerts -->
+  <!-- Flash Messages / Flash Alerts -->
   {% if messages %}
-    <div class="container" style="padding-bottom: 0;">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
-          {{ message }}
+        <div class="flex items-center gap-3 p-3 text-xs rounded-lg border shadow-2xs mb-2 
+          {% if message.tags == 'error' %}bg-red-50 text-red-800 border-red-200
+          {% elif message.tags == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200
+          {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border-amber-200
+          {% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %}" role="alert">
+          <span class="w-2 h-2 rounded-full 
+            {% if message.tags == 'error' %}bg-red-500
+            {% elif message.tags == 'success' %}bg-emerald-500
+            {% elif message.tags == 'warning' %}bg-amber-500
+            {% else %}bg-blue-500{% endif %}"></span>
+          <span>{{ message }}</span>
         </div>
       {% endfor %}
     </div>
   {% endif %}
 
   <!-- Main Content Block -->
-  <main class="main-content" id="main-content">
-    {% block content %}{% endblock %}
-  </main>
+  {% block content %}{% endblock %}
 
-  <!-- Institutional Footer -->
-  <footer class="app-footer">
-    <div>
-      <strong>{{ PLATFORM_NAME }} v{{ PLATFORM_VERSION }}</strong> — Production Examination & Intelligent Proctoring Engine
-    </div>
-    <div>
-      &copy; {% now "Y" %} {{ INSTITUTION_NAME }}. All rights reserved.
+  <!-- BEGIN: Minimal Institutional Footer -->
+  <footer class="mt-auto border-t-2 border-[#ea580c] bg-zinc-900 text-xs text-zinc-400 py-5">
+    <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-5 h-5 rounded bg-[#ea580c] text-white flex items-center justify-center font-bold text-[10px]">EP</div>
+        <span class="font-semibold text-zinc-100">{{ PLATFORM_NAME }} Institutional Platform</span>
+        <span class="text-zinc-600">•</span>
+        <span class="text-orange-400 font-mono text-[11px]">{{ INSTITUTION_NAME }}</span>
+      </div>
+      <div class="flex items-center gap-4 text-zinc-400">
+        <span class="hover:text-orange-300 transition cursor-default">Django 5.1 Modular Monolith</span>
+        <span class="text-zinc-600">•</span>
+        <span class="inline-flex items-center gap-1.5 text-zinc-300 font-mono">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Privacy-Preserving Telemetry Active
+        </span>
+      </div>
     </div>
   </footer>
+  <!-- END: Minimal Institutional Footer -->
 
   <script>
     function toggleThemeCycle() {
+      if (!window.EPSAppearance) return;
       const current = window.EPSAppearance.getTheme();
       let next = "light";
       if (current === "light") next = "dark";

@@ -3,126 +3,131 @@
 {% block title %}Resolve Escalation {{ application.registration_number }} — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block admin_content %}
-<div>
-  <!-- Dossier Header -->
-  <div class="card" style="margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-4);">
+<div class="space-y-6">
+  <!-- Candidate Dossier Header -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-zinc-100">
       <div>
-        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-danger); text-transform: uppercase;">
-          Escalated Exception Review
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-rose-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+          Escalated Admission Exception
         </div>
-        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-top: var(--space-1);">
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
           {{ application.user.get_full_name|default:application.user.username }}
         </h1>
-        <div style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px;">
-          Username: <strong>{{ application.user.username }}</strong> &bull; Registration Ref: <strong style="color: var(--color-danger);">{{ application.registration_number }}</strong>
+        <div class="font-mono text-xs text-zinc-500 mt-0.5">
+          User: @{{ application.user.username }} &bull; Ref: <span class="font-bold text-[#ea580c]">{{ application.registration_number }}</span>
         </div>
       </div>
 
-      <div style="text-align: right;">
-        <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">APPLICATION STATUS</span>
-        <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-danger);">
-          Escalated to Institutional Admin
-        </div>
+      <div class="text-right">
+        <span class="status-pill-amber text-xs">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          Awaiting Determination
+        </span>
       </div>
     </div>
 
-    <!-- Candidate Academic & Personal Data Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4); font-size: var(--font-size-xs);">
+    <!-- Candidate Meta Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-zinc-50 p-4 rounded-xl border border-zinc-200/70 text-xs">
       <div>
-        <div style="color: var(--text-tertiary);">DEPARTMENT</div>
-        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.department_name }}</div>
+        <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Department</div>
+        <div class="font-bold text-zinc-900 mt-0.5">{{ application.department_name }}</div>
       </div>
       <div>
-        <div style="color: var(--text-tertiary);">TARGET PROGRAM</div>
-        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.course_name }}</div>
+        <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Target Course</div>
+        <div class="font-bold text-zinc-900 mt-0.5">{{ application.course_name }}</div>
       </div>
       <div>
-        <div style="color: var(--text-tertiary);">ACADEMIC BATCH</div>
-        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">{{ application.batch_name }}</div>
+        <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Academic Batch</div>
+        <div class="font-bold text-zinc-900 mt-0.5">{{ application.batch_name }}</div>
       </div>
       <div>
-        <div style="color: var(--text-tertiary);">GUARDIAN</div>
-        <div style="font-weight: var(--font-weight-semibold);">{{ application.guardian_name|default:"Not specified" }}</div>
-      </div>
-      <div>
-        <div style="color: var(--text-tertiary);">CONTACT NUMBER</div>
-        <div style="font-weight: var(--font-weight-semibold);">{{ application.contact_number|default:"Not specified" }}</div>
-      </div>
-      <div>
-        <div style="color: var(--text-tertiary);">SUBMISSION DATE</div>
-        <div style="font-weight: var(--font-weight-semibold);">{{ application.created_at|date:"M d, Y H:i" }}</div>
+        <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Registered On</div>
+        <div class="font-mono text-zinc-700 mt-0.5">{{ application.created_at|date:"M d, Y" }}</div>
       </div>
     </div>
   </div>
 
-  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Admin Determination Form -->
-    <div class="card">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
-        Executive Determination
-      </h2>
+    <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+      <div class="pb-3 mb-4 border-b border-zinc-100">
+        <h2 class="text-base font-bold text-zinc-900 tracking-tight">Executive Determination</h2>
+        <p class="text-xs text-zinc-500">Approve with roll issuance, remand to department, or reject dossier</p>
+      </div>
 
-      <form method="post" novalidate>
+      <form method="post" novalidate class="space-y-4">
         {% csrf_token %}
 
-        <div class="form-group">
-          <label for="{{ form.action.id_for_label }}" class="form-label">Administrative Determination *</label>
+        <div>
+          <label for="{{ form.action.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Administrative Determination <span class="text-rose-500">*</span>
+          </label>
           {{ form.action }}
           {% if form.action.errors %}
-            <div class="form-error">{{ form.action.errors.0 }}</div>
+            <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.action.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.roll_number.id_for_label }}" class="form-label">Assign Official Roll Number (Optional Override)</label>
+        <div>
+          <label for="{{ form.roll_number.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Assign Official Roll Number (Optional Override)
+          </label>
           {{ form.roll_number }}
-          <div class="form-hint">{{ form.roll_number.help_text }}</div>
+          {% if form.roll_number.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.roll_number.help_text }}</p>
+          {% endif %}
           {% if form.roll_number.errors %}
-            <div class="form-error">{{ form.roll_number.errors.0 }}</div>
+            <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.roll_number.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.remarks.id_for_label }}" class="form-label">Official Administrative Justification *</label>
+        <div>
+          <label for="{{ form.remarks.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Official Administrative Justification <span class="text-rose-500">*</span>
+          </label>
           {{ form.remarks }}
           {% if form.remarks.errors %}
-            <div class="form-error">{{ form.remarks.errors.0 }}</div>
+            <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.remarks.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3);">
-          <button type="submit" class="btn btn-primary">Execute Determination &rarr;</button>
-          <a href="{% url 'administration:escalated_admissions' %}" class="btn btn-secondary">Cancel</a>
+        <div class="pt-3 flex items-center gap-3">
+          <button type="submit" class="btn-brand">
+            Execute Determination &rarr;
+          </button>
+          <a href="{% url 'administration:escalated_admissions' %}" class="btn-secondary">
+            Cancel
+          </a>
         </div>
       </form>
     </div>
 
-    <!-- Review Dossier & Faculty Remarks History -->
-    <div class="card">
-      <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
-        Faculty Review Trail ({{ history.count }})
-      </h3>
+    <!-- Review History Trail -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs">
+      <div class="pb-3 mb-4 border-b border-zinc-100 flex items-center justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Faculty Review Trail</h3>
+        <span class="font-mono text-xs font-bold text-zinc-500">{{ history.count }}</span>
+      </div>
 
       {% if history %}
-        <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        <div class="space-y-3">
           {% for record in history %}
-            <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-3); font-size: var(--font-size-xs);">
-              <div style="display: flex; justify-content: space-between; font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-                <span style="color: var(--color-danger);">{{ record.get_action_display }}</span>
-                <span style="color: var(--text-tertiary); font-size: 10px;">{{ record.created_at|date:"M d, H:i" }}</span>
+            <div class="p-3 bg-zinc-50 rounded-lg border border-zinc-200/70 text-xs space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-[#ea580c]">{{ record.get_action_display }}</span>
+                <span class="font-mono text-[10px] text-zinc-400">{{ record.created_at|date:"M d, H:i" }}</span>
               </div>
-              <div style="color: var(--text-secondary); margin-bottom: var(--space-1);">
-                {{ record.remarks }}
-              </div>
-              <div style="color: var(--text-tertiary); font-size: 10px;">
-                Reviewer: {{ record.reviewer.get_full_name|default:record.reviewer.username }}
+              <p class="text-zinc-700">{{ record.remarks }}</p>
+              <div class="font-mono text-[10px] text-zinc-400 pt-1 border-t border-zinc-200/50">
+                Reviewer: @{{ record.reviewer.username }}
               </div>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-align: center; padding: var(--space-6) 0;">
+        <div class="p-6 text-center text-xs text-zinc-400">
           No prior departmental review records logged.
         </div>
       {% endif %}

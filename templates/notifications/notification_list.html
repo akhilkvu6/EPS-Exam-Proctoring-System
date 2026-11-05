@@ -1,66 +1,70 @@
 {% extends "base/base.html" %}
 
-{% block title %}Notifications | EPS Phoenix{% endblock %}
+{% block title %}Notifications — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Top bar -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Top Navigation & Action -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        🔔 Notifications & Activity Feed
+      <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
+        Notifications & Activity Ledger
       </h1>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-        Stay informed on admissions, examination schedules, result releases, and academic alerts.
+      <p class="text-xs text-zinc-500 mt-0.5">
+        Stay updated on admission determinations, examination scheduling, evaluation publications, and security alerts.
       </p>
     </div>
+
     {% if unread_notifications_count > 0 %}
       <form method="post" action="{% url 'notifications:mark_all_read' %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-secondary" style="font-size: 12px;">
+        <button type="submit" class="btn-secondary text-xs">
           ✓ Mark All as Read
         </button>
       </form>
     {% endif %}
   </div>
 
-  <!-- Filter Buttons -->
-  <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
-    <a href="{% url 'notifications:list' %}" class="btn {% if not filter_unread %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+  <!-- Filter Pills -->
+  <div class="flex items-center gap-2 text-xs">
+    <a href="{% url 'notifications:list' %}" class="px-3.5 py-1.5 rounded-full font-semibold transition-all {% if not filter_unread %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
       All Activity
     </a>
-    <a href="{% url 'notifications:list' %}?unread=1" class="btn {% if filter_unread %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+    <a href="{% url 'notifications:list' %}?unread=1" class="px-3.5 py-1.5 rounded-full font-semibold transition-all {% if filter_unread %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
       Unread Only
     </a>
   </div>
 
-  <!-- Notifications List -->
+  <!-- Notifications List Card -->
   {% if notifications %}
-    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+    <div class="space-y-3">
       {% for n in notifications %}
-        <div class="card" style="padding: var(--space-4); display: flex; justify-content: space-between; align-items: flex-start; background-color: {% if not n.is_read %}rgba(59, 130, 246, 0.05){% else %}var(--bg-surface-primary){% endif %}; border-left: 4px solid {% if n.level == 'SUCCESS' %}#22c55e{% elif n.level == 'WARNING' %}#eab308{% elif n.level == 'CRITICAL' %}#ef4444{% else %}var(--color-accent){% endif %};">
-          <div>
-            <div style="display: flex; gap: var(--space-2); align-items: center; margin-bottom: var(--space-1);">
-              <span class="badge" style="font-size: 10px;">{{ n.get_level_display }}</span>
-              <span style="font-size: 11px; color: var(--text-secondary);">{{ n.created_at|timesince }} ago</span>
+        <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs hover:shadow-md transition-all flex items-start justify-between gap-4 border-l-4 {% if n.level == 'SUCCESS' %}border-l-emerald-500{% elif n.level == 'WARNING' %}border-l-amber-500{% elif n.level == 'CRITICAL' %}border-l-rose-600{% else %}border-l-[#ea580c]{% endif %}">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-mono {% if n.level == 'SUCCESS' %}bg-emerald-50 text-emerald-800{% elif n.level == 'WARNING' %}bg-amber-50 text-amber-800{% elif n.level == 'CRITICAL' %}bg-rose-50 text-rose-800{% else %}bg-orange-50 text-[#c2410c]{% endif %}">
+                {{ n.get_level_display }}
+              </span>
+              <span class="text-[11px] text-zinc-400 font-mono">{{ n.created_at|timesince }} ago</span>
               {% if not n.is_read %}
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); display: inline-block;"></span>
+                <span class="w-2 h-2 rounded-full bg-[#ea580c]"></span>
               {% endif %}
             </div>
-            <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--space-1);">
+            <h3 class="font-bold text-sm text-zinc-900">
               {{ n.title }}
             </h3>
-            <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-2);">
+            <p class="text-xs text-zinc-600 leading-relaxed">
               {{ n.message }}
             </p>
           </div>
-          <div style="white-space: nowrap; margin-left: var(--space-4);">
+
+          <div class="shrink-0 pt-1">
             {% if n.action_url %}
-              <a href="{% url 'notifications:mark_read' n.id %}" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;">
-                View →
+              <a href="{% url 'notifications:mark_read' n.id %}" class="btn-action-edit py-1 px-3 text-xs">
+                View &rarr;
               </a>
             {% elif not n.is_read %}
-              <a href="{% url 'notifications:mark_read' n.id %}" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;">
+              <a href="{% url 'notifications:mark_read' n.id %}" class="btn-ghost py-1 px-2 text-xs">
                 Mark Read
               </a>
             {% endif %}
@@ -69,14 +73,12 @@
       {% endfor %}
     </div>
   {% else %}
-    <div class="card" style="text-align: center; padding: var(--space-12);">
-      <div style="font-size: 48px; margin-bottom: var(--space-2);">🔔</div>
-      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        No Notifications
-      </h3>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
-        You're completely caught up! New institutional updates, examination notices, and scores will appear here.
-      </p>
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-12 text-center text-xs text-zinc-400 shadow-2xs">
+      <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+        🔔
+      </div>
+      <div class="font-bold text-zinc-800 text-sm mb-1">No Notifications</div>
+      <p class="text-zinc-500 max-w-sm mx-auto">You are completely caught up! Examination alerts, review statuses, and publications will be logged here.</p>
     </div>
   {% endif %}
 </div>

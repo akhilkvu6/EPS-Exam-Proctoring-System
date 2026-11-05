@@ -3,106 +3,150 @@
 {% block title %}Institutional Settings — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block admin_content %}
-<div class="card" style="max-width: 760px;">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+<div class="bg-white border border-zinc-200/90 rounded-xl p-6 sm:p-8 shadow-2xs border-t-2 border-t-[#ea580c] max-w-3xl">
+  <div class="border-b border-zinc-100 pb-4 mb-6">
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
       Institutional Platform Settings
     </h1>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-      Central parameters governing legal institution name, transcripts branding, default appearance theme tokens, and admission policies.
+    <p class="text-xs text-zinc-500 mt-1">
+      Central parameters governing legal institution name, transcripts branding, default appearance tokens, and admission policies.
     </p>
   </div>
 
-  <form method="post" novalidate>
+  <form method="post" novalidate class="space-y-8">
     {% csrf_token %}
 
-    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-bottom: var(--space-4);">
-      1. Institutional Identity & Contact
-    </div>
-
-    <div class="form-group">
-      <label for="{{ form.institution_name.id_for_label }}" class="form-label">Official Legal Institution Name *</label>
-      {{ form.institution_name }}
-      <div class="form-hint">{{ form.institution_name.help_text }}</div>
-      {% if form.institution_name.errors %}
-        <div class="form-error">{{ form.institution_name.errors.0 }}</div>
-      {% endif %}
-    </div>
-
-    <div class="form-group">
-      <label for="{{ form.tagline.id_for_label }}" class="form-label">Motto / Transcripts Subheading</label>
-      {{ form.tagline }}
-      <div class="form-hint">{{ form.tagline.help_text }}</div>
-      {% if form.tagline.errors %}
-        <div class="form-error">{{ form.tagline.errors.0 }}</div>
-      {% endif %}
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-      <div class="form-group">
-        <label for="{{ form.contact_email.id_for_label }}" class="form-label">Central Administrative Email</label>
-        {{ form.contact_email }}
-        {% if form.contact_email.errors %}
-          <div class="form-error">{{ form.contact_email.errors.0 }}</div>
-        {% endif %}
+    <!-- Section 1: Identity -->
+    <div class="space-y-4">
+      <div class="flex items-center gap-2 pb-2 border-b border-orange-100">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">1</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Institutional Identity & Contact</h2>
       </div>
 
-      <div class="form-group">
-        <label for="{{ form.contact_phone.id_for_label }}" class="form-label">Administrative Helpline Phone</label>
-        {{ form.contact_phone }}
-        {% if form.contact_phone.errors %}
-          <div class="form-error">{{ form.contact_phone.errors.0 }}</div>
-        {% endif %}
-      </div>
-    </div>
+      <div class="space-y-4">
+        <div>
+          <label for="{{ form.institution_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Official Legal Institution Name <span class="text-rose-500">*</span>
+          </label>
+          {{ form.institution_name }}
+          {% if form.institution_name.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.institution_name.help_text }}</p>
+          {% endif %}
+          {% if form.institution_name.errors %}
+            <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.institution_name.errors.0 }}</p>
+          {% endif %}
+        </div>
 
-    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-top: var(--space-6); margin-bottom: var(--space-4);">
-      2. Appearance & Design Tokens Defaults
-    </div>
+        <div>
+          <label for="{{ form.tagline.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Motto / Transcripts Subheading
+          </label>
+          {{ form.tagline }}
+          {% if form.tagline.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.tagline.help_text }}</p>
+          {% endif %}
+          {% if form.tagline.errors %}
+            <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.tagline.errors.0 }}</p>
+          {% endif %}
+        </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-      <div class="form-group">
-        <label for="{{ form.default_theme.id_for_label }}" class="form-label">Default Theme Mode</label>
-        {{ form.default_theme }}
-        <div class="form-hint">{{ form.default_theme.help_text }}</div>
-        {% if form.default_theme.errors %}
-          <div class="form-error">{{ form.default_theme.errors.0 }}</div>
-        {% endif %}
-      </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="{{ form.contact_email.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Administrative Email
+            </label>
+            {{ form.contact_email }}
+            {% if form.contact_email.errors %}
+              <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.contact_email.errors.0 }}</p>
+            {% endif %}
+          </div>
 
-      <div class="form-group">
-        <label for="{{ form.default_accent_color.id_for_label }}" class="form-label">Default Brand Accent Color</label>
-        {{ form.default_accent_color }}
-        <div class="form-hint">{{ form.default_accent_color.help_text }}</div>
-        {% if form.default_accent_color.errors %}
-          <div class="form-error">{{ form.default_accent_color.errors.0 }}</div>
-        {% endif %}
+          <div>
+            <label for="{{ form.contact_phone.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Helpline Phone
+            </label>
+            {{ form.contact_phone }}
+            {% if form.contact_phone.errors %}
+              <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.contact_phone.errors.0 }}</p>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
 
-    <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-danger); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1); margin-top: var(--space-6); margin-bottom: var(--space-4);">
-      3. Admissions & Roll Allocation Governance
+    <!-- Section 2: Appearance & Design Tokens -->
+    <div class="space-y-4">
+      <div class="flex items-center gap-2 pb-2 border-b border-orange-100">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">2</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Appearance & Theme Defaults</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="{{ form.default_theme.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Default Theme Mode
+          </label>
+          {{ form.default_theme }}
+          {% if form.default_theme.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.default_theme.help_text }}</p>
+          {% endif %}
+          {% if form.default_theme.errors %}
+            <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.default_theme.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.default_accent_color.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Default Brand Accent Color
+          </label>
+          {{ form.default_accent_color }}
+          {% if form.default_accent_color.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.default_accent_color.help_text }}</p>
+          {% endif %}
+          {% if form.default_accent_color.errors %}
+            <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.default_accent_color.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="{{ form.roll_number_prefix.id_for_label }}" class="form-label">Official Roll Number Prefix</label>
-      {{ form.roll_number_prefix }}
-      <div class="form-hint">{{ form.roll_number_prefix.help_text }}</div>
-      {% if form.roll_number_prefix.errors %}
-        <div class="form-error">{{ form.roll_number_prefix.errors.0 }}</div>
-      {% endif %}
+    <!-- Section 3: Admissions & Roll Allocation -->
+    <div class="space-y-4">
+      <div class="flex items-center gap-2 pb-2 border-b border-orange-100">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">3</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Admissions & Roll Allocation Governance</h2>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label for="{{ form.roll_number_prefix.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+            Official Roll Number Prefix
+          </label>
+          {{ form.roll_number_prefix }}
+          {% if form.roll_number_prefix.help_text %}
+            <p class="mt-1 text-[11px] text-zinc-500">{{ form.roll_number_prefix.help_text }}</p>
+          {% endif %}
+          {% if form.roll_number_prefix.errors %}
+            <p class="mt-1 text-xs text-rose-600 font-medium">{{ form.roll_number_prefix.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          {{ form.allow_student_self_registration }}
+          <label for="{{ form.allow_student_self_registration.id_for_label }}" class="text-xs font-semibold text-zinc-800 cursor-pointer">
+            Enable Public Candidate Self-Registration Portal
+          </label>
+        </div>
+      </div>
     </div>
 
-    <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: var(--space-3); margin-top: var(--space-2);">
-      {{ form.allow_student_self_registration }}
-      <label for="{{ form.allow_student_self_registration.id_for_label }}" class="form-label" style="margin-bottom: 0;">
-        Enable Public Candidate Self-Registration Portal
-      </label>
-    </div>
-
-    <div style="margin-top: var(--space-8); display: flex; gap: var(--space-3);">
-      <button type="submit" class="btn btn-primary">Save Institutional Settings &rarr;</button>
-      <a href="{% url 'administration:dashboard' %}" class="btn btn-secondary">Cancel</a>
+    <div class="pt-4 flex items-center gap-3">
+      <button type="submit" class="btn-brand">
+        Save Institutional Settings &rarr;
+      </button>
+      <a href="{% url 'administration:dashboard' %}" class="btn-secondary">
+        Cancel
+      </a>
     </div>
   </form>
 </div>

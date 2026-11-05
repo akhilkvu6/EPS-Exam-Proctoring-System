@@ -1,61 +1,104 @@
 {% extends "base/base.html" %}
 
 {% block header_nav %}
-  <li><a href="{% url 'teacher:dashboard' %}" class="nav-link">Faculty Workspace</a></li>
-  <li><a href="{% url 'teacher:admission_queue' %}" class="nav-link">Admissions</a></li>
-  <li><a href="{% url 'teacher:students_list' %}" class="nav-link">Students</a></li>
+  <a href="{% url 'teacher:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs{% else %}px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition{% endif %}">Overview</a>
+  <a href="{% url 'teacher:admission_queue' %}" class="{% if 'admission' in request.resolver_match.url_name %}px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs{% else %}px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition{% endif %}">Admissions</a>
+  <a href="{% url 'teacher:students_list' %}" class="{% if 'student' in request.resolver_match.url_name %}px-3 py-1.5 text-xs font-semibold text-[#ea580c] bg-white rounded-md shadow-xs{% else %}px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition{% endif %}">Students</a>
+  <a href="{% url 'question_bank:question_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition">Questions</a>
+  <a href="{% url 'examinations:exam_list' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition">Exams</a>
+  <a href="{% url 'evaluation:queue' %}" class="px-3 py-1.5 text-xs font-medium text-orange-100 hover:text-white hover:bg-white/10 rounded-md transition">Grading</a>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="display: grid; grid-template-columns: 240px 1fr; gap: var(--space-8); padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Teacher Sidebar -->
-  <aside style="display: flex; flex-direction: column; gap: var(--space-2);">
-    <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-2); text-align: center;">
-      <div style="width: 52px; height: 52px; border-radius: 50%; background-color: var(--color-accent-subtle); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0 auto var(--space-2) auto;">
-        {{ user.first_name|first|default:user.username|first|upper }}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Teacher Left Rail Cockpit -->
+    <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-4">
+      <!-- Profile Card -->
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs border-t-2 border-t-[#ea580c]">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#c2410c] to-[#ea580c] text-white flex items-center justify-center font-bold text-base shadow-xs shrink-0">
+            {{ user.first_name|first|default:user.username|first|upper }}
+          </div>
+          <div class="overflow-hidden">
+            <div class="font-bold text-sm text-zinc-900 truncate">
+              {{ user.get_full_name|default:user.username }}
+            </div>
+            <div class="text-[11px] font-semibold text-[#ea580c] uppercase tracking-wider flex items-center gap-1 mt-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              {{ user.teacher_profile.designation|default:"Faculty Member" }}
+            </div>
+            <div class="font-mono text-[10px] text-zinc-400 mt-0.5">
+              ID: {{ user.teacher_profile.staff_id|default:"FAC-0001" }}
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
-        {{ user.get_full_name|default:user.username }}
-      </div>
-      <div style="font-size: var(--font-size-xs); color: var(--color-accent); font-weight: var(--font-weight-semibold); margin-top: 2px;">
-        {{ user.teacher_profile.designation|default:"Faculty Member" }}
-      </div>
-      <div style="font-size: 11px; color: var(--text-tertiary); margin-top: 2px;">
-        Staff ID: {{ user.teacher_profile.staff_id|default:"FAC-0001" }}
-      </div>
-    </div>
 
-    <nav aria-label="Teacher Workspace Navigation" style="display: flex; flex-direction: column; gap: var(--space-1);">
-      <a href="{% url 'teacher:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-        📊 Overview Dashboard
-      </a>
-      <a href="{% url 'teacher:admission_queue' %}" class="nav-link {% if 'admission' in request.resolver_match.url_name %}active{% endif %}">
-        📥 Admission Queue
-      </a>
-      <a href="{% url 'teacher:students_list' %}" class="nav-link {% if request.resolver_match.url_name == 'students_list' %}active{% endif %}">
-        👥 Enrolled Students
-      </a>
-      <a href="{% url 'question_bank:question_list' %}" class="nav-link {% if 'question_bank' in request.resolver_match.app_names or 'question' in request.resolver_match.url_name %}active{% endif %}">
-        📚 Question Bank
-      </a>
-      <a href="{% url 'examinations:exam_list' %}" class="nav-link {% if 'examinations' in request.resolver_match.app_names or 'exam' in request.resolver_match.url_name %}active{% endif %}">
-        📝 Examinations
-      </a>
-      <a href="{% url 'examinations:exam_list' %}" class="nav-link {% if 'incidents' in request.resolver_match.app_names or 'console' in request.resolver_match.url_name %}active{% endif %}">
-        👁️ Proctoring & Incidents
-      </a>
-      <a href="{% url 'evaluation:queue' %}" class="nav-link {% if 'evaluation' in request.resolver_match.app_names or 'grade' in request.resolver_match.url_name %}active{% endif %}">
-        ⚖️ Evaluation Queue
-      </a>
-      <a href="{% url 'teacher:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
-        👤 Faculty Profile
-      </a>
-    </nav>
-  </aside>
+      <!-- Navigation Menu -->
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-3 shadow-2xs">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-3 py-2">
+          Faculty Controls
+        </div>
+        <nav class="space-y-1">
+          <a href="{% url 'teacher:dashboard' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if request.resolver_match.url_name == 'dashboard' %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-[#ea580c]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+            <span>Faculty Dashboard</span>
+          </a>
 
-  <!-- Main Teacher View Area -->
-  <section>
-    {% block teacher_content %}{% endblock %}
-  </section>
+          <a href="{% url 'teacher:admission_queue' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if 'admission' in request.resolver_match.url_name %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            <span>Admission Queue</span>
+          </a>
+
+          <a href="{% url 'teacher:students_list' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if request.resolver_match.url_name == 'students_list' %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            <span>Enrolled Students</span>
+          </a>
+
+          <a href="{% url 'question_bank:question_list' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if 'question' in request.resolver_match.url_name %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+            <span>Question Bank</span>
+          </a>
+
+          <a href="{% url 'examinations:exam_list' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if 'exam' in request.resolver_match.url_name %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+            <span>Examinations</span>
+          </a>
+
+          <a href="{% url 'evaluation:queue' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if 'evaluation' in request.resolver_match.app_names or 'grade' in request.resolver_match.url_name %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Evaluation Queue</span>
+          </a>
+
+          <a href="{% url 'teacher:profile' %}" class="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all {% if request.resolver_match.url_name == 'profile' %}bg-orange-50 text-[#ea580c] border border-orange-200/60{% else %}text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900{% endif %}">
+            <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            <span>Faculty Profile</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Scope Telemetry Widget -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white shadow-2xs">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-mono uppercase tracking-wider text-zinc-400">Jurisdiction Scoping</span>
+          <span class="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            ACTIVE
+          </span>
+        </div>
+        <div class="space-y-1 font-mono text-[11px] text-zinc-300">
+          <div class="text-zinc-400 text-[10px]">Department:</div>
+          <div class="text-orange-400 font-semibold truncate">{{ user.teacher_profile.department_name }}</div>
+          <div class="text-zinc-500 text-[10px] pt-1">RBAC Isolation: Strict Scope</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Content -->
+    <main class="flex-1 min-w-0">
+      {% block teacher_content %}{% endblock %}
+    </main>
+  </div>
 </div>
 {% endblock %}

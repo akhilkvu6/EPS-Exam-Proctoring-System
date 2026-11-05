@@ -3,46 +3,70 @@
 {% block title %}Academic Departments — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div style="display: grid; grid-template-columns: 1fr 340px; gap: var(--space-6);">
-    <div class="card">
-      <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-        <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-          Academic Departments
-        </h1>
-        <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-          Foundational institutional departments governing academic programs, student cohorts, and faculty jurisdictions.
-        </p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Academic Hierarchy Subnav -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+    <a href="{% url 'academics:departments_list' %}" class="px-3.5 py-1.5 rounded-full font-bold bg-[#ea580c] text-white shadow-2xs">
+      Departments
+    </a>
+    <a href="{% url 'academics:courses_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Degree Programs
+    </a>
+    <a href="{% url 'academics:batches_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Academic Batches
+    </a>
+    <a href="{% url 'academics:subjects_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Subjects & Papers
+    </a>
+    <a href="{% url 'academics:teacher_assignments' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Faculty Scoping
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Departments Table -->
+    <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs border-t-2 border-t-[#ea580c]">
+      <div class="section-header">
+        <div>
+          <h1 class="text-base font-bold text-zinc-900 tracking-tight">Institutional Departments</h1>
+          <p class="text-xs text-zinc-500">Governing academic faculties, programs, and departmental jurisdictions</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c]">
+          {{ departments|length }} Active
+        </span>
       </div>
 
       {% if departments %}
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-                <th style="padding: var(--space-3);">Code</th>
-                <th style="padding: var(--space-3);">Department Name</th>
-                <th style="padding: var(--space-3);">Status</th>
-                <th style="padding: var(--space-3); text-align: right;">Courses</th>
+              <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                <th class="py-3 px-4">Code</th>
+                <th class="py-3 px-4">Department Name</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4 text-right">Programs</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-zinc-100">
               {% for d in departments %}
-                <tr style="border-bottom: 1px solid var(--border-default);">
-                  <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+                <tr class="hover:bg-zinc-50/80 transition-colors">
+                  <td class="py-3 px-4 font-mono font-bold text-[#ea580c]">
                     {{ d.code }}
                   </td>
-                  <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
+                  <td class="py-3 px-4 font-bold text-zinc-900">
                     {{ d.name }}
                   </td>
-                  <td style="padding: var(--space-3);">
+                  <td class="py-3 px-4">
                     {% if d.is_active %}
-                      <span style="display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); background-color: var(--color-success-bg); color: var(--color-success-fg); font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold);">Active</span>
+                      <span class="status-pill-emerald">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Active
+                      </span>
                     {% else %}
-                      <span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">Inactive</span>
+                      <span class="text-zinc-400 font-mono">Inactive</span>
                     {% endif %}
                   </td>
-                  <td style="padding: var(--space-3); text-align: right; color: var(--text-secondary);">
+                  <td class="py-3 px-4 text-right font-mono font-bold text-zinc-700">
                     {{ d.courses.count }}
                   </td>
                 </tr>
@@ -51,36 +75,52 @@
           </table>
         </div>
       {% else %}
-        <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
+        <div class="p-10 text-center text-xs text-zinc-400">
           No academic departments created yet.
-        </p>
+        </div>
       {% endif %}
     </div>
 
     <!-- Create Department Panel (Staff Only) -->
     {% if user.is_staff %}
-      <div class="card">
-        <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
-          Add Department
-        </h2>
-        <form method="post" novalidate>
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs border-t-2 border-t-[#ea580c] h-fit">
+        <div class="pb-3 mb-4 border-b border-zinc-100 flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-orange-100 text-[#ea580c] flex items-center justify-center font-bold text-xs">+</div>
+          <div>
+            <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Add Department</h2>
+            <p class="text-[11px] text-zinc-500">Register new academic division</p>
+          </div>
+        </div>
+
+        <form method="post" novalidate class="space-y-3.5">
           {% csrf_token %}
-          <div class="form-group">
-            <label for="{{ form.code.id_for_label }}" class="form-label">Department Code *</label>
+          <div>
+            <label for="{{ form.code.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+              Department Code <span class="text-rose-500">*</span>
+            </label>
             {{ form.code }}
-            {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+            {% if form.code.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.code.errors.0 }}</div>{% endif %}
           </div>
-          <div class="form-group">
-            <label for="{{ form.name.id_for_label }}" class="form-label">Full Department Title *</label>
+
+          <div>
+            <label for="{{ form.name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+              Full Department Title <span class="text-rose-500">*</span>
+            </label>
             {{ form.name }}
-            {% if form.name.errors %}<div class="form-error">{{ form.name.errors.0 }}</div>{% endif %}
+            {% if form.name.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.name.errors.0 }}</div>{% endif %}
           </div>
-          <div class="form-group" style="display: flex; flex-direction: row; align-items: center; gap: var(--space-2);">
+
+          <div class="flex items-center gap-2.5 pt-1">
             {{ form.is_active }}
-            <label for="{{ form.is_active.id_for_label }}" class="form-label" style="margin-bottom: 0;">Active Department</label>
+            <label for="{{ form.is_active.id_for_label }}" class="text-xs font-semibold text-zinc-800 cursor-pointer">
+              Active Department
+            </label>
           </div>
-          <div style="margin-top: var(--space-6);">
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Create Department &rarr;</button>
+
+          <div class="pt-2">
+            <button type="submit" class="btn-brand w-full justify-center py-2.5 text-xs font-bold shadow-xs">
+              Create Department &rarr;
+            </button>
           </div>
         </form>
       </div>

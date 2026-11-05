@@ -1,28 +1,30 @@
 {% extends "base/base.html" %}
 
-{% block title %}Grading Dashboard | {{ exam.code }}{% endblock %}
+{% block title %}Grading Dashboard | {{ exam.code }} — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 1100px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Top Nav -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <a href="{% url 'evaluation:queue' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
-      ← Back to Evaluation Queue
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Top Navigation & Action Buttons -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <a href="{% url 'evaluation:queue' %}" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-[#ea580c] font-semibold transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      <span>Back to Evaluation Queue</span>
     </a>
-    <div style="display: flex; gap: var(--space-3);">
+
+    <div class="flex items-center gap-2">
       <!-- Run Batch Auto-Grader -->
-      <form method="post">
+      <form method="post" class="inline">
         {% csrf_token %}
         <input type="hidden" name="run_autograder" value="1">
-        <button type="submit" class="btn btn-secondary" style="font-size: 12px;">
+        <button type="submit" class="btn-secondary text-xs">
           ⚡ Run Auto-Grader
         </button>
       </form>
 
       <!-- Publish Official Results -->
-      <form method="post" action="{% url 'results:publish_results' exam.pk %}">
+      <form method="post" action="{% url 'results:publish_results' exam.pk %}" class="inline">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary" style="font-size: 12px;" onclick="return confirm('Publish official results for this examination? Scorecards and PDF transcripts will become active for students.');">
+        <button type="submit" class="btn-brand text-xs" onclick="return confirm('Publish official results for this examination? Scorecards and transcripts will become active for candidates.');">
           🚀 Publish Official Results
         </button>
       </form>
@@ -30,49 +32,64 @@
   </div>
 
   <!-- Header Card -->
-  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent); margin-bottom: var(--space-2);">
-          {{ exam.code }}
-        </span>
-        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-zinc-100 text-zinc-800 border border-zinc-200">
+            {{ exam.code }}
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+            {{ exam.subject.code }} &bull; {{ exam.subject.name }}
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 text-zinc-700">
+            Cohort: {{ exam.batch.name }}
+          </span>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
           {{ exam.title }}
         </h1>
-        <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-          {{ exam.subject.code }} - {{ exam.subject.name }} | Cohort: {{ exam.batch.name }} | Total Marks: {{ exam.total_marks }}
-        </div>
+        <p class="text-xs text-zinc-500 mt-1">
+          Total Examination Marks: <strong class="text-zinc-800">{{ exam.total_marks }} pts</strong> &bull; Passing Mark: {{ exam.pass_percentage }}%
+        </p>
       </div>
-      <div style="text-align: right;">
-        <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: {% if total_pending_subjective > 0 %}#ca8a04{% else %}#22c55e{% endif %};">
+
+      <div class="sm:text-right shrink-0">
+        <div class="text-3xl font-black {% if total_pending_subjective > 0 %}text-amber-600{% else %}text-emerald-600{% endif %} font-mono tracking-tight">
           {{ total_pending_subjective }}
         </div>
-        <div style="font-size: 11px; color: var(--text-secondary);">Pending Subjective Items</div>
+        <div class="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">Pending Subjective Items</div>
       </div>
     </div>
   </div>
 
   <!-- Pending Subjective Rubric Queue -->
   {% if pending_items %}
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6); border-left: 4px solid #ca8a04;">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3); color: var(--text-primary);">
-        ⏳ Subjective Responses Requiring Faculty Rubric Grading
-      </h2>
-      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+    <div class="bg-white border border-amber-200 rounded-xl p-5 shadow-2xs border-l-4 border-l-amber-500 space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          Subjective Responses Requiring Faculty Rubric Grading
+        </h2>
+        <span class="font-mono text-xs font-bold text-amber-700">{{ pending_items|length }} Queued</span>
+      </div>
+
+      <div class="divide-y divide-amber-100">
         {% for item in pending_items %}
-          <div style="display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-surface-secondary); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md);">
+          <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div>
-              <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); font-size: var(--font-size-sm);">
+              <div class="font-bold text-zinc-900">
                 {{ item.exam_question.question.title }} (Q{{ item.order }})
               </div>
-              <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-                Candidate: <strong>{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}</strong>
-                ({{ item.attempt.student.student_profile.roll_number|default:"PENDING" }}) | Marks Weight: {{ item.exam_question.marks }} pts
+              <div class="font-mono text-[11px] text-zinc-500 mt-0.5">
+                Candidate: <strong class="text-zinc-800 font-sans">{{ item.attempt.student.get_full_name|default:item.attempt.student.username }}</strong>
+                &bull; Roll: {{ item.attempt.student.student_profile.roll_number|default:"PENDING" }} &bull; Max: {{ item.exam_question.marks }} pts
               </div>
             </div>
             <div>
-              <a href="{% url 'evaluation:grade_item' item.id %}" class="btn btn-primary" style="font-size: 12px; padding: 4px 10px;">
-                Grade with Rubric →
+              <a href="{% url 'evaluation:grade_item' item.id %}" class="btn-brand text-xs py-1 px-3">
+                Grade with Rubric &rarr;
               </a>
             </div>
           </div>
@@ -81,55 +98,67 @@
     </div>
   {% endif %}
 
-  <!-- Cohort Submission Ledger -->
-  <h2 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4);">
-    Candidate Submission Ledger
-  </h2>
-  <div class="card" style="overflow: hidden; padding: 0;">
-    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-      <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-        <tr>
-          <th style="padding: var(--space-3) var(--space-4);">Roll Number</th>
-          <th style="padding: var(--space-3) var(--space-4);">Candidate</th>
-          <th style="padding: var(--space-3) var(--space-4);">Session Status</th>
-          <th style="padding: var(--space-3) var(--space-4);">Submitted At</th>
-          <th style="padding: var(--space-3) var(--space-4);">Score Awarded</th>
-          <th style="padding: var(--space-3) var(--space-4); text-align: right;">Integrity Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for a in attempts %}
-          <tr style="border-bottom: 1px solid var(--border-color);">
-            <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); font-size: 11px;">
-              {{ a.student.student_profile.roll_number|default:"PENDING" }}
-            </td>
-            <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); color: var(--text-primary);">
-              {{ a.student.get_full_name|default:a.student.username }}
-            </td>
-            <td style="padding: var(--space-3) var(--space-4);">
-              <span class="badge" style="font-size: 11px;">{{ a.get_status_display }}</span>
-            </td>
-            <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); color: var(--text-secondary);">
-              {{ a.submitted_at|date:"M d, Y H:i"|default:"Active" }}
-            </td>
-            <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent);">
-              {% if a.total_score is not None %}
-                {{ a.total_score }} / {{ exam.total_marks }}
-              {% else %}
-                <span style="color: var(--text-tertiary); font-weight: normal;">Pending Evaluation</span>
-              {% endif %}
-            </td>
-            <td style="padding: var(--space-3) var(--space-4); text-align: right; font-size: var(--font-size-xs);">
-              {% if a.proctoring_summary %}
-                Trust: <strong>{{ a.proctoring_summary.trust_score }}%</strong>
-              {% else %}
-                <span>100%</span>
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Cohort Submission Ledger Table -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    <div class="section-header">
+      <div>
+        <h2 class="text-base font-bold text-zinc-900 tracking-tight">Candidate Submissions Ledger</h2>
+        <p class="text-xs text-zinc-500">Evaluated scores, integrity results, and answer transcripts</p>
+      </div>
+      <span class="font-mono text-xs font-bold text-zinc-500">{{ submissions|length }} Records</span>
+    </div>
+
+    {% if submissions %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Roll Number</th>
+              <th class="py-3 px-4">Candidate</th>
+              <th class="py-3 px-4">Session State</th>
+              <th class="py-3 px-4">Submitted At</th>
+              <th class="py-3 px-4">Awarded Score</th>
+              <th class="py-3 px-4 text-right">Integrity Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for sub in submissions %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-emerald-600 text-sm whitespace-nowrap">
+                  {{ sub.student.student_profile.roll_number|default:"PENDING" }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-bold text-zinc-900">{{ sub.student.get_full_name|default:sub.student.username }}</div>
+                  <div class="font-mono text-[11px] text-zinc-500">@{{ sub.student.username }}</div>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="status-pill-emerald text-[11px]">
+                    {{ sub.get_status_display }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
+                  {{ sub.submitted_at|date:"M d, Y H:i" }}
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-sm text-zinc-900 whitespace-nowrap">
+                  {{ sub.total_score|default:"0.00" }} / {{ exam.total_marks }}
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  {% if sub.proctoring_summary and sub.proctoring_summary.requires_human_review %}
+                    <span class="status-pill-rose text-[11px]">Flagged</span>
+                  {% else %}
+                    <span class="status-pill-emerald text-[11px]">Verified</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-10 text-center text-xs text-zinc-400">
+        No candidate submissions recorded for this examination yet.
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

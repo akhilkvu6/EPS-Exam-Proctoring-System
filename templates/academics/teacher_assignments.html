@@ -3,87 +3,131 @@
 {% block title %}Faculty Academic Scoping — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block admin_content %}
-<div style="display: grid; grid-template-columns: 1fr 360px; gap: var(--space-6);">
-  <div class="card">
-    <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        Faculty Academic Scoping Assignments
-      </h1>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        Section 9: Maps individual faculty members to specific Subject and Academic Batch pairs, strictly enforcing assessment authoring and invigilation scoping boundaries.
-      </p>
-    </div>
-
-    {% if assignments %}
-      <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); text-align: left;">
-          <thead>
-            <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-              <th style="padding: var(--space-3);">Faculty Member</th>
-              <th style="padding: var(--space-3);">Subject</th>
-              <th style="padding: var(--space-3);">Batch Cohort</th>
-              <th style="padding: var(--space-3); text-align: right;">Year</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for a in assignments %}
-              <tr style="border-bottom: 1px solid var(--border-default);">
-                <td style="padding: var(--space-3);">
-                  <strong>{{ a.teacher.get_full_name|default:a.teacher.username }}</strong>
-                  <div style="font-size: 11px; color: var(--text-tertiary);">@{{ a.teacher.username }}</div>
-                </td>
-                <td style="padding: var(--space-3);">
-                  <strong style="color: var(--color-accent);">{{ a.subject.code }}</strong> - {{ a.subject.name }}
-                </td>
-                <td style="padding: var(--space-3); font-size: var(--font-size-xs);">
-                  {{ a.batch.course.code }} &bull; {{ a.batch.name }}
-                </td>
-                <td style="padding: var(--space-3); text-align: right; font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--text-secondary);">
-                  {{ a.academic_year }}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <p style="font-size: var(--font-size-sm); color: var(--text-tertiary); text-align: center; padding: var(--space-8) 0;">
-        No faculty scoping assignments configured.
-      </p>
-    {% endif %}
+<div class="space-y-6">
+  <!-- Academic Hierarchy Subnav -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+    <a href="{% url 'academics:departments_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Departments
+    </a>
+    <a href="{% url 'academics:courses_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Degree Programs
+    </a>
+    <a href="{% url 'academics:batches_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Academic Batches
+    </a>
+    <a href="{% url 'academics:subjects_list' %}" class="px-3.5 py-1.5 rounded-full font-semibold bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50">
+      Subjects & Papers
+    </a>
+    <a href="{% url 'academics:teacher_assignments' %}" class="px-3.5 py-1.5 rounded-full font-bold bg-[#ea580c] text-white shadow-2xs">
+      Faculty Scoping
+    </a>
   </div>
 
-  <!-- Assignment Creation Form (Admin Only) -->
-  <div class="card">
-    <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-2);">
-      Assign Faculty to Course & Batch
-    </h2>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      <div class="form-group">
-        <label for="{{ form.teacher.id_for_label }}" class="form-label">Faculty Member *</label>
-        {{ form.teacher }}
-        {% if form.teacher.errors %}<div class="form-error">{{ form.teacher.errors.0 }}</div>{% endif %}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Assignments Table -->
+    <div class="lg:col-span-2 bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs border-t-2 border-t-[#ea580c]">
+      <div class="section-header">
+        <div>
+          <h1 class="text-base font-bold text-zinc-900 tracking-tight">Faculty Academic Jurisdiction Scoping</h1>
+          <p class="text-xs text-zinc-500">Maps faculty members to Subject and Batch pairs, enforcing RBAC authoring boundaries</p>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c]">
+          {{ assignments|length }} Mappings
+        </span>
       </div>
-      <div class="form-group">
-        <label for="{{ form.subject.id_for_label }}" class="form-label">Curriculum Subject *</label>
-        {{ form.subject }}
-        {% if form.subject.errors %}<div class="form-error">{{ form.subject.errors.0 }}</div>{% endif %}
+
+      {% if assignments %}
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                <th class="py-3 px-4">Faculty Member</th>
+                <th class="py-3 px-4">Subject Paper</th>
+                <th class="py-3 px-4">Target Cohort</th>
+                <th class="py-3 px-4 text-right">Academic Year</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-100">
+              {% for a in assignments %}
+                <tr class="hover:bg-zinc-50/80 transition-colors">
+                  <td class="py-3 px-4">
+                    <div class="font-bold text-zinc-900">{{ a.teacher.get_full_name|default:a.teacher.username }}</div>
+                    <div class="font-mono text-[11px] text-zinc-500">@{{ a.teacher.username }}</div>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="font-mono font-bold text-[#ea580c]">{{ a.subject.code }}</span>
+                    <span class="font-medium text-zinc-800 ml-1">{{ a.subject.name }}</span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="font-semibold text-zinc-800">{{ a.batch.course.code }}</span> &bull; 
+                    <span class="text-zinc-600">{{ a.batch.name }}</span>
+                  </td>
+                  <td class="py-3 px-4 text-right font-mono text-[11px] text-zinc-500">
+                    {{ a.academic_year }}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="p-10 text-center text-xs text-zinc-400">
+          No faculty scoping assignments configured yet.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Assignment Creation Panel -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs border-t-2 border-t-[#ea580c] h-fit">
+      <div class="pb-3 mb-4 border-b border-zinc-100 flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-orange-100 text-[#ea580c] flex items-center justify-center font-bold text-xs">+</div>
+        <div>
+          <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Assign Faculty Scoping</h2>
+          <p class="text-[11px] text-zinc-500">Authorize subject paper jurisdiction</p>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="{{ form.batch.id_for_label }}" class="form-label">Academic Batch *</label>
-        {{ form.batch }}
-        {% if form.batch.errors %}<div class="form-error">{{ form.batch.errors.0 }}</div>{% endif %}
-      </div>
-      <div class="form-group">
-        <label for="{{ form.academic_year.id_for_label }}" class="form-label">Academic Year</label>
-        {{ form.academic_year }}
-        {% if form.academic_year.errors %}<div class="form-error">{{ form.academic_year.errors.0 }}</div>{% endif %}
-      </div>
-      <div style="margin-top: var(--space-6);">
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Authorize Assignment &rarr;</button>
-      </div>
-    </form>
+
+      <form method="post" novalidate class="space-y-3.5">
+        {% csrf_token %}
+        <div>
+          <label for="{{ form.teacher.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+            Faculty Member <span class="text-rose-500">*</span>
+          </label>
+          {{ form.teacher }}
+          {% if form.teacher.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.teacher.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.subject.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+            Curriculum Subject <span class="text-rose-500">*</span>
+          </label>
+          {{ form.subject }}
+          {% if form.subject.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.subject.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.batch.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+            Academic Batch <span class="text-rose-500">*</span>
+          </label>
+          {{ form.batch }}
+          {% if form.batch.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.batch.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.academic_year.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1">
+            Academic Year
+          </label>
+          {{ form.academic_year }}
+          {% if form.academic_year.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.academic_year.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="btn-brand w-full justify-center py-2.5 text-xs font-bold shadow-xs">
+            Authorize Assignment &rarr;
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}

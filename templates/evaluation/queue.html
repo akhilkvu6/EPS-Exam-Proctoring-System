@@ -1,82 +1,91 @@
 {% extends "base/base.html" %}
 
-{% block title %}Evaluation Queue | EPS Phoenix{% endblock %}
+{% block title %}Evaluation Queue — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 1000px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Header -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        ⚖️ Assessment Evaluation Queue
-      </h1>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-        Execute deterministic auto-graders and evaluate subjective essay responses using established rubrics.
-      </p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#c2410c] text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-orange-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
+          Grading & Rubrics Studio
+        </div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
+          Assessment Evaluation Queue
+        </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Execute deterministic auto-graders and score subjective essay responses against established faculty rubrics.
+        </p>
+      </div>
     </div>
   </div>
 
-  <!-- Queue Table -->
-  {% if exams_data %}
-    <div class="card" style="overflow: hidden; padding: 0;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-          <tr>
-            <th style="padding: var(--space-3) var(--space-4);">Code</th>
-            <th style="padding: var(--space-3) var(--space-4);">Examination</th>
-            <th style="padding: var(--space-3) var(--space-4);">Subject & Batch</th>
-            <th style="padding: var(--space-3) var(--space-4);">Submissions</th>
-            <th style="padding: var(--space-3) var(--space-4);">Pending Subjective</th>
-            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in exams_data %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
-              <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); font-size: 11px;">
-                {{ item.exam.code }}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); color: var(--text-primary);">
-                {{ item.exam.title }}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs);">
-                <div>{{ item.exam.subject.code }}</div>
-                <div style="color: var(--text-secondary);">{{ item.exam.batch.name }}</div>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-bold);">
-                {{ item.total_submissions }}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4);">
-                {% if item.pending_subjective > 0 %}
-                  <span class="badge" style="background-color: rgba(234, 179, 8, 0.15); color: #ca8a04;">
-                    ⏳ {{ item.pending_subjective }} Pending
-                  </span>
-                {% else %}
-                  <span class="badge" style="background-color: rgba(34, 197, 94, 0.15); color: #22c55e;">
-                    ✓ All Graded
-                  </span>
-                {% endif %}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); text-align: right;">
-                <a href="{% url 'evaluation:exam_overview' item.exam.pk %}" class="btn btn-primary" style="font-size: 12px; padding: 4px 10px;">
-                  Open Grading Dashboard →
-                </a>
-              </td>
+  <!-- Queue Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if exams_data %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Code</th>
+              <th class="py-3 px-4">Examination</th>
+              <th class="py-3 px-4">Subject & Batch</th>
+              <th class="py-3 px-4">Submissions</th>
+              <th class="py-3 px-4">Pending Subjective</th>
+              <th class="py-3 px-4 text-right">Action</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="card" style="text-align: center; padding: var(--space-12);">
-      <div style="font-size: 48px; margin-bottom: var(--space-2);">📑</div>
-      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        No Submissions Awaiting Evaluation
-      </h3>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
-        All submitted assessments in your assigned academic scope are evaluated, or no candidate attempts have been received yet.
-      </p>
-    </div>
-  {% endif %}
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for item in exams_data %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-[#ea580c] whitespace-nowrap">
+                  {{ item.exam.code }}
+                </td>
+                <td class="py-3 px-4 font-bold text-zinc-900">
+                  {{ item.exam.title }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-semibold text-zinc-800">{{ item.exam.subject.code }}</div>
+                  <div class="text-[11px] text-zinc-500 font-mono">{{ item.exam.batch.name }}</div>
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-zinc-800">
+                  {{ item.total_submissions }}
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {% if item.pending_subjective > 0 %}
+                    <span class="status-pill-amber">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      {{ item.pending_subjective }} Pending
+                    </span>
+                  {% else %}
+                    <span class="status-pill-emerald">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      All Graded
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <a href="{% url 'evaluation:exam_overview' item.exam.pk %}" class="btn-action-edit">
+                    <span>Open Dashboard</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+          📑
+        </div>
+        <div class="font-bold text-zinc-800 text-sm mb-1">No Submissions Awaiting Evaluation</div>
+        <p class="text-zinc-500 max-w-sm mx-auto">All submitted assessments in your assigned academic scope are evaluated, or no candidate attempts have been received yet.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

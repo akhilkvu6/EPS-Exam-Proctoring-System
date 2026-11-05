@@ -3,80 +3,88 @@
 {% block title %}System Audit Logs — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block admin_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
-    <div>
-      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        Security & Administrative Audit Logs
-      </h1>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        Section 22: Immutable audit trail tracking executive decisions, security interventions, user status modifications, and system configuration updates.
-      </p>
-    </div>
+<div class="space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+          Security & Administrative Audit Logs
+        </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Immutable audit trail tracking executive governance, security interventions, status updates, and configuration events.
+        </p>
+      </div>
 
-    <form method="get" style="display: flex; gap: var(--space-2);">
-      <input 
-        type="text" 
-        name="action_type" 
-        value="{{ action_type }}" 
-        placeholder="Filter by action code..." 
-        class="form-input" 
-        style="width: 220px; font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
-      <button type="submit" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
-        Filter
-      </button>
-    </form>
+      <form method="get" class="flex items-center gap-2">
+        <input 
+          type="text" 
+          name="action_type" 
+          value="{{ action_type }}" 
+          placeholder="Filter by action code..." 
+          class="form-control-precision text-xs py-1.5 px-3 w-52 rounded-lg">
+        <button type="submit" class="btn-brand text-xs py-1.5 px-3">
+          Filter
+        </button>
+        {% if action_type %}
+          <a href="{% url 'administration:audit_logs' %}" class="btn-ghost text-xs py-1.5 px-2">Clear</a>
+        {% endif %}
+      </form>
+    </div>
   </div>
 
-  {% if audit_logs %}
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead>
-          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-            <th style="padding: var(--space-3);">Timestamp</th>
-            <th style="padding: var(--space-3);">Action Code</th>
-            <th style="padding: var(--space-3);">Actor</th>
-            <th style="padding: var(--space-3);">Subject / Target</th>
-            <th style="padding: var(--space-3);">Details</th>
-            <th style="padding: var(--space-3); text-align: right;">IP</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for log in audit_logs %}
-            <tr style="border-bottom: 1px solid var(--border-default); font-size: var(--font-size-xs);">
-              <td style="padding: var(--space-3); color: var(--text-secondary); white-space: nowrap;">
-                {{ log.created_at|date:"Y-m-d H:i:s" }}
-              </td>
-              <td style="padding: var(--space-3); font-weight: var(--font-weight-bold); color: var(--color-accent); font-family: var(--font-family-mono);">
-                {{ log.action_type }}
-              </td>
-              <td style="padding: var(--space-3);">
-                {% if log.actor %}
-                  <strong>@{{ log.actor.username }}</strong>
-                {% else %}
-                  <span style="color: var(--text-tertiary);">System</span>
-                {% endif %}
-              </td>
-              <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold);">
-                {{ log.target_repr }}
-              </td>
-              <td style="padding: var(--space-3); color: var(--text-secondary); max-width: 320px;">
-                {{ log.details }}
-              </td>
-              <td style="padding: var(--space-3); text-align: right; color: var(--text-tertiary); font-family: var(--font-family-mono);">
-                {{ log.ip_address|default:"-" }}
-              </td>
+  <!-- Audit Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if audit_logs %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Timestamp (UTC)</th>
+              <th class="py-3 px-4">Action Code</th>
+              <th class="py-3 px-4">Actor</th>
+              <th class="py-3 px-4">Target Entity</th>
+              <th class="py-3 px-4">Details</th>
+              <th class="py-3 px-4 text-right">IP Origin</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-        No audit entries matching filter criteria.
-      </p>
-    </div>
-  {% endif %}
+          </thead>
+          <tbody class="divide-y divide-zinc-100 font-mono text-[11px]">
+            {% for log in audit_logs %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 text-zinc-500 whitespace-nowrap">
+                  {{ log.created_at|date:"Y-m-d H:i:s" }}
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-[#c2410c] border border-orange-200">
+                    {{ log.action_type }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 font-sans text-xs">
+                  {% if log.actor %}
+                    <span class="font-bold text-zinc-900">@{{ log.actor.username }}</span>
+                  {% else %}
+                    <span class="text-zinc-400 italic">System Automation</span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 font-sans text-xs font-semibold text-zinc-800">
+                  {{ log.target_repr }}
+                </td>
+                <td class="py-3 px-4 font-sans text-xs text-zinc-600 max-w-sm truncate">
+                  {{ log.details }}
+                </td>
+                <td class="py-3 px-4 text-right text-zinc-400">
+                  {{ log.ip_address|default:"127.0.0.1" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        No audit log records match the current filter.
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

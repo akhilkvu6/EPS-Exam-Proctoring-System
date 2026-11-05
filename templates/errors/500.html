@@ -1,14 +1,33 @@
 {% extends "base/base.html" %}
 
-{% block title %}500 Server Error — {{ PLATFORM_NAME }}{% endblock %}
+{% block title %}500 Internal Error — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="text-align: center; padding-top: var(--space-16); padding-bottom: var(--space-16);">
-  <div style="font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); color: var(--color-danger); margin-bottom: var(--space-2);">500</div>
-  <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3);">Internal Server Error</h1>
-  <p style="font-size: var(--font-size-base); color: var(--text-secondary); max-width: 480px; margin: 0 auto var(--space-6) auto;">
-    An unexpected error occurred while processing your request. The incident has been logged for institutional system administrator review.
-  </p>
-  <a href="{% url 'core:index' %}" class="btn btn-primary">Return to Home</a>
+<div class="max-w-xl mx-auto px-4 py-16 text-center">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-8 sm:p-10 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-semibold tracking-wide mb-4 border border-rose-200">
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+      <span class="font-mono">HTTP 500 &bull; CRITICAL RUNTIME FAULT</span>
+    </div>
+    
+    <div class="font-mono text-5xl font-black text-rose-600 tracking-tight mb-3">500</div>
+    <h1 class="text-2xl font-bold text-zinc-900 tracking-tight mb-3">Internal Server Error</h1>
+    <p class="text-sm text-zinc-600 leading-relaxed mb-8 max-w-md mx-auto">
+      An unexpected internal exception occurred while processing this operation. Platform administrators have been notified via automated diagnostic logs.
+    </p>
+
+    <div class="flex items-center justify-center gap-3">
+      <a href="javascript:location.reload()" class="btn-secondary">
+        Retry Request
+      </a>
+      <a href="{% url 'core:index' %}" class="btn-brand">
+        Return Home
+      </a>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-zinc-100 font-mono text-[11px] text-zinc-400">
+      System Telemetry Recorded &bull; Ref: ERR-500-PHX
+    </div>
+  </div>
 </div>
 {% endblock %}

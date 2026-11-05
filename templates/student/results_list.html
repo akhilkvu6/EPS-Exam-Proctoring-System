@@ -3,28 +3,73 @@
 {% block title %}Results & Scorecards — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block student_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-      Official Results & PDF Scorecards
+<div class="space-y-6">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+      Official Results & Cryptographic Scorecards
     </h1>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+    <p class="text-xs text-zinc-500 mt-1">
       Cryptographically verified institutional marks transcripts and downloadable PDF certificates.
     </p>
   </div>
 
   {% if results %}
-    <!-- Results list dynamically rendered when results are published -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Subject</th>
+              <th class="py-3 px-4">Examination</th>
+              <th class="py-3 px-4">Score</th>
+              <th class="py-3 px-4">Grade</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Certificate</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for r in results %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-[#ea580c] whitespace-nowrap">
+                  {{ r.examination.subject.code }}
+                </td>
+                <td class="py-3 px-4 font-bold text-zinc-900">
+                  {{ r.examination.title }}
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-sm text-zinc-900 whitespace-nowrap">
+                  {{ r.total_score }} / {{ r.maximum_score }} ({{ r.percentage }}%)
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap font-mono font-black text-sm text-zinc-800">
+                  {{ r.grade_letter }}
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {% if r.is_passed %}
+                    <span class="status-pill-emerald">PASS</span>
+                  {% else %}
+                    <span class="status-pill-rose">FAIL</span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <a href="{% url 'results:scorecard' r.id %}" class="btn-action-edit">
+                    <span>View Scorecard</span>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   {% else %}
-    <div style="text-align: center; padding: var(--space-12) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-lg);">
-      <div style="font-size: 2.5rem; margin-bottom: var(--space-2);">🏆</div>
-      <h3 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-        No Published Results Found
-      </h3>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); max-width: 440px; margin: 0 auto var(--space-4) auto;">
-        Evaluation records and official verified scorecards with cryptographic QR validation will be published here upon completion of faculty grading.
-      </p>
-      <a href="{% url 'student:dashboard' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Back to Dashboard</a>
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-12 text-center text-xs text-zinc-400 shadow-2xs">
+      <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+        🏆
+      </div>
+      <div class="font-bold text-zinc-800 text-sm mb-1">No Published Results Found</div>
+      <p class="text-zinc-500 max-w-sm mx-auto mb-4">Official verified scorecards with cryptographic QR validation will be published here upon completion of faculty evaluation.</p>
+      <a href="{% url 'student:dashboard' %}" class="btn-secondary text-xs">
+        Return to Dashboard
+      </a>
     </div>
   {% endif %}
 </div>

@@ -3,80 +3,90 @@
 {% block title %}Enrolled Candidate Directory — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block teacher_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-4);">
-    <div>
-      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        Enrolled Student Directory
-      </h1>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        Active candidates in {{ teacher_profile.department_name }} with approved admission and allocated roll numbers.
-      </p>
-    </div>
+<div class="space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+          Enrolled Student Directory
+        </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Active candidates in <strong class="text-zinc-800">{{ teacher_profile.department_name }}</strong> with approved admission and allocated roll numbers.
+        </p>
+      </div>
 
-    <!-- Search input -->
-    <form method="get" style="display: flex; gap: var(--space-2);">
-      <input 
-        type="text" 
-        name="q" 
-        value="{{ query }}" 
-        placeholder="Search roll, name, or username..." 
-        class="form-input" 
-        style="width: 240px; padding: var(--space-1) var(--space-3); font-size: var(--font-size-xs);">
-      <button type="submit" class="btn btn-primary" style="font-size: var(--font-size-xs); padding: var(--space-1) var(--space-3);">
-        Search
-      </button>
-    </form>
+      <form method="get" class="flex items-center gap-2">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ query }}" 
+          placeholder="Search roll, name, or username..." 
+          class="form-control-precision text-xs py-1.5 px-3 w-56 sm:w-64 rounded-lg">
+        <button type="submit" class="btn-brand text-xs py-1.5 px-3">
+          Search
+        </button>
+        {% if query %}
+          <a href="{% url 'teacher:students_list' %}" class="btn-ghost text-xs py-1.5 px-2">Clear</a>
+        {% endif %}
+      </form>
+    </div>
   </div>
 
-  {% if students %}
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead>
-          <tr style="border-bottom: 2px solid var(--border-default); color: var(--text-tertiary); font-size: var(--font-size-xs); text-transform: uppercase;">
-            <th style="padding: var(--space-3);">Official Roll</th>
-            <th style="padding: var(--space-3);">Candidate Name</th>
-            <th style="padding: var(--space-3);">Course & Batch</th>
-            <th style="padding: var(--space-3);">Semester</th>
-            <th style="padding: var(--space-3);">Approval Date</th>
-            <th style="padding: var(--space-3); text-align: right;">Registration Ref</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for student in students %}
-            <tr style="border-bottom: 1px solid var(--border-default);">
-              <td style="padding: var(--space-3); font-family: var(--font-family-mono); font-weight: var(--font-weight-bold); color: var(--color-success-fg);">
-                {{ student.roll_number }}
-              </td>
-              <td style="padding: var(--space-3);">
-                <strong>{{ student.user.get_full_name|default:student.user.username }}</strong>
-                <div style="font-size: 11px; color: var(--text-tertiary);">@{{ student.user.username }}</div>
-              </td>
-              <td style="padding: var(--space-3);">
-                {{ student.course_name }}
-                <div style="font-size: 11px; color: var(--text-tertiary);">{{ student.batch_name }}</div>
-              </td>
-              <td style="padding: var(--space-3); font-weight: var(--font-weight-semibold); color: var(--color-accent);">
-                Semester {{ student.current_semester }}
-              </td>
-              <td style="padding: var(--space-3); font-size: var(--font-size-xs); color: var(--text-secondary);">
-                {{ student.admission_approved_at|date:"M d, Y"|default:"Verified" }}
-              </td>
-              <td style="padding: var(--space-3); text-align: right; font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--text-tertiary);">
-                {{ student.registration_number }}
-              </td>
+  <!-- Students Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if students %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Official Roll</th>
+              <th class="py-3 px-4">Candidate Name</th>
+              <th class="py-3 px-4">Course & Batch</th>
+              <th class="py-3 px-4">Current Semester</th>
+              <th class="py-3 px-4">Approval Date</th>
+              <th class="py-3 px-4 text-right">Registration Ref</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: var(--space-10) var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md);">
-      <div style="font-size: 2rem; margin-bottom: var(--space-2);">👥</div>
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-        No approved students found in this department matching the search criteria.
-      </p>
-    </div>
-  {% endif %}
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for student in students %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 font-mono font-bold text-emerald-600 text-sm">
+                  {{ student.roll_number }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-bold text-zinc-900">{{ student.user.get_full_name|default:student.user.username }}</div>
+                  <div class="font-mono text-[11px] text-zinc-500">@{{ student.user.username }}</div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="font-semibold text-zinc-800">{{ student.course_name }}</span>
+                  <div class="text-[11px] text-zinc-500 font-mono">{{ student.batch_name }}</div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="status-pill-emerald">
+                    Sem {{ student.current_semester }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 font-mono text-[11px] text-zinc-500">
+                  {{ student.admission_approved_at|date:"M d, Y"|default:"Verified" }}
+                </td>
+                <td class="py-3 px-4 text-right font-mono text-[11px] text-zinc-400">
+                  {{ student.registration_number }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+          👥
+        </div>
+        <div class="font-bold text-zinc-800 text-sm mb-1">No Enrolled Candidates</div>
+        <p class="text-zinc-500">No approved students found in this department matching the search criteria.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

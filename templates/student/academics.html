@@ -3,52 +3,52 @@
 {% block title %}Academic Details — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block student_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+<div class="bg-white border border-zinc-200/90 rounded-xl p-6 sm:p-8 shadow-2xs border-t-2 border-t-[#ea580c] space-y-6">
+  <div class="border-b border-zinc-100 pb-4">
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
       Enrolled Academic Curriculum
     </h1>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-      Institutional department, batch enrollment, and curriculum assignments.
+    <p class="text-xs text-zinc-500 mt-1">
+      Institutional department, batch enrollment, and curriculum syllabus assignments.
     </p>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6);">
-    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">DEPARTMENT</div>
-      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200/70">
+      <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold mb-1">Academic Department</div>
+      <div class="font-bold text-zinc-900 text-sm">
         {{ profile.department_name|default:"Department of Computer Science" }}
       </div>
     </div>
 
-    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">COURSE PROGRAM</div>
-      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200/70">
+      <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold mb-1">Course / Program</div>
+      <div class="font-bold text-zinc-900 text-sm">
         {{ profile.course_name|default:"Bachelor of Technology" }}
       </div>
     </div>
 
-    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">ACADEMIC BATCH</div>
-      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
+    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200/70">
+      <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold mb-1">Academic Cohort</div>
+      <div class="font-bold text-zinc-900 text-sm font-mono">
         {{ profile.batch_name|default:"2024 - 2028" }}
       </div>
     </div>
 
-    <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: 2px;">ACTIVE SEMESTER</div>
-      <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+    <div class="p-4 bg-zinc-50 rounded-xl border border-zinc-200/70">
+      <div class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold mb-1">Active Semester</div>
+      <div class="font-bold text-[#ea580c] text-sm font-mono">
         Semester {{ profile.current_semester }}
       </div>
     </div>
   </div>
 
-  <div class="card" style="background-color: var(--bg-surface); border: 1px solid var(--border-default);">
-    <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-      Registered Course Units
+  <div class="p-5 bg-gradient-to-r from-orange-50/50 to-white border border-orange-200/70 rounded-xl text-xs space-y-2">
+    <h3 class="font-bold text-zinc-900 tracking-tight">
+      Institutional Course Registrations
     </h3>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-normal);">
-      Subject registrations and examination schedules are synchronised with your academic batch. Once scheduled by your course faculty, examinations will appear automatically in your candidate exam portal.
+    <p class="text-zinc-600 leading-relaxed">
+      Subject papers and proctored examination schedules are synchronized with your academic batch cohort. Once scheduled by departmental faculty, assessments appear directly in your active examinations register.
     </p>
   </div>
 </div>

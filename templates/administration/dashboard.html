@@ -3,103 +3,142 @@
 {% block title %}Institutional Governance — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block admin_content %}
-<div>
-  <!-- Header / Greeting Banner -->
-  <div class="card" style="margin-bottom: var(--space-6); background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+<div class="space-y-6">
+  <!-- Governance Greeting Banner -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-danger); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#c2410c] text-[11px] font-bold tracking-wider uppercase mb-2 border border-orange-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
           Central Administration Console
         </div>
-        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
           {{ settings_obj.institution_name }}
         </h1>
-        <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-          Platform Version {{ PLATFORM_VERSION }} &bull; Enterprise Governance & Security Control
+        <p class="text-xs text-zinc-500 mt-1 font-mono">
+          Security Compliance &bull; Platform v{{ PLATFORM_VERSION }} &bull; Cluster Active
         </p>
       </div>
 
-      <div>
-        <div style="background-color: var(--color-success-bg); border: 1px solid var(--color-success-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
-          <div style="font-size: var(--font-size-xs); color: var(--color-success-fg); font-weight: var(--font-weight-semibold);">CORE STATUS</div>
-          <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-success-fg);">Operational</div>
+      <div class="flex items-center gap-2">
+        <div class="px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-right">
+          <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Engine Status</div>
+          <div class="text-xs font-bold text-emerald-700 flex items-center justify-end gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Operational
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Metric Overview Cards -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Total Students</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Total Students</div>
+      <div class="text-2xl font-black text-zinc-900 font-mono tracking-tight my-1">
         {{ total_students }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        <a href="{% url 'administration:users_directory' %}?role=STUDENT">View student accounts &rarr;</a>
-      </div>
+      <a href="{% url 'administration:users_directory' %}?role=STUDENT" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Roster Directory</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Faculty Members</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Faculty Members</div>
+      <div class="text-2xl font-black text-zinc-900 font-mono tracking-tight my-1">
         {{ total_teachers }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        <a href="{% url 'administration:teachers_management' %}">Manage roster &rarr;</a>
-      </div>
+      <a href="{% url 'administration:teachers_management' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Manage Faculty</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Pending Escalations</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: {% if pending_escalations > 0 %}var(--color-danger){% else %}var(--text-primary){% endif %}; margin: var(--space-1) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Pending Escalations</div>
+      <div class="text-2xl font-black {% if pending_escalations > 0 %}text-rose-600{% else %}text-zinc-900{% endif %} font-mono tracking-tight my-1">
         {{ pending_escalations }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        <a href="{% url 'administration:escalated_admissions' %}">Review escalations &rarr;</a>
-      </div>
+      <a href="{% url 'administration:escalated_admissions' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Review Queue</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Suspended Accounts</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: {% if suspended_accounts > 0 %}var(--color-warning){% else %}var(--text-primary){% endif %}; margin: var(--space-1) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Suspended Accounts</div>
+      <div class="text-2xl font-black {% if suspended_accounts > 0 %}text-amber-600{% else %}text-zinc-900{% endif %} font-mono tracking-tight my-1">
         {{ suspended_accounts }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-        <a href="{% url 'administration:users_directory' %}?status=SUSPENDED">Security blocks &rarr;</a>
-      </div>
+      <a href="{% url 'administration:users_directory' %}?status=SUSPENDED" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Security Blocks</span>
+        <span>&rarr;</span>
+      </a>
     </div>
   </div>
 
-  <!-- Recent Audit Feed -->
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-3); margin-bottom: var(--space-4);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold);">
-        Recent Security & Administrative Audits
-      </h2>
-      <a href="{% url 'administration:audit_logs' %}" style="font-size: var(--font-size-xs);">View Full Audit Log &rarr;</a>
+  <!-- Quick Governance Actions -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs">
+    <div class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">Institutional Shortcuts</div>
+    <div class="flex flex-wrap gap-2.5">
+      <a href="{% url 'administration:teachers_management' %}" class="btn-brand text-xs">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span>Provision Faculty Member</span>
+      </a>
+      <a href="{% url 'academics:departments_list' %}" class="btn-secondary text-xs">
+        <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+        <span>Configure Academic Structure</span>
+      </a>
+      <a href="{% url 'administration:escalated_admissions' %}" class="btn-secondary text-xs">
+        <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Admissions Review</span>
+      </a>
+      <a href="{% url 'administration:settings' %}" class="btn-secondary text-xs">
+        <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.388-.497-.686-1.05-.88-1.64m6.08 1.64c.388-.497.686-1.05.88-1.64M12 21a9 9 0 110-18 9 9 0 010 18z"/></svg>
+        <span>Policy Settings</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Recent Security & Administrative Audits -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    <div class="section-header">
+      <div>
+        <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Recent Security & Administrative Audits</h2>
+        <p class="text-xs text-zinc-500">Immutable ledger events from institutional administrators and automated engines</p>
+      </div>
+      <a href="{% url 'administration:audit_logs' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>View Full Audit Log</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
     {% if recent_audits %}
-      <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+      <div class="divide-y divide-zinc-100">
         {% for log in recent_audits %}
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-2) var(--space-3); background-color: var(--bg-secondary); border-radius: var(--radius-sm); font-size: var(--font-size-xs);">
-            <div>
-              <span style="font-weight: var(--font-weight-bold); color: var(--color-accent);">{{ log.action_type }}</span>
-              <span style="color: var(--text-secondary); margin-left: var(--space-2);">{{ log.target_repr }}</span>
-              <div style="color: var(--text-tertiary); font-size: 11px; margin-top: 2px;">{{ log.details|truncatechars:100 }}</div>
+          <div class="p-4 hover:bg-zinc-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+                  {{ log.action_type }}
+                </span>
+                <span class="font-bold text-zinc-900">{{ log.target_repr }}</span>
+              </div>
+              <p class="text-zinc-600 text-xs">{{ log.details|truncatechars:120 }}</p>
             </div>
-            <div style="text-align: right; color: var(--text-tertiary); font-size: 11px;">
-              <div>{{ log.created_at|date:"M d, H:i" }}</div>
+            <div class="text-left sm:text-right shrink-0 font-mono text-[11px] text-zinc-400">
+              <div class="text-zinc-700 font-medium">{{ log.created_at|date:"M d, H:i:s" }}</div>
               <div>by @{{ log.actor.username|default:"System" }}</div>
             </div>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-align: center; padding: var(--space-4) 0;">
-        No administrative actions logged yet.
-      </p>
+      <div class="p-8 text-center text-xs text-zinc-400">
+        No administrative audit events recorded yet.
+      </div>
     {% endif %}
   </div>
 </div>

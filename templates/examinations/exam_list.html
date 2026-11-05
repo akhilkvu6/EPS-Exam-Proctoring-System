@@ -1,116 +1,125 @@
 {% extends "base/base.html" %}
 
-{% block title %}Examinations & Scheduling | EPS Phoenix{% endblock %}
+{% block title %}Examinations & Scheduling — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Header -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        📝 Examination Operations & Scheduling
-      </h1>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-        Schedule, configure sections, attach version-locked question snapshots, and manage candidate rosters.
-      </p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#c2410c] text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-orange-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
+          Assessment Operations
+        </div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
+          Examination Scheduling & Management
+        </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Schedule, partition sections, attach version-locked question snapshots, and manage examinee rosters.
+        </p>
+      </div>
+
+      <a href="{% url 'examinations:exam_create' %}" class="btn-brand">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        <span>Schedule Examination</span>
+      </a>
     </div>
-    <a href="{% url 'examinations:exam_create' %}" class="btn btn-primary">
-      + Schedule New Examination
-    </a>
   </div>
 
-  <!-- Status Filter Bar -->
-  <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
-    <form method="get" style="display: flex; gap: var(--space-3); align-items: center;">
-      <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary);">
-        Filter Status:
+  <!-- Status Filter Bar Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs">
+    <form method="get" class="flex flex-wrap items-center gap-3 text-xs">
+      <label class="font-semibold text-zinc-600 uppercase tracking-wider text-[11px]">
+        Operational Status:
       </label>
-      <select name="status" class="form-select" style="max-width: 250px;">
+      <select name="status" class="form-control-precision text-xs py-1.5 w-60">
         <option value="">All Operational Statuses</option>
         {% for code, label in statuses %}
           <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
-      <button type="submit" class="btn btn-secondary">Filter</button>
+      <button type="submit" class="btn-brand py-1.5 text-xs">Filter</button>
       {% if selected_status %}
-        <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary" style="color: var(--text-tertiary);">Reset</a>
+        <a href="{% url 'examinations:exam_list' %}" class="btn-ghost py-1.5 text-xs">Reset</a>
       {% endif %}
     </form>
   </div>
 
-  <!-- Examinations Table -->
-  {% if exams %}
-    <div class="card" style="overflow: hidden; padding: 0;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-          <tr>
-            <th style="padding: var(--space-3) var(--space-4);">Code</th>
-            <th style="padding: var(--space-3) var(--space-4);">Title</th>
-            <th style="padding: var(--space-3) var(--space-4);">Subject & Cohort</th>
-            <th style="padding: var(--space-3) var(--space-4);">Window & Duration</th>
-            <th style="padding: var(--space-3) var(--space-4);">Total Marks</th>
-            <th style="padding: var(--space-3) var(--space-4);">Status</th>
-            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for exam in exams %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
-              <td style="padding: var(--space-3) var(--space-4); font-family: monospace; font-weight: var(--font-weight-bold); white-space: nowrap;">
-                <span style="display: inline-block; padding: 2px 6px; border-radius: var(--radius-sm); background-color: var(--bg-surface-secondary); color: var(--text-primary); font-size: 11px;">
-                  {{ exam.code }}
-                </span>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4);">
-                <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary);">
-                  <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: inherit; text-decoration: none;">
+  <!-- Examinations Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if exams %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Code</th>
+              <th class="py-3 px-4">Examination Title</th>
+              <th class="py-3 px-4">Subject & Cohort</th>
+              <th class="py-3 px-4">Window & Timer</th>
+              <th class="py-3 px-4">Marks</th>
+              <th class="py-3 px-4">Operational Status</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for exam in exams %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+                    {{ exam.code }}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <a href="{% url 'examinations:exam_detail' exam.pk %}" class="font-bold text-zinc-900 hover:text-[#ea580c] transition-colors block">
                     {{ exam.title }}
                   </a>
-                </div>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-accent);">
-                  {{ exam.subject.code }} - {{ exam.subject.name }}
-                </div>
-                <div style="font-size: 11px; color: var(--text-secondary);">
-                  Cohort: {{ exam.batch.name }}
-                </div>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap; font-size: var(--font-size-xs);">
-                <div>{{ exam.start_window|date:"M d, Y H:i" }}</div>
-                <div style="color: var(--text-secondary);">Timer: {{ exam.duration_minutes }} mins</div>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap; font-weight: var(--font-weight-semibold);">
-                {{ exam.total_marks }} pts
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                <span class="badge" style="font-size: 11px;">
-                  {{ exam.get_status_display }}
-                </span>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
-                <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">
-                  Manage
-                </a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="card" style="text-align: center; padding: var(--space-12);">
-      <div style="font-size: 48px; margin-bottom: var(--space-2);">📋</div>
-      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        No Examinations Scheduled
-      </h3>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto var(--space-4) auto;">
-        No examination schedules exist matching your active filter.
-      </p>
-      <a href="{% url 'examinations:exam_create' %}" class="btn btn-primary">
-        + Schedule First Examination
-      </a>
-    </div>
-  {% endif %}
+                  {% if exam.strict_proctoring %}
+                    <span class="inline-flex items-center gap-1 text-[10px] text-amber-700 font-semibold mt-0.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      AI & Browser Lock Active
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <div class="font-semibold text-zinc-800">{{ exam.subject.code }} &bull; {{ exam.subject.name }}</div>
+                  <div class="text-[11px] text-zinc-500">Cohort: {{ exam.batch.name }}</div>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-zinc-600">
+                  <div>{{ exam.start_window|date:"M d, H:i" }}</div>
+                  <div class="text-zinc-400">{{ exam.duration_minutes }}m timer</div>
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-zinc-900 whitespace-nowrap">
+                  {{ exam.total_marks }} pts
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="status-pill-emerald">
+                    {{ exam.get_status_display }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn-action-edit">
+                    <span>Manage Exam</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+          📝
+        </div>
+        <div class="font-bold text-zinc-800 text-sm mb-1">No Examinations Scheduled</div>
+        <p class="text-zinc-500 max-w-sm mx-auto mb-4">No assessments currently match your criteria. Create and publish scheduled exams for student cohorts.</p>
+        <a href="{% url 'examinations:exam_create' %}" class="btn-brand">
+          + Schedule New Examination
+        </a>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

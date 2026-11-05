@@ -1,136 +1,158 @@
 {% extends "base/base.html" %}
 
-{% block title %}Schedule Examination | EPS Phoenix{% endblock %}
+{% block title %}Schedule Examination — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 800px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div style="margin-bottom: var(--space-6);">
-    <a href="{% url 'examinations:exam_list' %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
-      ← Back to Examinations
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Top Navigation & Heading -->
+  <div class="flex items-center justify-between">
+    <a href="{% url 'examinations:exam_list' %}" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-[#ea580c] font-semibold transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      <span>Back to Examinations</span>
     </a>
-    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
+  </div>
+
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <h1 class="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
       Schedule New Examination
     </h1>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-      Establish academic parameters, delivery windows, proctoring security rules, and timer constraints.
+    <p class="text-xs text-zinc-500 mt-1">
+      Establish academic scoping, delivery windows, proctoring security levels, and server-authoritative timer limits.
     </p>
   </div>
 
-  <form method="post">
+  <form method="post" class="space-y-6">
     {% csrf_token %}
 
-    <!-- Core Identification -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
-        1. Academic Scoping & Identity
-      </h2>
+    <!-- Academic Scoping Card -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs space-y-4">
+      <div class="pb-3 border-b border-zinc-100 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">1</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Academic Scoping & Identity</h2>
+      </div>
 
-      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
-        <div>
-          <label class="form-label" for="{{ form.title.id_for_label }}">Examination Title *</label>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.title.id_for_label }}">
+            Examination Title <span class="text-rose-500">*</span>
+          </label>
           {{ form.title }}
-          {% if form.title.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.title.errors }}</div>{% endif %}
+          {% if form.title.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.title.errors }}</div>{% endif %}
         </div>
         <div>
-          <label class="form-label" for="{{ form.code.id_for_label }}">Exam Code *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.code.id_for_label }}">
+            Exam Code <span class="text-rose-500">*</span>
+          </label>
           {{ form.code }}
-          {% if form.code.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.code.errors }}</div>{% endif %}
+          {% if form.code.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.code.errors }}</div>{% endif %}
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="form-label" for="{{ form.subject.id_for_label }}">Academic Subject *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.subject.id_for_label }}">
+            Academic Subject <span class="text-rose-500">*</span>
+          </label>
           {{ form.subject }}
-          {% if form.subject.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.subject.errors }}</div>{% endif %}
+          {% if form.subject.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.subject.errors }}</div>{% endif %}
         </div>
         <div>
-          <label class="form-label" for="{{ form.batch.id_for_label }}">Target Academic Cohort / Batch *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.batch.id_for_label }}">
+            Target Academic Cohort / Batch <span class="text-rose-500">*</span>
+          </label>
           {{ form.batch }}
-          {% if form.batch.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.batch.errors }}</div>{% endif %}
+          {% if form.batch.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.batch.errors }}</div>{% endif %}
         </div>
       </div>
     </div>
 
-    <!-- Scheduling & Windows -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
-        2. Delivery Window & Duration
-      </h2>
+    <!-- Delivery Window Card -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs space-y-4">
+      <div class="pb-3 border-b border-zinc-100 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">2</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Delivery Window & Time Synchronization</h2>
+      </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="form-label" for="{{ form.start_window.id_for_label }}">Window Start (Earliest Entry) *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.start_window.id_for_label }}">
+            Window Start (Earliest Admission) <span class="text-rose-500">*</span>
+          </label>
           {{ form.start_window }}
-          {% if form.start_window.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.start_window.errors }}</div>{% endif %}
+          {% if form.start_window.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.start_window.errors }}</div>{% endif %}
         </div>
         <div>
-          <label class="form-label" for="{{ form.end_window.id_for_label }}">Window End (Absolute Deadline) *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.end_window.id_for_label }}">
+            Window End (Absolute Deadline) <span class="text-rose-500">*</span>
+          </label>
           {{ form.end_window }}
-          {% if form.end_window.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.end_window.errors }}</div>{% endif %}
+          {% if form.end_window.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.end_window.errors }}</div>{% endif %}
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-4);">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label class="form-label" for="{{ form.duration_minutes.id_for_label }}">Duration (Minutes) *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.duration_minutes.id_for_label }}">
+            Duration (Minutes) <span class="text-rose-500">*</span>
+          </label>
           {{ form.duration_minutes }}
         </div>
         <div>
-          <label class="form-label" for="{{ form.pass_percentage.id_for_label }}">Passing Mark (%) *</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.pass_percentage.id_for_label }}">
+            Passing Threshold (%) <span class="text-rose-500">*</span>
+          </label>
           {{ form.pass_percentage }}
         </div>
         <div>
-          <label class="form-label" for="{{ form.allow_late_join_minutes.id_for_label }}">Late Entry Window (Mins)</label>
+          <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.allow_late_join_minutes.id_for_label }}">
+            Late Entry Grace (Mins)
+          </label>
           {{ form.allow_late_join_minutes }}
         </div>
       </div>
     </div>
 
-    <!-- Delivery Engine & Proctoring Controls -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
-        3. Delivery Engine & Proctoring Rules
-      </h2>
+    <!-- Security & Delivery Engine Card -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs space-y-4">
+      <div class="pb-3 border-b border-zinc-100 flex items-center gap-2">
+        <span class="w-5 h-5 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">3</span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Delivery Engine & Proctoring Rules</h2>
+      </div>
 
-      <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-4);">
-        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+      <div class="space-y-3">
+        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
           {{ form.shuffle_questions }}
-          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
-            Shuffle Questions per Candidate
-          </span>
+          <span>Shuffle Questions Randomly per Candidate</span>
         </label>
-        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
           {{ form.shuffle_options }}
-          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
-            Shuffle Options per Question
-          </span>
+          <span>Shuffle Multiple Choice Options per Question</span>
         </label>
-        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
           {{ form.strict_proctoring }}
-          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
-            Enforce Intelligent Proctoring (Full-screen, tab monitoring & AI computer vision)
-          </span>
+          <span>Enforce Intelligent Edge Proctoring (Full-screen, tab monitoring & AI computer vision)</span>
         </label>
-        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+        <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-zinc-800">
           {{ form.calculator_enabled }}
-          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
-            Enable In-Browser Scientific Calculator
-          </span>
+          <span>Enable Built-in Scientific Calculator</span>
         </label>
       </div>
 
       <div>
-        <label class="form-label" for="{{ form.instructions.id_for_label }}">Candidate Instructions & Rules</label>
+        <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.instructions.id_for_label }}">
+          Candidate Instructions & Delivery Directives
+        </label>
         {{ form.instructions }}
       </div>
     </div>
 
-    <!-- Actions -->
-    <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
-      <a href="{% url 'examinations:exam_list' %}" class="btn btn-secondary">Cancel</a>
-      <button type="submit" class="btn btn-primary" style="padding: var(--space-3) var(--space-6);">
-        Save & Proceed to Question Setup →
+    <!-- Form Actions -->
+    <div class="pt-2 flex items-center justify-end gap-3">
+      <a href="{% url 'examinations:exam_list' %}" class="btn-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn-brand">
+        Save & Proceed to Sections Setup &rarr;
       </button>
     </div>
   </form>

@@ -1,134 +1,104 @@
 {% extends "base/base.html" %}
 
-{% block title %}Appearance Settings | EPS Phoenix{% endblock %}
+{% block title %}Appearance Settings — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 750px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Header -->
-  <div style="margin-bottom: var(--space-6);">
-    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-      🎨 Appearance Settings
-    </h1>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-      Customize your visual workspace, color theme, accent palette, and accessibility preferences.
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex items-center gap-2 mb-1.5">
+      <div class="w-7 h-7 rounded-lg bg-orange-100 text-[#ea580c] flex items-center justify-center font-bold text-xs">🎨</div>
+      <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+        Appearance & Theme Preferences
+      </h1>
+    </div>
+    <p class="text-xs text-zinc-500">
+      Configure your visual environment, daytime vs. midnight theme modes, and institutional design tokens.
     </p>
   </div>
 
-  <form method="post">
+  <form method="post" class="space-y-6">
     {% csrf_token %}
 
-    <!-- Theme Mode Cards (ChatGPT Reference) -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-        Color Theme
-      </h2>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
-        Select whether EPS Phoenix adopts a bright daylight theme, a charcoal dark theme, or synchronizes with your device's system settings.
-      </p>
+    <!-- Theme Mode Cards -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs space-y-4">
+      <div>
+        <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Interface Theme Mode</h2>
+        <p class="text-xs text-zinc-500">Select daylight mode, midnight slate mode, or synchronize with device OS settings</p>
+      </div>
 
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-bottom: var(--space-4);">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- System Auto Card -->
-        <label style="border: 2px solid {% if pref.theme_mode == 'SYSTEM' %}var(--color-accent){% else %}var(--border-color){% endif %}; border-radius: var(--radius-md); padding: var(--space-4); cursor: pointer; text-align: center; background-color: var(--bg-surface-secondary); display: block;">
-          <input type="radio" name="theme_mode" value="SYSTEM" {% if pref.theme_mode == 'SYSTEM' %}checked{% endif %} style="display: none;" onchange="this.form.submit()">
-          <div style="height: 60px; border-radius: 4px; background: linear-gradient(135deg, #f8fafc 50%, #0f172a 50%); border: 1px solid var(--border-color); margin-bottom: var(--space-2);"></div>
-          <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
-            System (Auto)
+        <label class="border-2 {% if pref.theme_mode == 'SYSTEM' %}border-[#ea580c] bg-orange-50/40{% else %}border-zinc-200 bg-white hover:border-zinc-300{% endif %} rounded-xl p-4 cursor-pointer text-center block transition-all shadow-2xs">
+          <input type="radio" name="theme_mode" value="SYSTEM" {% if pref.theme_mode == 'SYSTEM' %}checked{% endif %} class="hidden" onchange="this.form.submit()">
+          <div class="h-14 rounded-lg border border-zinc-200 mb-3 overflow-hidden shadow-2xs flex">
+            <div class="w-1/2 bg-white h-full border-r border-zinc-200"></div>
+            <div class="w-1/2 bg-zinc-900 h-full"></div>
           </div>
-          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-            Syncs with OS
-          </div>
+          <div class="font-bold text-xs text-zinc-900">System (Auto)</div>
+          <div class="text-[10px] text-zinc-500 mt-0.5">Syncs with OS</div>
         </label>
 
         <!-- Light Mode Card -->
-        <label style="border: 2px solid {% if pref.theme_mode == 'LIGHT' %}var(--color-accent){% else %}var(--border-color){% endif %}; border-radius: var(--radius-md); padding: var(--space-4); cursor: pointer; text-align: center; background-color: var(--bg-surface-secondary); display: block;">
-          <input type="radio" name="theme_mode" value="LIGHT" {% if pref.theme_mode == 'LIGHT' %}checked{% endif %} style="display: none;" onchange="this.form.submit()">
-          <div style="height: 60px; border-radius: 4px; background: #ffffff; border: 1px solid #cbd5e1; margin-bottom: var(--space-2);"></div>
-          <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
-            Light
+        <label class="border-2 {% if pref.theme_mode == 'LIGHT' %}border-[#ea580c] bg-orange-50/40{% else %}border-zinc-200 bg-white hover:border-zinc-300{% endif %} rounded-xl p-4 cursor-pointer text-center block transition-all shadow-2xs">
+          <input type="radio" name="theme_mode" value="LIGHT" {% if pref.theme_mode == 'LIGHT' %}checked{% endif %} class="hidden" onchange="this.form.submit()">
+          <div class="h-14 rounded-lg bg-zinc-50 border border-zinc-200 mb-3 shadow-2xs flex items-center justify-center">
+            <div class="w-8 h-4 rounded bg-white border border-zinc-200"></div>
           </div>
-          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-            Daylight Contrast
-          </div>
+          <div class="font-bold text-xs text-zinc-900">Light Daylight</div>
+          <div class="text-[10px] text-zinc-500 mt-0.5">High Contrast</div>
         </label>
 
         <!-- Dark Mode Card -->
-        <label style="border: 2px solid {% if pref.theme_mode == 'DARK' %}var(--color-accent){% else %}var(--border-color){% endif %}; border-radius: var(--radius-md); padding: var(--space-4); cursor: pointer; text-align: center; background-color: var(--bg-surface-secondary); display: block;">
-          <input type="radio" name="theme_mode" value="DARK" {% if pref.theme_mode == 'DARK' %}checked{% endif %} style="display: none;" onchange="this.form.submit()">
-          <div style="height: 60px; border-radius: 4px; background: #0f172a; border: 1px solid #334155; margin-bottom: var(--space-2);"></div>
-          <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
-            Dark
+        <label class="border-2 {% if pref.theme_mode == 'DARK' %}border-[#ea580c] bg-orange-50/40{% else %}border-zinc-200 bg-white hover:border-zinc-300{% endif %} rounded-xl p-4 cursor-pointer text-center block transition-all shadow-2xs">
+          <input type="radio" name="theme_mode" value="DARK" {% if pref.theme_mode == 'DARK' %}checked{% endif %} class="hidden" onchange="this.form.submit()">
+          <div class="h-14 rounded-lg bg-zinc-900 border border-zinc-800 mb-3 shadow-2xs flex items-center justify-center">
+            <div class="w-8 h-4 rounded bg-zinc-800 border border-zinc-700"></div>
           </div>
-          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
-            Midnight Slate
-          </div>
+          <div class="font-bold text-xs text-zinc-900">Midnight Slate</div>
+          <div class="text-[10px] text-zinc-500 mt-0.5">Low Glare</div>
         </label>
       </div>
     </div>
 
-    <!-- Primary Accent Hue Selector -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-        Primary Accent Color
-      </h2>
-      <p style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-bottom: var(--space-4);">
-        Choose the interactive brand highlight applied to buttons, badges, links, and focused input rings.
-      </p>
-
-      <div style="display: flex; gap: var(--space-4); align-items: center;">
-        {% for color_code, color_label in "[('#3b82f6', 'Classic Blue'), ('#10b981', 'Emerald Green'), ('#8b5cf6', 'Royal Violet'), ('#f59e0b', 'Amber Gold'), ('#f43f5e', 'Rose Crimson')]"|slice:":0" %}{% endfor %}
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="radio" name="accent_color" value="#3b82f6" {% if pref.accent_color == '#3b82f6' %}checked{% endif %}>
-          <span style="display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #3b82f6;"></span>
-          <span style="font-size: var(--font-size-sm);">Classic Blue</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="radio" name="accent_color" value="#10b981" {% if pref.accent_color == '#10b981' %}checked{% endif %}>
-          <span style="display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #10b981;"></span>
-          <span style="font-size: var(--font-size-sm);">Emerald</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="radio" name="accent_color" value="#8b5cf6" {% if pref.accent_color == '#8b5cf6' %}checked{% endif %}>
-          <span style="display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #8b5cf6;"></span>
-          <span style="font-size: var(--font-size-sm);">Violet</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="radio" name="accent_color" value="#f59e0b" {% if pref.accent_color == '#f59e0b' %}checked{% endif %}>
-          <span style="display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #f59e0b;"></span>
-          <span style="font-size: var(--font-size-sm);">Amber</span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Density & Accessibility Controls -->
-    <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-      <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-4); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-2);">
-        Layout Density & Accessibility
-      </h2>
-
-      <div style="margin-bottom: var(--space-4);">
-        <label class="form-label">Spacing & Content Density</label>
-        <select name="density" class="form-select" style="max-width: 320px;">
-          {% for code, label in densities %}
-            <option value="{{ code }}" {% if pref.density == code %}selected{% endif %}>{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
+    <!-- Primary Accent Hue Selector Card -->
+    <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs space-y-4">
       <div>
-        <label style="display: flex; align-items: center; gap: var(--space-3); cursor: pointer;">
-          <input type="checkbox" name="high_contrast" class="form-checkbox" {% if pref.high_contrast %}checked{% endif %}>
-          <span style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold);">
-            Enable High Contrast Mode (Deep borders and enhanced element definition)
-          </span>
+        <h2 class="text-sm font-bold text-zinc-900 tracking-tight">Primary Accent Hue</h2>
+        <p class="text-xs text-zinc-500">Institutional highlight applied to focus rings, active tabs, and primary action controls</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <label class="flex items-center gap-2.5 p-3 rounded-lg border border-zinc-200 bg-zinc-50/60 hover:bg-zinc-100 cursor-pointer transition-all">
+          <input type="radio" name="accent_color" value="#ea580c" {% if pref.accent_color == '#ea580c' or not pref.accent_color %}checked{% endif %} class="text-[#ea580c] focus:ring-[#ea580c]">
+          <span class="w-3.5 h-3.5 rounded-full bg-[#ea580c]"></span>
+          <span class="font-semibold text-zinc-800">Safety Amber</span>
+        </label>
+
+        <label class="flex items-center gap-2.5 p-3 rounded-lg border border-zinc-200 bg-zinc-50/60 hover:bg-zinc-100 cursor-pointer transition-all">
+          <input type="radio" name="accent_color" value="#0284c7" {% if pref.accent_color == '#0284c7' %}checked{% endif %} class="text-sky-600 focus:ring-sky-600">
+          <span class="w-3.5 h-3.5 rounded-full bg-sky-600"></span>
+          <span class="font-semibold text-zinc-800">Sky Telemetry</span>
+        </label>
+
+        <label class="flex items-center gap-2.5 p-3 rounded-lg border border-zinc-200 bg-zinc-50/60 hover:bg-zinc-100 cursor-pointer transition-all">
+          <input type="radio" name="accent_color" value="#10b981" {% if pref.accent_color == '#10b981' %}checked{% endif %} class="text-emerald-600 focus:ring-emerald-600">
+          <span class="w-3.5 h-3.5 rounded-full bg-emerald-600"></span>
+          <span class="font-semibold text-zinc-800">Emerald Nominal</span>
+        </label>
+
+        <label class="flex items-center gap-2.5 p-3 rounded-lg border border-zinc-200 bg-zinc-50/60 hover:bg-zinc-100 cursor-pointer transition-all">
+          <input type="radio" name="accent_color" value="#0f172a" {% if pref.accent_color == '#0f172a' %}checked{% endif %} class="text-slate-900 focus:ring-slate-900">
+          <span class="w-3.5 h-3.5 rounded-full bg-slate-900"></span>
+          <span class="font-semibold text-zinc-800">Charcoal Slate</span>
         </label>
       </div>
-    </div>
 
-    <!-- Actions -->
-    <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
-      <button type="submit" class="btn btn-primary" style="padding: var(--space-3) var(--space-6);">
-        Save Appearance Preferences
-      </button>
+      <div class="pt-2 flex justify-end">
+        <button type="submit" class="btn-brand">
+          Save Appearance &rarr;
+        </button>
+      </div>
     </div>
   </form>
 </div>

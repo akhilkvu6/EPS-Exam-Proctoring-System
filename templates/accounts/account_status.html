@@ -3,40 +3,75 @@
 {% block title %}Account Status — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 600px; padding-top: var(--space-10); padding-bottom: var(--space-12);">
-  <div class="card" style="padding: var(--space-8); text-align: center;">
+<div class="max-w-lg mx-auto px-4 py-16">
+  <div class="bg-white border border-zinc-200/90 rounded-2xl p-8 shadow-2xs border-t-4 border-t-[#ea580c] text-center">
     {% if user_obj.status == 'PENDING_APPROVAL' %}
-      <div style="font-size: 3rem; margin-bottom: var(--space-2);">⏳</div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+      <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-2xs">
+        ⏳
+      </div>
+      
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-semibold tracking-wide mb-3 border border-amber-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>DOSSIER UNDER FACULTY REVIEW</span>
+      </div>
+
+      <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight mb-2">
         Admission Review in Progress
       </h1>
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-6);">
-        Your application is currently assigned to the institutional review queue. Once approved and an official roll number is allocated, full student workspace access will be activated.
+      
+      <p class="text-sm text-zinc-600 leading-relaxed mb-6">
+        Your admission dossier has been securely staged in the faculty evaluation queue. Workspace access and examination permissions will activate immediately upon verification and atomic roll number issuance.
       </p>
-      <div style="background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-6); text-align: left; font-size: var(--font-size-xs);">
-        <div><strong>Username:</strong> {{ user_obj.username }}</div>
-        <div><strong>Role:</strong> {{ user_obj.get_role_display }}</div>
-        <div><strong>Application Status:</strong> <span style="color: var(--color-warning);">Pending Review</span></div>
+
+      <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-4 mb-6 text-left font-mono text-xs space-y-1.5">
+        <div class="flex justify-between text-zinc-600">
+          <span>Target Account:</span>
+          <span class="font-bold text-zinc-900">{{ user_obj.username }}</span>
+        </div>
+        <div class="flex justify-between text-zinc-600">
+          <span>Assigned Role:</span>
+          <span class="font-bold text-zinc-900">{{ user_obj.get_role_display }}</span>
+        </div>
+        <div class="flex justify-between text-zinc-600">
+          <span>Review Status:</span>
+          <span class="font-bold text-amber-600">Pending Authorization</span>
+        </div>
       </div>
     {% elif user_obj.status == 'SUSPENDED' %}
-      <div style="font-size: 3rem; margin-bottom: var(--space-2);">🛑</div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-danger); margin-bottom: var(--space-2);">
+      <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-2xs">
+        🛑
+      </div>
+      
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 text-xs font-semibold tracking-wide mb-3 border border-rose-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+        <span>ADMINISTRATIVE LOCK</span>
+      </div>
+
+      <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight mb-2 text-rose-600">
         Account Suspended
       </h1>
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-6);">
-        This account has been placed under administrative suspension. Active examinations and evaluations for this account are halted. Contact the institutional examination controller.
+      
+      <p class="text-sm text-zinc-600 leading-relaxed mb-6">
+        This account has been placed under administrative suspension. Active examinations, session credentials, and evaluations for this account have been halted. Contact the institutional examination controller.
       </p>
     {% else %}
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-        Account Active
+      <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-2xs">
+        ✓
+      </div>
+      
+      <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight mb-2">
+        Account Operational
       </h1>
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-6);">
-        Your account status is active.
+      
+      <p class="text-sm text-zinc-600 mb-6">
+        Your institutional credentials are in an active and compliant state.
       </p>
     {% endif %}
 
     <div>
-      <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">Sign Out</a>
+      <a href="{% url 'accounts:logout' %}" class="btn-secondary text-xs">
+        Sign Out Session
+      </a>
     </div>
   </div>
 </div>

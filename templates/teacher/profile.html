@@ -3,99 +3,113 @@
 {% block title %}Faculty Profile — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block teacher_content %}
-<div class="card">
-  <div style="border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
-    <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+<div class="bg-white border border-zinc-200/90 rounded-xl p-6 sm:p-8 shadow-2xs border-t-2 border-t-[#ea580c] max-w-3xl">
+  <div class="border-b border-zinc-100 pb-4 mb-6">
+    <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
       Faculty Profile & Academic Scope
     </h1>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary);">
+    <p class="text-xs text-zinc-500 mt-1">
       Institutional faculty credentials, assigned academic department, and contact information.
     </p>
   </div>
 
   <!-- Read-Only Institutional Identifiers -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); background-color: var(--bg-secondary); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-6); font-size: var(--font-size-xs);">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-zinc-50 p-4 rounded-xl border border-zinc-200/70 mb-6 text-xs">
     <div>
-      <div style="color: var(--text-tertiary);">STAFF IDENTIFIER</div>
-      <div style="font-weight: var(--font-weight-bold); font-family: var(--font-family-mono); font-size: var(--font-size-sm); color: var(--color-accent);">
+      <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Staff Identifier</div>
+      <div class="font-mono font-bold text-[#ea580c] text-sm mt-0.5">
         {{ teacher_profile.staff_id }}
       </div>
     </div>
     <div>
-      <div style="color: var(--text-tertiary);">DEPARTMENT JURISDICTION</div>
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm);">
+      <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Department</div>
+      <div class="font-bold text-zinc-900 mt-0.5">
         {{ teacher_profile.department_name }}
       </div>
     </div>
     <div>
-      <div style="color: var(--text-tertiary);">DEPARTMENTAL ROLE</div>
-      <div style="font-weight: var(--font-weight-semibold); font-size: var(--font-size-sm);">
+      <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Departmental Role</div>
+      <div class="font-semibold text-zinc-800 mt-0.5">
         {% if teacher_profile.is_head_of_department %}
           Head of Department (HOD)
         {% else %}
-          Faculty Member / Invigilator
+          Faculty Invigilator
         {% endif %}
       </div>
     </div>
     <div>
-      <div style="color: var(--text-tertiary);">USERNAME</div>
-      <div style="font-weight: var(--font-weight-mono); font-size: var(--font-size-sm);">
+      <div class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Username</div>
+      <div class="font-mono font-bold text-zinc-900 mt-0.5">
         @{{ user.username }}
       </div>
     </div>
   </div>
 
   <!-- Editable Faculty Details -->
-  <form method="post" novalidate>
+  <form method="post" novalidate class="space-y-4">
     {% csrf_token %}
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-      <div class="form-group">
-        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="{{ form.first_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+          First Name
+        </label>
         {{ form.first_name }}
         {% if form.first_name.errors %}
-          <div class="form-error">{{ form.first_name.errors.0 }}</div>
+          <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.first_name.errors.0 }}</div>
         {% endif %}
       </div>
 
-      <div class="form-group">
-        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+      <div>
+        <label for="{{ form.last_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+          Last Name
+        </label>
         {{ form.last_name }}
         {% if form.last_name.errors %}
-          <div class="form-error">{{ form.last_name.errors.0 }}</div>
+          <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.last_name.errors.0 }}</div>
         {% endif %}
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-      <div class="form-group">
-        <label for="{{ form.designation.id_for_label }}" class="form-label">Academic Designation</label>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="{{ form.designation.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+          Academic Designation
+        </label>
         {{ form.designation }}
         {% if form.designation.errors %}
-          <div class="form-error">{{ form.designation.errors.0 }}</div>
+          <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.designation.errors.0 }}</div>
         {% endif %}
       </div>
 
-      <div class="form-group">
-        <label for="{{ form.office_location.id_for_label }}" class="form-label">Office / Room Location</label>
+      <div>
+        <label for="{{ form.office_location.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+          Office / Cabin Location
+        </label>
         {{ form.office_location }}
         {% if form.office_location.errors %}
-          <div class="form-error">{{ form.office_location.errors.0 }}</div>
+          <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.office_location.errors.0 }}</div>
         {% endif %}
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="{{ form.qualifications.id_for_label }}" class="form-label">Academic Credentials & Qualifications</label>
+    <div>
+      <label for="{{ form.qualifications.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+        Academic Credentials & Qualifications
+      </label>
       {{ form.qualifications }}
       {% if form.qualifications.errors %}
-        <div class="form-error">{{ form.qualifications.errors.0 }}</div>
+        <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.qualifications.errors.0 }}</div>
       {% endif %}
     </div>
 
-    <div style="margin-top: var(--space-6); display: flex; gap: var(--space-3);">
-      <button type="submit" class="btn btn-primary">Save Profile Changes</button>
-      <a href="{% url 'teacher:dashboard' %}" class="btn btn-secondary">Cancel</a>
+    <div class="pt-3 flex items-center gap-3">
+      <button type="submit" class="btn-brand">
+        Save Profile Changes
+      </button>
+      <a href="{% url 'teacher:dashboard' %}" class="btn-secondary">
+        Cancel
+      </a>
     </div>
   </form>
 </div>

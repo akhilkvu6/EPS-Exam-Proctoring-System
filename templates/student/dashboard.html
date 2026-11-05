@@ -3,32 +3,33 @@
 {% block title %}Student Dashboard — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block student_content %}
-<div>
-  <!-- Header / Greeting Banner -->
-  <div class="card" style="margin-bottom: var(--space-6); background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: var(--space-4);">
+<div class="space-y-6">
+  <!-- Greeting Banner -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <div style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--color-accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-1);">
-          Student Workspace
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#c2410c] text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-orange-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
+          Candidate Workspace
         </div>
-        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
           Welcome back, {{ user.get_full_name|default:user.username }}!
         </h1>
-        <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
-          {{ profile.course_name|default:"Program Enrolled" }} &bull; Semester {{ profile.current_semester }} &bull; Batch {{ profile.batch_name|default:"Active" }}
+        <p class="text-xs text-zinc-500 mt-1">
+          {{ profile.course_name|default:"Program Enrolled" }} &bull; Semester {{ profile.current_semester }} &bull; Cohort {{ profile.batch_name|default:"Active" }}
         </p>
       </div>
 
       <div>
         {% if profile.roll_number %}
-          <div style="background-color: var(--color-success-bg); border: 1px solid var(--color-success-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
-            <div style="font-size: var(--font-size-xs); color: var(--color-success-fg); font-weight: var(--font-weight-semibold);">OFFICIAL ROLL NUMBER</div>
-            <div style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-success-fg); font-family: var(--font-family-mono);">{{ profile.roll_number }}</div>
+          <div class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-right">
+            <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Official Roll Number</div>
+            <div class="font-mono text-base font-black text-emerald-700">{{ profile.roll_number }}</div>
           </div>
         {% else %}
-          <div style="background-color: var(--color-warning-bg); border: 1px solid var(--color-warning-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-4); text-align: right;">
-            <div style="font-size: var(--font-size-xs); color: var(--color-warning-fg); font-weight: var(--font-weight-semibold);">REGISTRATION REF</div>
-            <div style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-warning-fg); font-family: var(--font-family-mono);">{{ profile.registration_number }}</div>
+          <div class="px-4 py-2 rounded-xl bg-amber-50 border border-amber-200 text-right">
+            <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Registration Ref</div>
+            <div class="font-mono text-base font-black text-amber-700">{{ profile.registration_number }}</div>
           </div>
         {% endif %}
       </div>
@@ -36,51 +37,74 @@
   </div>
 
   <!-- Metric Overview Cards -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Active Semester</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
-        Semester {{ profile.current_semester }}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Current Level</div>
+      <div class="text-2xl font-black text-zinc-900 font-mono tracking-tight my-1">
+        Sem {{ profile.current_semester }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--color-accent);">{{ profile.department_name|default:"Department Enrolled" }}</div>
+      <div class="text-xs text-zinc-500 truncate">{{ profile.department_name|default:"Assigned Dept" }}</div>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Active Examinations</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Active Exams</div>
+      <div class="text-2xl font-black text-zinc-900 font-mono tracking-tight my-1">
         {{ active_exams_count }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Ready for candidate attempt</div>
+      <a href="{% url 'student:exams_list' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Enter Portal</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Published Results</div>
-      <div style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: var(--space-1) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Published Results</div>
+      <div class="text-2xl font-black text-zinc-900 font-mono tracking-tight my-1">
         {{ published_results_count }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">Verified scorecards</div>
+      <a href="{% url 'results:my_results' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>View Scorecards</span>
+        <span>&rarr;</span>
+      </a>
     </div>
 
-    <div class="card" style="padding: var(--space-5);">
-      <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase;">Admission Status</div>
-      <div style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-success); margin: var(--space-2) 0;">
+    <div class="metric-ribbon-card">
+      <div class="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Admission State</div>
+      <div class="text-base font-black text-emerald-600 font-mono tracking-tight my-1">
         {{ profile.get_admission_status_display }}
       </div>
-      <div style="font-size: var(--font-size-xs); color: var(--text-secondary);"><a href="{% url 'student:admission_status' %}">View review audit &rarr;</a></div>
+      <a href="{% url 'student:admission_status' %}" class="text-xs text-[#ea580c] font-semibold hover:underline inline-flex items-center gap-1">
+        <span>Review Stages</span>
+        <span>&rarr;</span>
+      </a>
     </div>
   </div>
 
-  <!-- Quick Action & Integrity Notice -->
-  <div class="card">
-    <h2 style="font-size: var(--font-size-base); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
-      Examination Integrity & Readiness Checklist
-    </h2>
-    <p style="font-size: var(--font-size-xs); color: var(--text-secondary); line-height: var(--line-height-relaxed); margin-bottom: var(--space-4);">
-      Prior to commencing institutional examinations, verify device readiness (working front-facing camera, microphone, and stable connection). EPS Phoenix operates client-side hybrid AI proctoring with zero continuous video recording to respect candidate privacy.
+  <!-- Quick Action & Integrity Notice Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="pb-3 mb-3 border-b border-zinc-100 flex items-center justify-between">
+      <h2 class="text-base font-bold text-zinc-900 tracking-tight">
+        Examination Readiness & Hardware Directives
+      </h2>
+      <span class="status-pill-emerald">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Zero-Stream ML Edge
+      </span>
+    </div>
+    <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-6">
+      Before launching scheduled examinations, confirm device readiness (functional front-facing camera, microphone, and stable connection). EPS Phoenix operates local client-side computer vision with strict zero continuous video egress to respect candidate privacy.
     </p>
-    <div style="display: flex; gap: var(--space-3);">
-      <a href="{% url 'student:exams_list' %}" class="btn btn-primary" style="font-size: var(--font-size-xs);">Browse Examinations</a>
-      <a href="{% url 'student:profile' %}" class="btn btn-secondary" style="font-size: var(--font-size-xs);">Update Emergency Contact</a>
+    <div class="flex flex-wrap items-center gap-3">
+      <a href="{% url 'student:exams_list' %}" class="btn-brand text-xs">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+        <span>Browse Examinations Portal</span>
+      </a>
+      <a href="{% url 'results:my_results' %}" class="btn-secondary text-xs">
+        <span>Check Results</span>
+      </a>
+      <a href="{% url 'student:profile' %}" class="btn-secondary text-xs">
+        <span>Verify Emergency Contact</span>
+      </a>
     </div>
   </div>
 </div>

@@ -3,144 +3,191 @@
 {% block title %}Candidate Admission Registration — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 680px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div class="card" style="padding: var(--space-8);">
-    <div style="text-align: center; margin-bottom: var(--space-6);">
-      <div class="brand-logo-badge" style="margin: 0 auto var(--space-3) auto; width: 44px; height: 44px; font-size: var(--font-size-xl);">P</div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
+<div class="max-w-2xl mx-auto px-4 py-10">
+  <div class="bg-white border border-zinc-200/90 rounded-2xl p-7 sm:p-9 shadow-sm border-t-4 border-t-[#ea580c]">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#c2410c] to-[#ea580c] text-white flex items-center justify-center font-black text-xl tracking-tight shadow-sm mx-auto mb-3">
+        EP
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight">
         Candidate Admission Registration
       </h1>
-      <p style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+      <p class="text-xs sm:text-sm text-zinc-500 mt-1">
         {{ INSTITUTION_NAME }} Online Examination Enrollment Portal
       </p>
     </div>
 
-    <form method="post" novalidate>
+    <form method="post" novalidate class="space-y-8">
       {% csrf_token %}
 
       {% if form.non_field_errors %}
-        <div class="alert alert-danger">
+        <div class="p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs">
           {% for error in form.non_field_errors %}
-            <div>{{ error }}</div>
+            <div class="font-medium">{{ error }}</div>
           {% endfor %}
         </div>
       {% endif %}
 
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent); margin-bottom: var(--space-3); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1);">
-        1. Account Credentials (Login)
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-        <div class="form-group" style="grid-column: span 2;">
-          <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
-          {{ form.username }}
-          <div class="form-hint">{{ form.username.help_text }}</div>
-          {% if form.username.errors %}
-            <div class="form-error">{{ form.username.errors.0 }}</div>
-          {% endif %}
+      <!-- Section 1: Credentials -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2.5 pb-2 border-b border-orange-100">
+          <span class="w-6 h-6 rounded-md bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">1</span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Account Credentials (Login)</h2>
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.password.id_for_label }}" class="form-label">Password *</label>
-          {{ form.password }}
-          {% if form.password.errors %}
-            <div class="form-error">{{ form.password.errors.0 }}</div>
-          {% endif %}
-        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="{{ form.username.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Username <span class="text-rose-500">*</span>
+            </label>
+            {{ form.username }}
+            {% if form.username.help_text %}
+              <div class="mt-1 text-[11px] text-zinc-500">{{ form.username.help_text }}</div>
+            {% endif %}
+            {% if form.username.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.username.errors.0 }}</div>
+            {% endif %}
+          </div>
 
-        <div class="form-group">
-          <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password *</label>
-          {{ form.confirm_password }}
-          {% if form.confirm_password.errors %}
-            <div class="form-error">{{ form.confirm_password.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="{{ form.password.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+                Password <span class="text-rose-500">*</span>
+              </label>
+              {{ form.password }}
+              {% if form.password.errors %}
+                <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.password.errors.0 }}</div>
+              {% endif %}
+            </div>
 
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent); margin-top: var(--space-6); margin-bottom: var(--space-3); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1);">
-        2. Candidate Information
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-        <div class="form-group">
-          <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name *</label>
-          {{ form.first_name }}
-          {% if form.first_name.errors %}
-            <div class="form-error">{{ form.first_name.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
-          {{ form.last_name }}
-          {% if form.last_name.errors %}
-            <div class="form-error">{{ form.last_name.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.guardian_name.id_for_label }}" class="form-label">Guardian / Parent Name</label>
-          {{ form.guardian_name }}
-          {% if form.guardian_name.errors %}
-            <div class="form-error">{{ form.guardian_name.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.contact_number.id_for_label }}" class="form-label">Contact Number</label>
-          {{ form.contact_number }}
-          {% if form.contact_number.errors %}
-            <div class="form-error">{{ form.contact_number.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
-          {{ form.date_of_birth }}
-          {% if form.date_of_birth.errors %}
-            <div class="form-error">{{ form.date_of_birth.errors.0 }}</div>
-          {% endif %}
+            <div>
+              <label for="{{ form.confirm_password.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+                Confirm Password <span class="text-rose-500">*</span>
+              </label>
+              {{ form.confirm_password }}
+              {% if form.confirm_password.errors %}
+                <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.confirm_password.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--color-accent); margin-top: var(--space-6); margin-bottom: var(--space-3); border-bottom: 1px solid var(--border-default); padding-bottom: var(--space-1);">
-        3. Target Academic Program
+      <!-- Section 2: Candidate Bio -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2.5 pb-2 border-b border-orange-100">
+          <span class="w-6 h-6 rounded-md bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">2</span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Candidate Information</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              First Name <span class="text-rose-500">*</span>
+            </label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.first_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Last Name
+            </label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.last_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.guardian_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Guardian / Parent Name
+            </label>
+            {{ form.guardian_name }}
+            {% if form.guardian_name.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.guardian_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.contact_number.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Contact Number
+            </label>
+            {{ form.contact_number }}
+            {% if form.contact_number.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.contact_number.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="{{ form.date_of_birth.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Date of Birth
+            </label>
+            {{ form.date_of_birth }}
+            {% if form.date_of_birth.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.date_of_birth.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
-        <div class="form-group" style="grid-column: span 2;">
-          <label for="{{ form.department_name.id_for_label }}" class="form-label">Academic Department *</label>
-          {{ form.department_name }}
-          {% if form.department_name.errors %}
-            <div class="form-error">{{ form.department_name.errors.0 }}</div>
-          {% endif %}
+      <!-- Section 3: Academic Program -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2.5 pb-2 border-b border-orange-100">
+          <span class="w-6 h-6 rounded-md bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">3</span>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-900">Target Academic Program</h2>
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.course_name.id_for_label }}" class="form-label">Course / Degree Program *</label>
-          {{ form.course_name }}
-          {% if form.course_name.errors %}
-            <div class="form-error">{{ form.course_name.errors.0 }}</div>
-          {% endif %}
-        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="{{ form.department_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              Academic Department <span class="text-rose-500">*</span>
+            </label>
+            {{ form.department_name }}
+            {% if form.department_name.errors %}
+              <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.department_name.errors.0 }}</div>
+            {% endif %}
+          </div>
 
-        <div class="form-group">
-          <label for="{{ form.batch_name.id_for_label }}" class="form-label">Academic Batch *</label>
-          {{ form.batch_name }}
-          {% if form.batch_name.errors %}
-            <div class="form-error">{{ form.batch_name.errors.0 }}</div>
-          {% endif %}
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label for="{{ form.course_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+                Course / Degree Program <span class="text-rose-500">*</span>
+              </label>
+              {{ form.course_name }}
+              {% if form.course_name.errors %}
+                <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.course_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.batch_name.id_for_label }}" class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+                Academic Batch <span class="text-rose-500">*</span>
+              </label>
+              {{ form.batch_name }}
+              {% if form.batch_name.errors %}
+                <div class="mt-1 text-xs text-rose-600 font-medium">{{ form.batch_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="margin-top: var(--space-8);">
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: var(--space-3);">
-          Submit Admission Application &rarr;
+      <div class="pt-4">
+        <button type="submit" class="btn-brand w-full justify-center py-3 text-sm font-bold shadow-xs">
+          <span>Submit Admission Application</span>
+          <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
         </button>
       </div>
 
-      <div style="margin-top: var(--space-4); text-align: center; font-size: var(--font-size-xs); color: var(--text-tertiary);">
-        Already registered? <a href="{% url 'accounts:login' %}?role=student">Sign into Student Workspace</a>
+      <div class="pt-2 text-center text-xs text-zinc-500">
+        Already registered? 
+        <a href="{% url 'accounts:login' %}?role=student" class="text-[#ea580c] font-bold hover:underline ml-1">
+          Sign into Student Workspace &rarr;
+        </a>
       </div>
     </form>
   </div>

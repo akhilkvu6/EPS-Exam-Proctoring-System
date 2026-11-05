@@ -1,34 +1,42 @@
 {% extends "base/base.html" %}
 
-{% block title %}Question Bank | EPS Phoenix{% endblock %}
+{% block title %}Question Bank — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Header / Action Bar -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <div>
-      <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        📚 Master Question Bank
-      </h1>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-        Curate, version, and snapshot assessment items across assigned academic subjects.
-      </p>
-    </div>
-    <div style="display: flex; gap: var(--space-3);">
-      <a href="{% url 'question_bank:question_create' %}" class="btn btn-primary">
-        + Create Question
-      </a>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Header Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-100 text-[#c2410c] text-[11px] font-bold tracking-wider uppercase mb-1.5 border border-orange-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-[#ea580c]"></span>
+          Assessment Authoring Studio
+        </div>
+        <h1 class="text-xl sm:text-2xl font-extrabold text-zinc-900 tracking-tight">
+          Master Question Bank
+        </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Curate, version, and snapshot assessment items across assigned academic subjects with cryptographic lock integrity.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="{% url 'question_bank:question_create' %}" class="btn-brand">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          <span>Create Question</span>
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- Filters & Search Bar -->
-  <div class="card" style="padding: var(--space-4); margin-bottom: var(--space-6);">
-    <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: var(--space-3); align-items: end;">
+  <!-- Filters & Search Bar Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs">
+    <form method="get" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 items-end text-xs">
       <div>
-        <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary); display: block; margin-bottom: var(--space-1);">
+        <label class="block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
           Subject Scoping
         </label>
-        <select name="subject" class="form-select">
+        <select name="subject" class="form-control-precision text-xs py-1.5">
           <option value="">All Assigned Subjects</option>
           {% for sub in subjects %}
             <option value="{{ sub.id }}" {% if selected_subject == sub.id|stringformat:"s" %}selected{% endif %}>
@@ -39,10 +47,10 @@
       </div>
 
       <div>
-        <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary); display: block; margin-bottom: var(--space-1);">
+        <label class="block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
           Question Type
         </label>
-        <select name="type" class="form-select">
+        <select name="type" class="form-control-precision text-xs py-1.5">
           <option value="">All Question Types</option>
           {% for code, label in question_types %}
             <option value="{{ code }}" {% if selected_type == code %}selected{% endif %}>
@@ -53,10 +61,10 @@
       </div>
 
       <div>
-        <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary); display: block; margin-bottom: var(--space-1);">
-          Difficulty Level
+        <label class="block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
+          Difficulty Tier
         </label>
-        <select name="difficulty" class="form-select">
+        <select name="difficulty" class="form-control-precision text-xs py-1.5">
           <option value="">All Difficulties</option>
           {% for code, label in difficulties %}
             <option value="{{ code }}" {% if selected_difficulty == code %}selected{% endif %}>
@@ -67,105 +75,114 @@
       </div>
 
       <div>
-        <label style="font-size: var(--font-size-xs); font-weight: var(--font-weight-semibold); color: var(--text-secondary); display: block; margin-bottom: var(--space-1);">
+        <label class="block text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">
           Keyword Search
         </label>
-        <input type="text" name="q" value="{{ search_query }}" placeholder="Search title or content..." class="form-input">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search title or content..." class="form-control-precision text-xs py-1.5">
       </div>
 
-      <div style="display: flex; gap: var(--space-2);">
-        <button type="submit" class="btn btn-secondary">Filter</button>
+      <div class="flex items-center gap-2">
+        <button type="submit" class="btn-brand flex-1 justify-center py-1.5 text-xs">
+          Filter
+        </button>
         {% if selected_subject or selected_type or selected_difficulty or search_query %}
-          <a href="{% url 'question_bank:question_list' %}" class="btn btn-secondary" style="color: var(--text-tertiary);">Reset</a>
+          <a href="{% url 'question_bank:question_list' %}" class="btn-ghost py-1.5 text-xs">Clear</a>
         {% endif %}
       </div>
     </form>
   </div>
 
-  <!-- Questions Table -->
-  {% if questions %}
-    <div class="card" style="overflow: hidden; padding: 0;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-          <tr>
-            <th style="padding: var(--space-3) var(--space-4);">Subject</th>
-            <th style="padding: var(--space-3) var(--space-4);">Title & Prompt</th>
-            <th style="padding: var(--space-3) var(--space-4);">Type</th>
-            <th style="padding: var(--space-3) var(--space-4);">Difficulty</th>
-            <th style="padding: var(--space-3) var(--space-4);">Marks</th>
-            <th style="padding: var(--space-3) var(--space-4);">Version</th>
-            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for q in questions %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
-              <td style="padding: var(--space-3) var(--space-4); font-weight: var(--font-weight-semibold); white-space: nowrap;">
-                <span style="display: inline-block; padding: 2px 6px; border-radius: var(--radius-sm); background-color: var(--color-accent-subtle); color: var(--color-accent); font-size: var(--font-size-xs);">
-                  {{ q.subject.code }}
-                </span>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4);">
-                <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: 2px;">
-                  <a href="{% url 'question_bank:question_detail' q.pk %}" style="color: inherit; text-decoration: none;">
+  <!-- Questions Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if questions %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Subject</th>
+              <th class="py-3 px-4">Title & Prompt</th>
+              <th class="py-3 px-4">Format</th>
+              <th class="py-3 px-4">Difficulty</th>
+              <th class="py-3 px-4">Marks</th>
+              <th class="py-3 px-4">Version</th>
+              <th class="py-3 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for q in questions %}
+              <tr class="hover:bg-zinc-50/80 transition-colors">
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+                    {{ q.subject.code }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 max-w-md">
+                  <a href="{% url 'question_bank:question_detail' q.pk %}" class="font-bold text-zinc-900 hover:text-[#ea580c] transition-colors block line-clamp-1">
                     {{ q.title }}
                   </a>
-                </div>
-                <div style="color: var(--text-secondary); font-size: var(--font-size-xs); max-width: 480px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                  {{ q.content|striptags }}
-                </div>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                <span class="badge" style="font-size: 11px;">
-                  {{ q.get_question_type_display }}
-                </span>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                {% if q.difficulty == 'EASY' %}
-                  <span style="color: #22c55e; font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs);">● Easy</span>
-                {% elif q.difficulty == 'MEDIUM' %}
-                  <span style="color: #eab308; font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs);">● Medium</span>
-                {% else %}
-                  <span style="color: #ef4444; font-weight: var(--font-weight-semibold); font-size: var(--font-size-xs);">● Hard</span>
-                {% endif %}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap; font-size: var(--font-size-xs);">
-                +{{ q.default_marks }} / -{{ q.negative_marks }}
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 5px; border-radius: 4px;">
-                  v{{ q.version }}
-                </span>
-              </td>
-              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
-                <a href="{% url 'question_bank:question_detail' q.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">
-                  Preview
-                </a>
-                <a href="{% url 'question_bank:question_edit' q.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;">
-                  Edit
-                </a>
-                <a href="{% url 'question_bank:question_duplicate' q.pk %}" class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" title="Clone">
-                  Clone
-                </a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="card" style="text-align: center; padding: var(--space-12);">
-      <div style="font-size: 48px; margin-bottom: var(--space-2);">📖</div>
-      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        No Questions Found
-      </h3>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto var(--space-4) auto;">
-        No items match your active filters or you have not yet authored questions in your assigned subjects.
-      </p>
-      <a href="{% url 'question_bank:question_create' %}" class="btn btn-primary">
-        + Author First Question
-      </a>
-    </div>
-  {% endif %}
+                  <p class="text-zinc-500 text-[11px] line-clamp-1 mt-0.5">
+                    {{ q.content|striptags }}
+                  </p>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-100 text-zinc-700">
+                    {{ q.get_question_type_display }}
+                  </span>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {% if q.difficulty == 'EASY' %}
+                    <span class="status-pill-emerald">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      Easy
+                    </span>
+                  {% elif q.difficulty == 'MEDIUM' %}
+                    <span class="status-pill-amber">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      Medium
+                    </span>
+                  {% else %}
+                    <span class="status-pill-rose">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                      Hard
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-zinc-800 whitespace-nowrap">
+                  +{{ q.default_marks }} / <span class="text-rose-600">-{{ q.negative_marks }}</span>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap font-mono text-[11px] text-zinc-500">
+                  <span class="px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200">v{{ q.version }}</span>
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5">
+                    <a href="{% url 'question_bank:question_detail' q.pk %}" class="btn-ghost py-1 px-2 text-[11px]">
+                      Preview
+                    </a>
+                    <a href="{% url 'question_bank:question_edit' q.pk %}" class="btn-action-edit py-1 px-2 text-[11px]">
+                      Edit
+                    </a>
+                    <a href="{% url 'question_bank:question_duplicate' q.pk %}" class="btn-ghost py-1 px-2 text-[11px]" title="Clone">
+                      Clone
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+          📖
+        </div>
+        <div class="font-bold text-zinc-800 text-sm mb-1">No Questions Found</div>
+        <p class="text-zinc-500 max-w-sm mx-auto mb-4">No assessment questions match your active filters or you have not authored items yet.</p>
+        <a href="{% url 'question_bank:question_create' %}" class="btn-brand">
+          + Author First Question
+        </a>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

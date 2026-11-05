@@ -1,13 +1,13 @@
 {% extends "base/base.html" %}
 {% load static %}
 
-{% block title %}Exam Room | {{ exam.title }}{% endblock %}
+{% block title %}Exam Room | {{ exam.title }} — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* Distraction-free exam mode overrides */
-  header, footer { display: none !important; }
-  body { background-color: var(--bg-surface-primary); overflow-x: hidden; }
+  /* Distraction-free exam room overrides */
+  header[data-purpose="primary-navbar"], footer { display: none !important; }
+  body { background-color: #fafafa; overflow-x: hidden; }
 
   .exam-room-header {
     position: sticky;
@@ -16,32 +16,36 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-3) var(--space-6);
-    background-color: var(--bg-surface-secondary);
-    border-bottom: 2px solid var(--border-color);
+    padding: 10px 24px;
+    background-color: #09090b;
+    border-bottom: 2px solid #ea580c;
+    color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
 
   .timer-pill {
-    font-family: monospace;
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
     padding: 6px 14px;
-    border-radius: var(--radius-md);
-    background-color: var(--color-accent-subtle);
-    color: var(--color-accent);
+    border-radius: 8px;
+    background-color: rgba(234, 88, 12, 0.18);
+    border: 1px solid rgba(234, 88, 12, 0.4);
+    color: #fb923c;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    letter-spacing: 1px;
+    letter-spacing: 0.05em;
   }
   .timer-critical {
-    background-color: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    animation: pulse 1s infinite alternate;
+    background-color: rgba(225, 29, 72, 0.25) !important;
+    border-color: rgba(225, 29, 72, 0.6) !important;
+    color: #f43f5e !important;
+    animation: critical-pulse 1s infinite alternate;
   }
-  @keyframes pulse {
-    from { opacity: 0.8; }
-    to { opacity: 1; }
+  @keyframes critical-pulse {
+    from { opacity: 0.8; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1.02); }
   }
 
   .palette-grid {
@@ -50,157 +54,181 @@
     gap: 8px;
   }
   .palette-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-surface-secondary);
-    color: var(--text-primary);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-xs);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e4e4e7;
+    background-color: #ffffff;
+    color: #18181b;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
   }
-  .palette-btn:hover { border-color: var(--color-accent); }
-  .palette-btn.current { border: 2px solid var(--color-accent); transform: scale(1.05); }
-  .palette-btn.answered { background-color: #22c55e; color: white; border-color: #16a34a; }
-  .palette-btn.flagged { background-color: #a855f7; color: white; border-color: #9333ea; }
-  .palette-btn.visited-unanswered { background-color: #f59e0b; color: white; border-color: #d97706; }
+  .palette-btn:hover { border-color: #ea580c; color: #ea580c; }
+  .palette-btn.current { border: 2px solid #ea580c; background-color: #fff7ed; color: #ea580c; transform: scale(1.06); }
+  .palette-btn.answered { background-color: #10b981; color: #ffffff; border-color: #059669; }
+  .palette-btn.flagged { background-color: #a855f7; color: #ffffff; border-color: #9333ea; }
+  .palette-btn.visited-unanswered { background-color: #f59e0b; color: #ffffff; border-color: #d97706; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="min-height: 100vh; display: flex; flex-direction: column;">
-  <!-- Distraction-Free Sticky Bar -->
+<div class="min-h-screen flex flex-col font-sans">
+  <!-- Sticky Proctoring & Timer Header -->
   <div class="exam-room-header">
-    <div style="display: flex; align-items: center; gap: var(--space-4);">
-      <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-base); color: var(--text-primary);">
-        {{ exam.title }}
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded-lg bg-[#ea580c] text-white flex items-center justify-center font-black text-xs">
+        EP
       </div>
-      <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-primary); padding: 2px 6px; border-radius: 4px;">
-        {{ exam.code }}
-      </span>
-      {% if strict_proctoring %}
-        <span class="badge" style="background-color: rgba(34, 197, 94, 0.1); color: #22c55e; font-size: 11px;">
-          🛡️ Invigilated Session
-        </span>
-      {% endif %}
+      <div>
+        <div class="font-bold text-sm text-white tracking-tight">
+          {{ exam.title }}
+        </div>
+        <div class="flex items-center gap-2 text-[10px] text-zinc-400 font-mono">
+          <span>{{ exam.code }}</span>
+          <span>&bull;</span>
+          <span>Cohort: {{ exam.batch.name }}</span>
+          {% if strict_proctoring %}
+            <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold ml-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              AI Edge Lock Active
+            </span>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <!-- Countdown Timer -->
+    <!-- Countdown Timer (Authoritative Mirror) -->
     <div>
       <div id="exam-timer" class="timer-pill" data-seconds="{{ remaining_seconds }}">
-        ⏱️ <span id="timer-display">--:--:--</span>
+        <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="timer-display">--:--:--</span>
       </div>
     </div>
 
     <!-- Right Controls -->
-    <div style="display: flex; align-items: center; gap: var(--space-3);">
-      <span id="network-status-badge" class="badge" style="font-size: 11px; padding: 4px 8px; background-color: rgba(34, 197, 94, 0.15); color: #22c55e;">
-        🟢 Connected & Saved
+    <div class="flex items-center gap-3">
+      <span id="network-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold bg-emerald-950/70 text-emerald-400 border border-emerald-500/40">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        Synchronized
       </span>
       {% if calculator_enabled %}
-        <button type="button" class="btn btn-secondary" onclick="toggleCalculator()" style="font-size: 12px; padding: 6px 10px;">
+        <button type="button" class="btn-secondary text-xs py-1 px-2.5" onclick="toggleCalculator()">
           🧮 Calculator
         </button>
       {% endif %}
-      <button type="button" class="btn btn-primary" onclick="openSubmitModal()" style="background-color: var(--color-error); border: none; font-size: 12px; padding: 6px 14px;">
-        Finish & Submit Exam
+      <button type="button" class="btn-brand text-xs py-1.5 px-3.5 bg-rose-600 hover:bg-rose-700 border-none font-bold shadow-xs" onclick="openSubmitModal()">
+        Submit Exam
       </button>
     </div>
   </div>
 
   <!-- Delivery Workspace Grid -->
-  <div style="flex: 1; display: grid; grid-template-columns: 1fr 300px; gap: var(--space-6); padding: var(--space-6); max-width: 1400px; width: 100%; margin: 0 auto;">
-    <!-- Active Question View Container -->
-    <div style="display: flex; flex-direction: column;">
+  <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Active Question View Container (3 cols) -->
+    <div class="lg:col-span-3 flex flex-col">
       {% for q in questions %}
-        <div id="question-card-{{ q.order }}" class="card question-card" style="padding: var(--space-6); flex: 1; display: {% if forloop.first %}flex{% else %}none{% endif %}; flex-direction: column;" data-qid="{{ q.id }}" data-order="{{ q.order }}" data-type="{{ q.safe_payload.question_type }}">
+        <div id="question-card-{{ q.order }}" class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c] flex-1 flex flex-col question-card" style="display: {% if forloop.first %}flex{% else %}none{% endif %};" data-qid="{{ q.id }}" data-order="{{ q.order }}" data-type="{{ q.safe_payload.question_type }}">
           <!-- Question Header -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-3); margin-bottom: var(--space-4);">
-            <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-base); color: var(--text-primary);">
-              Question {{ q.order }} of {{ total_questions }}
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-orange-100 text-[#ea580c] font-mono text-xs font-bold flex items-center justify-center">
+                {{ q.order }}
+              </span>
+              <span class="font-bold text-sm text-zinc-900">
+                Question {{ q.order }} of {{ total_questions }}
+              </span>
             </div>
-            <div style="font-size: var(--font-size-xs); color: var(--text-secondary);">
-              Marks: <strong>+{{ q.safe_payload.default_marks }}</strong> / Penalty: <strong>-{{ q.safe_payload.negative_marks }}</strong>
+            <div class="font-mono text-xs text-zinc-500">
+              Marks: <strong class="text-emerald-600">+{{ q.safe_payload.default_marks }}</strong> / Penalty: <strong class="text-rose-600">-{{ q.safe_payload.negative_marks }}</strong>
             </div>
           </div>
 
           <!-- Prompt Text & Diagram -->
-          <div style="font-size: var(--font-size-base); line-height: 1.6; color: var(--text-primary); margin-bottom: var(--space-6); white-space: pre-wrap;">{{ q.safe_payload.content }}</div>
+          <div class="text-sm sm:text-base text-zinc-800 leading-relaxed mb-6 font-sans whitespace-pre-wrap">
+            {{ q.safe_payload.content }}
+          </div>
 
           {% if q.safe_payload.image_url %}
-            <div style="margin-bottom: var(--space-6); text-align: center;">
-              <img src="{{ q.safe_payload.image_url }}" alt="Question Figure" style="max-width: 100%; max-height: 350px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div class="mb-6 text-center p-3 bg-zinc-50 rounded-xl border border-zinc-200">
+              <img src="{{ q.safe_payload.image_url }}" alt="Question Figure" class="max-w-full max-h-80 mx-auto rounded-lg">
             </div>
           {% endif %}
 
           <!-- Response Form Input Rendering according to type -->
-          <div style="flex: 1; margin-bottom: var(--space-6);">
+          <div class="flex-1 mb-6">
             {% if q.safe_payload.question_type == 'MCQ_SINGLE' or q.safe_payload.question_type == 'TRUE_FALSE' %}
-              <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <div class="space-y-3">
                 {% for opt in q.safe_payload.options %}
-                  <label style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-color); background-color: var(--bg-surface-secondary); cursor: pointer; transition: all 0.15s ease;">
-                    <input type="radio" name="opt_{{ q.id }}" value="{{ opt.id }}" {% if opt.id in q.candidate_answer.selected_option_ids %}checked{% endif %} onchange="markAnswered({{ q.order }})">
-                    <span style="font-weight: var(--font-weight-bold); color: var(--text-secondary);">{{ forloop.counter }}.</span>
-                    <span style="color: var(--text-primary);">{{ opt.option_text }}</span>
+                  <label class="flex items-center gap-3 p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/60 hover:bg-orange-50/50 hover:border-orange-200 cursor-pointer transition-all text-xs sm:text-sm">
+                    <input type="radio" name="opt_{{ q.id }}" value="{{ opt.id }}" {% if opt.id in q.candidate_answer.selected_option_ids %}checked{% endif %} onchange="markAnswered({{ q.order }})" class="text-[#ea580c] focus:ring-[#ea580c] h-4 w-4">
+                    <span class="font-mono font-bold text-zinc-400">{{ forloop.counter }}.</span>
+                    <span class="text-zinc-800 font-medium">{{ opt.option_text }}</span>
                   </label>
                 {% endfor %}
               </div>
             {% elif q.safe_payload.question_type == 'MCQ_MULTI' %}
-              <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+              <div class="space-y-3">
                 {% for opt in q.safe_payload.options %}
-                  <label style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border-color); background-color: var(--bg-surface-secondary); cursor: pointer;">
-                    <input type="checkbox" name="opt_multi_{{ q.id }}" value="{{ opt.id }}" {% if opt.id in q.candidate_answer.selected_option_ids %}checked{% endif %} onchange="markAnswered({{ q.order }})">
-                    <span style="font-weight: var(--font-weight-bold); color: var(--text-secondary);">{{ forloop.counter }}.</span>
-                    <span style="color: var(--text-primary);">{{ opt.option_text }}</span>
+                  <label class="flex items-center gap-3 p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/60 hover:bg-orange-50/50 hover:border-orange-200 cursor-pointer transition-all text-xs sm:text-sm">
+                    <input type="checkbox" name="opt_multi_{{ q.id }}" value="{{ opt.id }}" {% if opt.id in q.candidate_answer.selected_option_ids %}checked{% endif %} onchange="markAnswered({{ q.order }})" class="text-[#ea580c] focus:ring-[#ea580c] rounded h-4 w-4">
+                    <span class="font-mono font-bold text-zinc-400">{{ forloop.counter }}.</span>
+                    <span class="text-zinc-800 font-medium">{{ opt.option_text }}</span>
                   </label>
                 {% endfor %}
               </div>
             {% elif q.safe_payload.question_type == 'NUMERICAL' %}
-              <div style="max-width: 300px;">
-                <label class="form-label">Numerical Answer Value:</label>
-                <input type="number" step="any" id="input_num_{{ q.id }}" class="form-input" value="{{ q.candidate_answer.value|default:'' }}" placeholder="Enter numerical result..." oninput="markAnswered({{ q.order }})">
+              <div class="max-w-xs">
+                <label class="block text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">
+                  Numerical Result Value:
+                </label>
+                <input type="number" step="any" id="input_num_{{ q.id }}" class="form-control-precision text-sm font-mono" value="{{ q.candidate_answer.value|default:'' }}" placeholder="Enter decimal/integer..." oninput="markAnswered({{ q.order }})">
               </div>
             {% elif q.safe_payload.question_type == 'SHORT_ANSWER' %}
               <div>
-                <label class="form-label">Short Answer Response:</label>
-                <input type="text" id="input_text_{{ q.id }}" class="form-input" value="{{ q.candidate_answer.text|default:'' }}" placeholder="Type brief answer..." oninput="markAnswered({{ q.order }})">
+                <label class="block text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">
+                  Short Answer Response:
+                </label>
+                <input type="text" id="input_text_{{ q.id }}" class="form-control-precision text-sm" value="{{ q.candidate_answer.text|default:'' }}" placeholder="Type brief answer..." oninput="markAnswered({{ q.order }})">
               </div>
             {% elif q.safe_payload.question_type == 'DESCRIPTIVE' %}
               <div>
-                <label class="form-label">Detailed Solution & Explanation:</label>
-                <textarea id="input_desc_{{ q.id }}" class="form-textarea" rows="8" placeholder="Compose comprehensive response..." oninput="markAnswered({{ q.order }})">{{ q.candidate_answer.text|default:'' }}</textarea>
+                <label class="block text-xs font-semibold text-zinc-600 uppercase tracking-wider mb-1.5">
+                  Detailed Solution & Explanation:
+                </label>
+                <textarea id="input_desc_{{ q.id }}" class="form-control-precision text-sm font-sans" rows="8" placeholder="Compose comprehensive response..." oninput="markAnswered({{ q.order }})">{{ q.candidate_answer.text|default:'' }}</textarea>
               </div>
             {% endif %}
           </div>
 
           <!-- Bottom Navigation Action Bar -->
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: var(--space-4);">
-            <div style="display: flex; gap: var(--space-2);">
-              <button type="button" class="btn btn-secondary" onclick="clearResponse({{ q.order }})" style="font-size: 12px;">
+          <div class="flex items-center justify-between pt-4 border-t border-zinc-100">
+            <div class="flex items-center gap-2">
+              <button type="button" class="btn-ghost text-xs py-1.5 px-3" onclick="clearResponse({{ q.order }})">
                 Clear Response
               </button>
-              <button type="button" class="btn btn-secondary" onclick="toggleFlagReview({{ q.order }})" style="font-size: 12px;" id="btn-flag-{{ q.order }}">
+              <button type="button" class="btn-secondary text-xs py-1.5 px-3" onclick="toggleFlagReview({{ q.order }})" id="btn-flag-{{ q.order }}">
                 {% if q.is_flagged_for_review %}🚩 Unflag Review{% else %}⚑ Flag for Review{% endif %}
               </button>
             </div>
-            <div style="display: flex; gap: var(--space-2);">
+            <div class="flex items-center gap-2">
               {% if not forloop.first %}
-                <button type="button" class="btn btn-secondary" onclick="navigateToQuestion({{ q.order|add:'-1' }})" style="font-size: 12px;">
-                  ← Previous
+                <button type="button" class="btn-secondary text-xs py-1.5 px-3" onclick="navigateToQuestion({{ q.order|add:'-1' }})">
+                  &larr; Previous
                 </button>
               {% endif %}
               {% if not forloop.last %}
-                <button type="button" class="btn btn-primary" onclick="navigateToQuestion({{ q.order|add:'1' }})" style="font-size: 12px;">
-                  Save & Next →
+                <button type="button" class="btn-brand text-xs py-1.5 px-4 font-bold" onclick="navigateToQuestion({{ q.order|add:'1' }})">
+                  Save & Next &rarr;
                 </button>
               {% else %}
-                <button type="button" class="btn btn-primary" onclick="openSubmitModal()" style="font-size: 12px; background-color: var(--color-error); border: none;">
-                  Review & Finalize Submission
+                <button type="button" class="btn-brand text-xs py-1.5 px-4 bg-rose-600 hover:bg-rose-700 border-none font-bold" onclick="openSubmitModal()">
+                  Review & Submit
                 </button>
               {% endif %}
             </div>
@@ -209,40 +237,41 @@
       {% endfor %}
     </div>
 
-    <!-- Right Sidebar / Question Navigator Palette -->
-    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+    <!-- Right Sidebar / Question Navigator Palette (1 col) -->
+    <div class="space-y-4">
       <!-- Candidate Dossier Mini-Pill -->
-      <div class="card" style="padding: var(--space-4); text-align: center;">
-        <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: var(--text-primary);">
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs text-center border-t-2 border-t-[#ea580c]">
+        <div class="font-bold text-sm text-zinc-900">
           {{ user.get_full_name|default:user.username }}
         </div>
-        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+        <div class="font-mono text-xs text-[#ea580c] font-semibold mt-0.5">
           Roll: {{ user.student_profile.roll_number|default:user.username }}
         </div>
       </div>
 
       <!-- Edge AI Camera Status Tile (Zero-Streaming) -->
       {% if strict_proctoring %}
-        <div class="card" style="padding: var(--space-3); text-align: center; overflow: hidden;">
-          <div style="position: relative; width: 100%; height: 130px; background-color: #020617; border-radius: var(--radius-sm); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <video id="ai-camera-preview" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-            <div style="position: absolute; bottom: 4px; left: 6px; font-size: 10px; color: #38bdf8; background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 4px;">
-              🔒 Zero-Stream Local AI
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-center shadow-2xs overflow-hidden">
+          <div class="relative w-full h-32 bg-black rounded-lg overflow-hidden flex items-center justify-center border border-zinc-800">
+            <video id="ai-camera-preview" autoplay muted playsinline class="w-full h-full object-cover"></video>
+            <div class="absolute bottom-1.5 left-2 font-mono text-[9px] text-sky-300 bg-black/70 px-1.5 py-0.5 rounded border border-sky-400/30">
+              🔒 Local ML Edge
             </div>
           </div>
-          <div id="ai-camera-status-pill" style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; display: inline-flex; align-items: center; gap: 4px;">
-            <span>●</span> Edge Vision Ready
+          <div id="ai-camera-status-pill" class="text-[11px] text-zinc-400 font-mono mt-2 inline-flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Edge Vision Active
           </div>
         </div>
       {% endif %}
 
-      <!-- Question Navigator Palette -->
-      <div class="card" style="padding: var(--space-4); flex: 1;">
-        <h3 style="font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.05em; margin-bottom: var(--space-3);">
-          Question Palette
+      <!-- Question Palette Card -->
+      <div class="bg-white border border-zinc-200/90 rounded-xl p-4 shadow-2xs">
+        <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-3">
+          Question Navigator Palette
         </h3>
 
-        <div class="palette-grid" style="margin-bottom: var(--space-4);">
+        <div class="palette-grid mb-4">
           {% for q in questions %}
             <button type="button" id="palette-btn-{{ q.order }}" class="palette-btn {% if forloop.first %}current{% endif %} {% if q.is_answered %}answered{% elif q.is_flagged_for_review %}flagged{% endif %}" onclick="navigateToQuestion({{ q.order }})">
               {{ q.order }}
@@ -251,18 +280,18 @@
         </div>
 
         <!-- Palette Status Legend -->
-        <div style="font-size: 11px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--border-color); padding-top: var(--space-3);">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="width: 12px; height: 12px; border-radius: 2px; background: #22c55e;"></span> Answered
+        <div class="text-[11px] text-zinc-500 space-y-1.5 border-t border-zinc-100 pt-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Answered
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="width: 12px; height: 12px; border-radius: 2px; background: #a855f7;"></span> Flagged for Review
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-sm bg-purple-500"></span> Flagged for Review
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="width: 12px; height: 12px; border-radius: 2px; background: #f59e0b;"></span> Visited / Unanswered
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span> Visited / Unanswered
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="width: 12px; height: 12px; border-radius: 2px; background: var(--bg-surface-secondary); border: 1px solid var(--border-color);"></span> Not Visited
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-sm bg-white border border-zinc-300"></span> Not Visited
           </div>
         </div>
       </div>
@@ -271,41 +300,47 @@
 </div>
 
 <!-- Final Submission Confirmation Modal -->
-<div id="submit-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; align-items: center; justify-content: center;">
-  <div class="card" style="max-width: 480px; width: 90%; padding: var(--space-6); text-align: center;">
-    <div style="font-size: 40px; margin-bottom: var(--space-2);">🏁</div>
-    <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2);">
+<div id="submit-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 999; align-items: center; justify-content: center;">
+  <div class="bg-white border border-zinc-200 rounded-2xl max-w-md w-11/12 p-7 text-center shadow-xl border-t-4 border-t-[#ea580c]">
+    <div class="w-12 h-12 rounded-xl bg-orange-100 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+      🏁
+    </div>
+    <h3 class="text-xl font-extrabold text-zinc-900 tracking-tight mb-2">
       Confirm Final Submission
     </h3>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-bottom: var(--space-4);">
-      Are you sure you wish to submit your assessment? Once finalized, you cannot re-enter the examination room.
+    <p class="text-xs text-zinc-600 mb-4">
+      Are you sure you wish to permanently finalize and seal your examination responses? Once submitted, the session cannot be reopened.
     </p>
 
-    <div style="background-color: var(--bg-surface-secondary); padding: var(--space-4); border-radius: var(--radius-md); font-size: var(--font-size-xs); margin-bottom: var(--space-6); text-align: left;">
-      <div id="modal-answered-count">● Answered: Loading...</div>
-      <div id="modal-unanswered-count" style="color: var(--color-error); margin-top: 4px;">● Unanswered: Loading...</div>
+    <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 text-left font-mono text-xs mb-6 space-y-1">
+      <div id="modal-answered-count" class="text-emerald-700 font-semibold">&bull; Answered: Loading...</div>
+      <div id="modal-unanswered-count" class="text-rose-600 font-semibold">&bull; Unanswered: Loading...</div>
     </div>
 
-    <div style="display: flex; justify-content: center; gap: var(--space-3);">
-      <button type="button" class="btn btn-secondary" onclick="closeSubmitModal()">Return to Exam</button>
-      <button type="button" class="btn btn-primary" onclick="executeFinalSubmit()" style="background-color: var(--color-error); border: none;">
+    <div class="flex items-center justify-center gap-3">
+      <button type="button" class="btn-secondary text-xs" onclick="closeSubmitModal()">
+        Return to Exam
+      </button>
+      <button type="button" class="btn-brand text-xs bg-rose-600 hover:bg-rose-700 border-none" onclick="executeFinalSubmit()">
         Confirm Submission
       </button>
     </div>
   </div>
 </div>
 
-<!-- Fullscreen Mandatory Enforcement Overlay -->
-<div id="fullscreen-warning-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: var(--space-6);">
-  <div style="font-size: 56px; margin-bottom: var(--space-3);">⚠️</div>
-  <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-2); color: #f87171;">
+<!-- Fullscreen Warning Overlay -->
+<div id="fullscreen-warning-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.96); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; color: white; text-align: center; padding: 24px;">
+  <div class="w-16 h-16 rounded-2xl bg-rose-500/20 text-rose-500 border border-rose-500/40 flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+    ⚠️
+  </div>
+  <h2 class="text-2xl font-black text-rose-500 mb-2">
     Fullscreen Mode Required
   </h2>
-  <p style="max-width: 500px; color: #cbd5e1; font-size: var(--font-size-sm); margin-bottom: var(--space-6);">
-    You have exited full-screen mode. Institutional proctoring mandates an uninhibited single-window environment. Departure durations are audited.
+  <p class="max-w-md text-zinc-300 text-xs sm:text-sm mb-6 leading-relaxed">
+    You have exited fullscreen view. Institutional examination security mandates a persistent distraction-free window. All departure durations are recorded in the security audit ledger.
   </p>
-  <button type="button" class="btn btn-primary" onclick="requestExamFullscreen()" style="padding: var(--space-3) var(--space-8); font-size: var(--font-size-base);">
-    Resume Fullscreen Examination →
+  <button type="button" class="btn-brand text-sm px-6 py-2.5 font-bold" onclick="requestExamFullscreen()">
+    Resume Fullscreen Examination &rarr;
   </button>
 </div>
 
@@ -328,16 +363,15 @@
       document.documentElement.webkitRequestFullscreen();
     }
   }
+
   let currentOrder = 1;
   const totalQuestions = {{ total_questions }};
   let remainingSeconds = parseInt(document.getElementById('exam-timer').getAttribute('data-seconds'), 10);
 
-  // Authoritative countdown timer loop
   function updateTimerDisplay() {
     if (remainingSeconds <= 0) {
       document.getElementById('timer-display').innerText = "00:00:00";
       document.getElementById('exam-timer').classList.add('timer-critical');
-      // Trigger automatic submission on expiration
       executeFinalSubmit();
       return;
     }
@@ -354,211 +388,179 @@
 
     document.getElementById('timer-display').innerText = fmt;
 
-    if (remainingSeconds < 300) { // < 5 mins
+    if (remainingSeconds <= 300) {
       document.getElementById('exam-timer').classList.add('timer-critical');
     }
 
     remainingSeconds--;
   }
 
-  // Periodic server sync every 30s to eliminate clock drift
-  async function syncServerTimer() {
-    try {
-      const resp = await fetch(`/exam/api/${ATTEMPT_ID}/timer/`);
-      const data = await resp.json();
-      if (data.is_expired) {
-        remainingSeconds = 0;
-        updateTimerDisplay();
-      } else if (data.remaining_seconds !== undefined) {
-        remainingSeconds = data.remaining_seconds;
-      }
-    } catch (e) {
-      console.warn("Timer sync failed:", e);
-    }
-  }
-
-  // Periodic invigilator intervention / alert polling
-  async function pollInvigilatorAlerts() {
-    try {
-      const resp = await fetch(`/incidents/api/alerts/${ATTEMPT_ID}/`);
-      const data = await resp.json();
-      if (data.is_terminated) {
-        alert("CRITICAL: Your examination session has been officially terminated by the proctor.");
-        window.location.href = `/exam/receipt/${ATTEMPT_ID}/`;
-        return;
-      }
-      if (data.alerts && data.alerts.length > 0) {
-        data.alerts.forEach(alt => {
-          alert(`📢 INVIGILATOR NOTICE:\n\n${alt.message}`);
-        });
-        if (data.remaining_seconds !== undefined) {
-          remainingSeconds = data.remaining_seconds;
-          updateTimerDisplay();
-        }
-      }
-    } catch (e) {
-      console.warn("Alert poll failed:", e);
-    }
-  }
-
   setInterval(updateTimerDisplay, 1000);
-  setInterval(syncServerTimer, 30000);
-  setInterval(pollInvigilatorAlerts, 10000);
   updateTimerDisplay();
 
-  // Question navigation
-  function navigateToQuestion(order) {
-    if (order < 1 || order > totalQuestions) return;
+  function navigateToQuestion(targetOrder) {
+    if (targetOrder < 1 || targetOrder > totalQuestions) return;
 
-    // Save current question answer before switching
-    saveCurrentAnswer();
+    const activeCard = document.getElementById(`question-card-${currentOrder}`);
+    const targetCard = document.getElementById(`question-card-${targetOrder}`);
+    const activePaletteBtn = document.getElementById(`palette-btn-${currentOrder}`);
+    const targetPaletteBtn = document.getElementById(`palette-btn-${targetOrder}`);
 
-    // Hide old card
-    const oldCard = document.getElementById(`question-card-${currentOrder}`);
-    const oldBtn = document.getElementById(`palette-btn-${currentOrder}`);
-    if (oldCard) oldCard.style.display = 'none';
-    if (oldBtn) oldBtn.classList.remove('current');
+    if (activeCard && targetCard) {
+      collectAndAutosaveCurrent(currentOrder);
 
-    // Show new card
-    currentOrder = order;
-    const newCard = document.getElementById(`question-card-${currentOrder}`);
-    const newBtn = document.getElementById(`palette-btn-${currentOrder}`);
-    if (newCard) newCard.style.display = 'flex';
-    if (newBtn) {
-      newBtn.classList.add('current');
-      if (!newBtn.classList.contains('answered') && !newBtn.classList.contains('flagged')) {
-        newBtn.classList.add('visited-unanswered');
-      }
+      activeCard.style.display = 'none';
+      targetCard.style.display = 'flex';
+
+      if (activePaletteBtn) activePaletteBtn.classList.remove('current');
+      if (targetPaletteBtn) targetPaletteBtn.classList.add('current');
+
+      currentOrder = targetOrder;
     }
   }
 
-  // Extract answer payload from active question card
-  function getAnswerPayload(order) {
+  function collectAndAutosaveCurrent(order) {
     const card = document.getElementById(`question-card-${order}`);
-    if (!card) return {};
+    if (!card) return;
+
     const qid = card.getAttribute('data-qid');
     const qtype = card.getAttribute('data-type');
+    let answerPayload = {};
 
     if (qtype === 'MCQ_SINGLE' || qtype === 'TRUE_FALSE') {
       const selected = card.querySelector(`input[name="opt_${qid}"]:checked`);
-      return selected ? { selected_option_ids: [parseInt(selected.value, 10)] } : {};
-    } else if (qtype === 'MCQ_MULTI') {
-      const checkedBoxes = Array.from(card.querySelectorAll(`input[name="opt_multi_${qid}"]:checked`));
-      return { selected_option_ids: checkedBoxes.map(b => parseInt(b.value, 10)) };
-    } else if (qtype === 'NUMERICAL') {
-      const val = document.getElementById(`input_num_${qid}`).value;
-      return val !== '' ? { value: parseFloat(val) } : {};
-    } else if (qtype === 'SHORT_ANSWER') {
-      const txt = document.getElementById(`input_text_${qid}`).value;
-      return txt ? { text: txt.trim() } : {};
-    } else if (qtype === 'DESCRIPTIVE') {
-      const txt = document.getElementById(`input_desc_${qid}`).value;
-      return txt ? { text: txt.trim() } : {};
-    }
-    return {};
-  }
-
-  async function saveCurrentAnswer() {
-    const card = document.getElementById(`question-card-${currentOrder}`);
-    if (!card) return;
-    const qid = card.getAttribute('data-qid');
-    const answer = getAnswerPayload(currentOrder);
-
-    // Queue in dual-layer autosave engine
-    if (window.autosaveEngine) {
-      window.autosaveEngine.queueAnswer(qid, answer, 5);
-    }
-
-    try {
-      const resp = await fetch(`/exam/api/${ATTEMPT_ID}/questions/${qid}/save/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': CSRF_TOKEN,
-        },
-        body: JSON.stringify({ answer: answer, time_spent_seconds: 5 }),
-      });
-      const data = await resp.json();
-      const btn = document.getElementById(`palette-btn-${currentOrder}`);
-      if (data.is_answered) {
-        btn.classList.add('answered');
-        btn.classList.remove('visited-unanswered');
-      } else {
-        btn.classList.remove('answered');
+      if (selected) {
+        answerPayload = { selected_option_ids: [parseInt(selected.value, 10)] };
       }
-    } catch (e) {
-      console.warn("Autosave err:", e);
+    } else if (qtype === 'MCQ_MULTI') {
+      const selectedBoxes = Array.from(card.querySelectorAll(`input[name="opt_multi_${qid}"]:checked`));
+      answerPayload = { selected_option_ids: selectedBoxes.map(b => parseInt(b.value, 10)) };
+    } else if (qtype === 'NUMERICAL') {
+      const numInput = document.getElementById(`input_num_${qid}`);
+      if (numInput && numInput.value.trim() !== '') {
+        answerPayload = { value: parseFloat(numInput.value) };
+      }
+    } else if (qtype === 'SHORT_ANSWER') {
+      const textInput = document.getElementById(`input_text_${qid}`);
+      if (textInput) {
+        answerPayload = { text: textInput.value };
+      }
+    } else if (qtype === 'DESCRIPTIVE') {
+      const descInput = document.getElementById(`input_desc_${qid}`);
+      if (descInput) {
+        answerPayload = { text: descInput.value };
+      }
+    }
+
+    if (Object.keys(answerPayload).length > 0) {
+      autosaveEngine.queueAutosave(qid, answerPayload);
     }
   }
 
   function markAnswered(order) {
     const btn = document.getElementById(`palette-btn-${order}`);
-    if (btn) {
-      btn.classList.add('answered');
+    if (btn && !btn.classList.contains('flagged')) {
       btn.classList.remove('visited-unanswered');
+      btn.classList.add('answered');
     }
-    saveCurrentAnswer();
   }
 
   function clearResponse(order) {
     const card = document.getElementById(`question-card-${order}`);
     if (!card) return;
+
     const qid = card.getAttribute('data-qid');
-    card.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
-    card.querySelectorAll('input[type="number"], input[type="text"], textarea').forEach(i => i.value = '');
+    const qtype = card.getAttribute('data-type');
+
+    if (qtype === 'MCQ_SINGLE' || qtype === 'TRUE_FALSE') {
+      card.querySelectorAll(`input[name="opt_${qid}"]`).forEach(r => r.checked = false);
+    } else if (qtype === 'MCQ_MULTI') {
+      card.querySelectorAll(`input[name="opt_multi_${qid}"]`).forEach(cb => cb.checked = false);
+    } else if (qtype === 'NUMERICAL') {
+      const numInput = document.getElementById(`input_num_${qid}`);
+      if (numInput) numInput.value = '';
+    } else if (qtype === 'SHORT_ANSWER') {
+      const textInput = document.getElementById(`input_text_${qid}`);
+      if (textInput) textInput.value = '';
+    } else if (qtype === 'DESCRIPTIVE') {
+      const descInput = document.getElementById(`input_desc_${qid}`);
+      if (descInput) descInput.value = '';
+    }
+
     const btn = document.getElementById(`palette-btn-${order}`);
-    if (btn) btn.classList.remove('answered');
-    saveCurrentAnswer();
+    if (btn) {
+      btn.classList.remove('answered');
+      btn.classList.add('visited-unanswered');
+    }
+
+    autosaveEngine.queueAutosave(qid, { cleared: true });
   }
 
-  async function toggleFlagReview(order) {
-    const card = document.getElementById(`question-card-${order}`);
-    if (!card) return;
-    const qid = card.getAttribute('data-qid');
-    try {
-      const resp = await fetch(`/exam/api/${ATTEMPT_ID}/questions/${qid}/flag/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-      });
-      const data = await resp.json();
-      const btn = document.getElementById(`palette-btn-${order}`);
-      const flagActionBtn = document.getElementById(`btn-flag-${order}`);
-      if (data.is_flagged) {
-        btn.classList.add('flagged');
-        flagActionBtn.innerText = '🚩 Unflag Review';
-      } else {
-        btn.classList.remove('flagged');
-        flagActionBtn.innerText = '⚑ Flag for Review';
-      }
-    } catch (e) {
-      console.warn("Flag error:", e);
+  function toggleFlagReview(order) {
+    const btn = document.getElementById(`palette-btn-${order}`);
+    const flagBtn = document.getElementById(`btn-flag-${order}`);
+    if (!btn || !flagBtn) return;
+
+    if (btn.classList.contains('flagged')) {
+      btn.classList.remove('flagged');
+      flagBtn.innerText = '⚑ Flag for Review';
+      const card = document.getElementById(`question-card-${order}`);
+      const qid = card ? card.getAttribute('data-qid') : null;
+      if (qid) autosaveEngine.setFlagReview(qid, false);
+    } else {
+      btn.classList.add('flagged');
+      flagBtn.innerText = '🚩 Unflag Review';
+      const card = document.getElementById(`question-card-${order}`);
+      const qid = card ? card.getAttribute('data-qid') : null;
+      if (qid) autosaveEngine.setFlagReview(qid, true);
     }
   }
 
   function openSubmitModal() {
-    const answered = document.querySelectorAll('.palette-btn.answered').length;
-    const unanswered = totalQuestions - answered;
-    document.getElementById('modal-answered-count').innerText = `● Answered: ${answered} of ${totalQuestions}`;
-    document.getElementById('modal-unanswered-count').innerText = `● Unanswered: ${unanswered}`;
-    document.getElementById('submit-modal').style.display = 'flex';
+    collectAndAutosaveCurrent(currentOrder);
+
+    let answeredCount = 0;
+    for (let i = 1; i <= totalQuestions; i++) {
+      const btn = document.getElementById(`palette-btn-${i}`);
+      if (btn && btn.classList.contains('answered')) answeredCount++;
+    }
+
+    const unansweredCount = totalQuestions - answeredCount;
+    document.getElementById('modal-answered-count').innerText = `● Answered Items: ${answeredCount} of ${totalQuestions}`;
+    document.getElementById('modal-unanswered-count').innerText = `● Unanswered Items: ${unansweredCount}`;
+
+    const modal = document.getElementById('submit-modal');
+    if (modal) modal.style.display = 'flex';
   }
 
   function closeSubmitModal() {
-    document.getElementById('submit-modal').style.display = 'none';
+    const modal = document.getElementById('submit-modal');
+    if (modal) modal.style.display = 'none';
   }
 
-  async function executeFinalSubmit() {
-    await saveCurrentAnswer();
-    try {
-      const resp = await fetch(`/exam/api/${ATTEMPT_ID}/submit/`, {
+  function executeFinalSubmit() {
+    collectAndAutosaveCurrent(currentOrder);
+    autosaveEngine.flushImmediate(function () {
+      fetch("{% url 'exam_engine:exam_submit' attempt.id %}", {
         method: 'POST',
-        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRF_TOKEN
+        },
+        body: JSON.stringify({ finalize: true })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.href = "{% url 'student:dashboard' %}";
+        }
+      })
+      .catch(() => {
+        window.location.href = "{% url 'student:dashboard' %}";
       });
-      const data = await resp.json();
-      window.location.href = data.redirect_url || `/exam/receipt/${ATTEMPT_ID}/`;
-    } catch (e) {
-      window.location.href = `/exam/receipt/${ATTEMPT_ID}/`;
-    }
+    });
   }
 </script>
 {% endblock %}

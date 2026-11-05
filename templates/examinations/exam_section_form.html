@@ -1,43 +1,53 @@
 {% extends "base/base.html" %}
 
-{% block title %}Add Section | {{ exam.title }}{% endblock %}
+{% block title %}Add Section | {{ exam.title }} — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 600px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <div style="margin-bottom: var(--space-6);">
-    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px; margin-bottom: var(--space-2);">
-      ← Back to {{ exam.code }}
+<div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <div class="flex items-center justify-between">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-[#ea580c] font-semibold transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      <span>Back to {{ exam.code }}</span>
     </a>
-    <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);">
-      Add Exam Section
-    </h1>
-    <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">
-      Partition the examination into structured sections (e.g. MCQ, Short Answer, Analytical Problems).
-    </p>
   </div>
 
-  <div class="card" style="padding: var(--space-6);">
-    <form method="post">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 sm:p-8 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="pb-3 mb-4 border-b border-zinc-100">
+      <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
+        Add Assessment Section
+      </h1>
+      <p class="text-xs text-zinc-500 mt-1">
+        Partition the examination into structured sections (e.g., Section A: Objective, Section B: Problem Solving).
+      </p>
+    </div>
+
+    <form method="post" class="space-y-4">
       {% csrf_token %}
-      <div style="margin-bottom: var(--space-4);">
-        <label class="form-label" for="{{ form.title.id_for_label }}">Section Title *</label>
+      <div>
+        <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.title.id_for_label }}">
+          Section Title <span class="text-rose-500">*</span>
+        </label>
         {{ form.title }}
-        {% if form.title.errors %}<div style="color: var(--color-error); font-size: var(--font-size-xs); margin-top: 4px;">{{ form.title.errors }}</div>{% endif %}
+        {% if form.title.errors %}<div class="mt-1 text-xs text-rose-600 font-medium">{{ form.title.errors }}</div>{% endif %}
       </div>
 
-      <div style="margin-bottom: var(--space-4);">
-        <label class="form-label" for="{{ form.order.id_for_label }}">Section Order Index *</label>
+      <div>
+        <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.order.id_for_label }}">
+          Section Order Index <span class="text-rose-500">*</span>
+        </label>
         {{ form.order }}
       </div>
 
-      <div style="margin-bottom: var(--space-6);">
-        <label class="form-label" for="{{ form.instructions.id_for_label }}">Section-Specific Candidate Instructions (Optional)</label>
+      <div>
+        <label class="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5" for="{{ form.instructions.id_for_label }}">
+          Section-Specific Candidate Directives (Optional)
+        </label>
         {{ form.instructions }}
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
-        <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn btn-secondary">Cancel</a>
-        <button type="submit" class="btn btn-primary">Save Section</button>
+      <div class="pt-3 flex items-center justify-end gap-3">
+        <a href="{% url 'examinations:exam_detail' exam.pk %}" class="btn-secondary">Cancel</a>
+        <button type="submit" class="btn-brand">Save Section &rarr;</button>
       </div>
     </form>
   </div>

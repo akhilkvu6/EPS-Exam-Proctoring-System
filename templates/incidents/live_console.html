@@ -1,179 +1,189 @@
 {% extends "base/base.html" %}
 
-{% block title %}Invigilator Live Console | {{ exam.code }}{% endblock %}
+{% block title %}Invigilator Live Console | {{ exam.code }} — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 1200px; padding-top: var(--space-8); padding-bottom: var(--space-12);">
-  <!-- Top Nav -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6);">
-    <a href="{% url 'examinations:exam_detail' exam.pk %}" style="color: var(--text-secondary); text-decoration: none; font-size: var(--font-size-sm); display: inline-flex; align-items: center; gap: 4px;">
-      ← Back to {{ exam.code }} Configuration
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <!-- Top Navigation & Refresh -->
+  <div class="flex items-center justify-between">
+    <a href="{% url 'examinations:exam_detail' exam.pk %}" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-[#ea580c] font-semibold transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      <span>Back to {{ exam.code }} Configuration</span>
     </a>
-    <div style="display: flex; gap: var(--space-2); align-items: center;">
-      <span class="badge" style="background-color: rgba(34, 197, 94, 0.15); color: #22c55e;">
-        ● Live Metadata Feed
+
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+        Live Telemetry Stream
       </span>
-      <button type="button" class="btn btn-secondary" onclick="window.location.reload()" style="font-size: 12px; padding: 4px 8px;">
-        🔄 Refresh
+      <button type="button" class="btn-secondary text-xs py-1 px-3" onclick="window.location.reload()">
+        &circlearrowright; Refresh Feed
       </button>
     </div>
   </div>
 
   <!-- Header Card -->
-  <div class="card" style="padding: var(--space-6); margin-bottom: var(--space-6);">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-2);">
-          <span style="font-family: monospace; font-size: 11px; background-color: var(--bg-surface-secondary); padding: 2px 6px; border-radius: 4px;">
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-zinc-100 text-zinc-800 border border-zinc-200">
             {{ exam.code }}
           </span>
-          <span class="badge" style="background-color: var(--color-accent-subtle); color: var(--color-accent);">
-            {{ exam.subject.code }} - {{ exam.subject.name }}
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-orange-100 text-[#c2410c] border border-orange-200">
+            {{ exam.subject.code }} &bull; {{ exam.subject.name }}
           </span>
-          <span class="badge">Cohort: {{ exam.batch.name }}</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-zinc-100 text-zinc-700">
+            Cohort: {{ exam.batch.name }}
+          </span>
         </div>
-        <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--text-primary);">
-          👁️ Invigilator Live Console & Incident Review
+
+        <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">
+          Invigilator Cockpit & Proctoring Telemetry
         </h1>
+        <p class="text-xs text-zinc-500 mt-1">
+          Real-time incident event monitoring, trust score evaluation, and live examination interventions.
+        </p>
       </div>
-      <div style="display: flex; gap: var(--space-4); text-align: right;">
+
+      <div class="flex items-center gap-6 sm:text-right">
         <div>
-          <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-accent);">
+          <div class="text-3xl font-black text-[#ea580c] font-mono tracking-tight">
             {{ total_active }}
           </div>
-          <div style="font-size: 11px; color: var(--text-secondary);">Active In-Room</div>
+          <div class="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">Active In Room</div>
         </div>
         <div>
-          <div style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: {% if total_flagged > 0 %}#ef4444{% else %}#22c55e{% endif %};">
+          <div class="text-3xl font-black {% if total_flagged > 0 %}text-rose-600{% else %}text-emerald-600{% endif %} font-mono tracking-tight">
             {{ total_flagged }}
           </div>
-          <div style="font-size: 11px; color: var(--text-secondary);">Requiring Review</div>
+          <div class="text-[11px] text-zinc-500 font-semibold uppercase tracking-wider">Review Flags</div>
         </div>
       </div>
     </div>
 
     <!-- Filter Toggle -->
-    <div style="display: flex; gap: var(--space-3); border-top: 1px solid var(--border-color); padding-top: var(--space-3);">
-      <a href="{% url 'incidents:live_console' exam.pk %}" class="btn {% if not filter_suspicious %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
+    <div class="flex items-center gap-2 pt-4 mt-4 border-t border-zinc-100 text-xs">
+      <a href="{% url 'incidents:live_console' exam.pk %}" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if not filter_suspicious %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
         All Candidates ({{ attempts|length }})
       </a>
-      <a href="{% url 'incidents:live_console' exam.pk %}?suspicious=1" class="btn {% if filter_suspicious %}btn-primary{% else %}btn-secondary{% endif %}" style="font-size: 12px; padding: 4px 12px;">
-        ⚠️ Suspicious / Review Required Only
+      <a href="{% url 'incidents:live_console' exam.pk %}?suspicious=1" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if filter_suspicious %}bg-rose-600 text-white shadow-2xs{% else %}bg-white text-rose-700 border border-rose-200 hover:bg-rose-50{% endif %}">
+        ⚠️ Anomalies / Review Flags Only
       </a>
     </div>
   </div>
 
-  <!-- Candidates Stream Table -->
-  {% if attempts %}
-    <div class="card" style="overflow: hidden; padding: 0;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: var(--font-size-sm);">
-        <thead style="background-color: var(--bg-surface-secondary); border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
-          <tr>
-            <th style="padding: var(--space-3) var(--space-4);">Candidate</th>
-            <th style="padding: var(--space-3) var(--space-4);">Session Status</th>
-            <th style="padding: var(--space-3) var(--space-4);">Trust Score</th>
-            <th style="padding: var(--space-3) var(--space-4);">Integrity Anomalies</th>
-            <th style="padding: var(--space-3) var(--space-4);">Timer Authority</th>
-            <th style="padding: var(--space-3) var(--space-4); text-align: right;">Invigilator Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in attempts %}
-            <tr style="border-bottom: 1px solid var(--border-color); background-color: {% if a.proctoring_summary and a.proctoring_summary.requires_human_review %}rgba(239, 68, 68, 0.04){% else %}transparent{% endif %};">
-              <td style="padding: var(--space-3) var(--space-4);">
-                <div style="font-weight: var(--font-weight-bold); color: var(--text-primary);">
-                  {{ a.student.get_full_name|default:a.student.username }}
-                </div>
-                <div style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">
-                  Roll: {{ a.student.student_profile.roll_number|default:"PENDING" }}
-                </div>
-              </td>
-
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                <span class="badge" style="font-size: 11px;">{{ a.get_status_display }}</span>
-              </td>
-
-              <td style="padding: var(--space-3) var(--space-4); white-space: nowrap;">
-                {% if a.proctoring_summary %}
-                  <div style="font-weight: var(--font-weight-bold); font-size: var(--font-size-sm); color: {% if a.proctoring_summary.trust_score >= 90 %}#22c55e{% elif a.proctoring_summary.trust_score >= 75 %}#eab308{% else %}#ef4444{% endif %};">
-                    {{ a.proctoring_summary.trust_score }}%
-                  </div>
-                  {% if a.proctoring_summary.requires_human_review %}
-                    <span style="font-size: 10px; color: #ef4444; font-weight: var(--font-weight-bold);">⚠️ Review Flag</span>
-                  {% endif %}
-                {% else %}
-                  <span style="color: var(--text-secondary); font-size: 11px;">100%</span>
-                {% endif %}
-              </td>
-
-              <td style="padding: var(--space-3) var(--space-4); font-size: 11px; color: var(--text-secondary);">
-                {% if a.proctoring_summary %}
-                  <div>FS Exits: <strong>{{ a.proctoring_summary.fullscreen_exit_count }}</strong> | Tab Blur: <strong>{{ a.proctoring_summary.tab_switch_count }}</strong></div>
-                  <div>Out-of-Focus: <strong>{{ a.proctoring_summary.total_out_of_focus_seconds|floatformat:1 }}s</strong> | AI: <strong>{{ a.proctoring_summary.ai_anomaly_count }}</strong></div>
-                {% else %}
-                  <div>No anomalies logged</div>
-                {% endif %}
-              </td>
-
-              <td style="padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); white-space: nowrap;">
-                <div>Expires: {{ a.expires_at|date:"H:i:s" }}</div>
-                <div style="color: var(--text-secondary);">Remaining: {{ a.get_remaining_seconds }}s</div>
-              </td>
-
-              <td style="padding: var(--space-3) var(--space-4); text-align: right; white-space: nowrap;">
-                <!-- Intervention Actions -->
-                <div style="display: inline-flex; gap: 4px;">
-                  <!-- Warning Trigger -->
-                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="warning">
-                    <input type="hidden" name="message" value="Official Warning: Please remain centered on your examination screen.">
-                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;" title="Send in-room warning alert">
-                      ⚠️ Warn
-                    </button>
-                  </form>
-
-                  <!-- Time Extension Trigger (+5 mins) -->
-                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="extend_time">
-                    <input type="hidden" name="minutes" value="5">
-                    <input type="hidden" name="notes" value="Invigilator granted +5m network accommodation">
-                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px;" title="Grant +5 mins extra time">
-                      ⏱️ +5m
-                    </button>
-                  </form>
-
-                  <!-- Terminate Trigger -->
-                  <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" style="display: inline;" onsubmit="return confirm('Authorize security termination for {{ a.student.username }}? This will instantly expel the candidate.');">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="terminate">
-                    <input type="hidden" name="notes" value="Authorized invigilator security termination">
-                    <button type="submit" class="btn btn-secondary" style="font-size: 11px; padding: 3px 8px; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);" title="Terminate exam immediately">
-                      🛑 Expel
-                    </button>
-                  </form>
-                </div>
-              </td>
+  <!-- Candidates Stream Table Card -->
+  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
+    {% if attempts %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-4">Candidate</th>
+              <th class="py-3 px-4">Session State</th>
+              <th class="py-3 px-4">Trust Score</th>
+              <th class="py-3 px-4">Telemetry Metrics</th>
+              <th class="py-3 px-4">Timer Sync</th>
+              <th class="py-3 px-4 text-right">Invigilator Actions</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="card" style="text-align: center; padding: var(--space-12);">
-      <div style="font-size: 48px; margin-bottom: var(--space-2);">🛡️</div>
-      <h3 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); margin-bottom: var(--space-1);">
-        No Active Examinees
-      </h3>
-      <p style="color: var(--text-secondary); font-size: var(--font-size-sm); max-width: 450px; margin: 0 auto;">
-        {% if filter_suspicious %}
-          No candidates currently trigger security or review thresholds!
-        {% else %}
-          No candidates have initiated attempts for this examination yet.
-        {% endif %}
-      </p>
-    </div>
-  {% endif %}
+          </thead>
+          <tbody class="divide-y divide-zinc-100">
+            {% for a in attempts %}
+              <tr class="hover:bg-zinc-50/80 transition-colors {% if a.proctoring_summary and a.proctoring_summary.requires_human_review %}bg-rose-50/30{% endif %}">
+                <td class="py-3 px-4">
+                  <div class="font-bold text-zinc-900">{{ a.student.get_full_name|default:a.student.username }}</div>
+                  <div class="font-mono text-[11px] text-[#ea580c]">Roll: {{ a.student.student_profile.roll_number|default:"PENDING" }}</div>
+                </td>
+
+                <td class="py-3 px-4 whitespace-nowrap">
+                  <span class="status-pill-emerald text-[11px]">{{ a.get_status_display }}</span>
+                </td>
+
+                <td class="py-3 px-4 whitespace-nowrap">
+                  {% if a.proctoring_summary %}
+                    <div class="font-mono font-bold text-sm {% if a.proctoring_summary.trust_score >= 90 %}text-emerald-600{% elif a.proctoring_summary.trust_score >= 75 %}text-amber-600{% else %}text-rose-600{% endif %}">
+                      {{ a.proctoring_summary.trust_score }}%
+                    </div>
+                    {% if a.proctoring_summary.requires_human_review %}
+                      <span class="inline-flex items-center gap-1 text-[10px] text-rose-600 font-bold mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
+                        Review Flagged
+                      </span>
+                    {% endif %}
+                  {% else %}
+                    <span class="font-mono text-emerald-600 font-bold">100%</span>
+                  {% endif %}
+                </td>
+
+                <td class="py-3 px-4 font-mono text-[11px] text-zinc-600">
+                  {% if a.proctoring_summary %}
+                    <div>Exits: <strong>{{ a.proctoring_summary.fullscreen_exit_count }}</strong> &bull; Blur: <strong>{{ a.proctoring_summary.tab_switch_count }}</strong></div>
+                    <div class="text-zinc-500 text-[10px]">Away: {{ a.proctoring_summary.total_out_of_focus_seconds|floatformat:1 }}s &bull; AI Flags: {{ a.proctoring_summary.ai_anomaly_count }}</div>
+                  {% else %}
+                    <span class="text-zinc-400 font-sans italic">Clean &bull; Zero anomalies</span>
+                  {% endif %}
+                </td>
+
+                <td class="py-3 px-4 font-mono text-[11px] text-zinc-500 whitespace-nowrap">
+                  <div>Expires: {{ a.expires_at|date:"H:i:s" }}</div>
+                  <div class="text-zinc-400">Left: {{ a.get_remaining_seconds }}s</div>
+                </td>
+
+                <td class="py-3 px-4 text-right whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5">
+                    <!-- Warning Trigger -->
+                    <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" class="inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="warning">
+                      <input type="hidden" name="message" value="Official Warning: Please remain centered on your examination screen.">
+                      <button type="submit" class="btn-action-edit py-1 px-2 text-[11px]" title="Send warning banner">
+                        ⚠️ Warn
+                      </button>
+                    </form>
+
+                    <!-- Time Extension Trigger (+5 mins) -->
+                    <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" class="inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="extend_time">
+                      <input type="hidden" name="minutes" value="5">
+                      <input type="hidden" name="notes" value="Invigilator granted +5m network accommodation">
+                      <button type="submit" class="btn-action-approve py-1 px-2 text-[11px]" title="Add 5 minutes">
+                        ⏱️ +5m
+                      </button>
+                    </form>
+
+                    <!-- Terminate Trigger -->
+                    <form method="post" action="{% url 'incidents:invigilator_action' a.id %}" class="inline" onsubmit="return confirm('Authorize immediate security expulsion for candidate {{ a.student.username }}?');">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="terminate">
+                      <input type="hidden" name="notes" value="Authorized invigilator security termination">
+                      <button type="submit" class="btn-action-delete py-1 px-2 text-[11px]" title="Terminate exam">
+                        🛑 Expel
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-12 text-center text-xs text-zinc-400">
+        <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#ea580c] flex items-center justify-center mx-auto mb-3 text-xl border border-orange-200">
+          🛡️
+        </div>
+        <div class="font-bold text-zinc-800 text-sm mb-1">No Active Examinees</div>
+        <p class="text-zinc-500 max-w-sm mx-auto">
+          {% if filter_suspicious %}
+            Zero examinees currently trigger anomaly or incident thresholds!
+          {% else %}
+            No examinees have launched session attempts for this examination yet.
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

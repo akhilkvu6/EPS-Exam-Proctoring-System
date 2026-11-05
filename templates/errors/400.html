@@ -3,12 +3,31 @@
 {% block title %}400 Bad Request — {{ PLATFORM_NAME }}{% endblock %}
 
 {% block content %}
-<div class="container" style="text-align: center; padding-top: var(--space-16); padding-bottom: var(--space-16);">
-  <div style="font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); color: var(--color-warning); margin-bottom: var(--space-2);">400</div>
-  <h1 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin-bottom: var(--space-3);">Invalid Request</h1>
-  <p style="font-size: var(--font-size-base); color: var(--text-secondary); max-width: 480px; margin: 0 auto var(--space-6) auto;">
-    The server was unable to process your request due to invalid or malformed data.
-  </p>
-  <a href="{% url 'core:index' %}" class="btn btn-primary">Return to Home</a>
+<div class="max-w-xl mx-auto px-4 py-16 text-center">
+  <div class="bg-white border border-zinc-200/90 rounded-xl p-8 sm:p-10 shadow-2xs border-t-2 border-t-[#ea580c]">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold tracking-wide mb-4 border border-rose-200">
+      <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+      <span class="font-mono">HTTP 400</span>
+    </div>
+    
+    <div class="font-mono text-5xl font-black text-[#ea580c] tracking-tight mb-3">400</div>
+    <h1 class="text-2xl font-bold text-zinc-900 tracking-tight mb-3">Malformed Client Request</h1>
+    <p class="text-sm text-zinc-600 leading-relaxed mb-8 max-w-md mx-auto">
+      The server was unable to interpret your request due to invalid parameters, an expired session token, or corrupted payload data.
+    </p>
+
+    <div class="flex items-center justify-center gap-3">
+      <a href="javascript:history.back()" class="btn-secondary">
+        &larr; Go Back
+      </a>
+      <a href="{% url 'core:index' %}" class="btn-brand">
+        Platform Home
+      </a>
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-zinc-100 font-mono text-[11px] text-zinc-400">
+      Node: EPS-PHX-GATEWAY &bull; Traceable Audit Event Logged
+    </div>
+  </div>
 </div>
 {% endblock %}
