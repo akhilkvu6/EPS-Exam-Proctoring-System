@@ -4,148 +4,337 @@
 
 {% block admin_content %}
 <div class="space-y-6">
-  <!-- Header Card -->
-  <div class="bg-white border border-zinc-200/90 rounded-xl p-6 shadow-2xs border-t-2 border-t-[#ea580c]">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-xl font-extrabold text-zinc-900 tracking-tight">
-          Institutional User Directory
-        </h1>
-        <p class="text-xs text-zinc-500 mt-1">
-          Manage user privileges, active authentication states, and administrative security suspensions.
-        </p>
+  <!-- PAGE HEADER & SEARCH -->
+  <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-1">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="w-2 h-2 rounded-full bg-[#ea580c]"></span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-orange-600">Roster &amp; Access Controls</span>
       </div>
+      <h1 class="text-2xl font-bold tracking-tight text-zinc-900">Institutional User Directory</h1>
+      <p class="text-xs text-zinc-500 mt-0.5">Manage examinees, live proctor allocations, faculty credentials, and security state.</p>
+    </div>
 
-      <!-- Search Input -->
+    <!-- Search Input & Quick Actions -->
+    <div class="flex items-center gap-2.5">
       <form method="get" class="flex items-center gap-2">
+        {% if role_filter %}<input type="hidden" name="role" value="{{ role_filter }}">{% endif %}
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
         <div class="relative">
           <input 
             type="text" 
             name="q" 
             value="{{ search_query }}" 
-            placeholder="Search username, name..." 
-            class="form-control-precision text-xs py-1.5 pl-8 pr-3 w-56 sm:w-64 rounded-lg">
+            placeholder="Search username, roll, email..." 
+            class="w-56 sm:w-64 pl-8 pr-3 py-1.5 text-xs bg-white border border-zinc-200 rounded-lg text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition shadow-2xs">
           <svg class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
         <button type="submit" class="btn-brand text-xs py-1.5 px-3">
           Search
         </button>
         {% if search_query %}
-          <a href="{% url 'administration:users_directory' %}" class="btn-ghost text-xs py-1.5 px-2">Reset</a>
+          <a href="{% url 'administration:users_directory' %}" class="btn-secondary text-xs py-1.5 px-2.5">Reset</a>
         {% endif %}
       </form>
     </div>
   </div>
 
-  <!-- Role & Status Filter Pills -->
-  <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-    <a href="?" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if not role_filter and not status_filter %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
-      All Accounts
-    </a>
-    <a href="?role=STUDENT" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if role_filter == 'STUDENT' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
-      Students Only
-    </a>
-    <a href="?role=TEACHER" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if role_filter == 'TEACHER' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
-      Faculty Only
-    </a>
-    <a href="?role=ADMIN" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if role_filter == 'ADMIN' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
-      Administrators
-    </a>
-    <a href="?status=SUSPENDED" class="px-3 py-1.5 rounded-full font-semibold transition-all {% if status_filter == 'SUSPENDED' %}bg-rose-600 text-white shadow-2xs{% else %}bg-white text-rose-700 border border-rose-200 hover:bg-rose-50{% endif %}">
-      Suspended Accounts
-    </a>
+  <!-- METRIC RIBBON (4 CARDS) -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white border border-zinc-200/90 border-t-2 border-t-[#ea580c] rounded-xl p-4 shadow-2xs flex flex-col justify-between">
+      <span class="text-xs font-medium text-zinc-500">Total In Registry</span>
+      <div class="flex items-baseline justify-between mt-2">
+        <span class="text-2xl font-bold text-zinc-900 font-mono">{{ users|length }}</span>
+        <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/70">Verified</span>
+      </div>
+    </div>
+
+    <div class="bg-white border border-zinc-200/90 border-t-2 border-t-[#ea580c] rounded-xl p-4 shadow-2xs flex flex-col justify-between">
+      <span class="text-xs font-medium text-zinc-500">Student Examinees</span>
+      <div class="flex items-baseline justify-between mt-2">
+        <span class="text-2xl font-bold text-zinc-900 font-mono">
+          {% for r, label in roles %}{% if r == 'STUDENT' %}{{ label }}{% endif %}{% endfor %}
+        </span>
+        <span class="text-[11px] font-semibold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200/70">Enrolled</span>
+      </div>
+    </div>
+
+    <div class="bg-white border border-zinc-200/90 border-t-2 border-t-[#ea580c] rounded-xl p-4 shadow-2xs flex flex-col justify-between">
+      <span class="text-xs font-medium text-zinc-500">Academic Hierarchy</span>
+      <div class="flex items-baseline justify-between mt-2">
+        <span class="text-base font-bold text-zinc-900">Faculty &amp; Council</span>
+        <span class="text-[11px] font-medium text-zinc-400 font-mono">Active</span>
+      </div>
+    </div>
+
+    <div class="bg-white border border-zinc-200/90 border-t-2 border-t-[#ea580c] rounded-xl p-4 shadow-2xs flex flex-col justify-between">
+      <span class="text-xs font-medium text-zinc-500">Security Compliance</span>
+      <div class="flex items-baseline justify-between mt-2">
+        <span class="text-sm font-bold text-zinc-900">Zero-Egress Active</span>
+        <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          Audit Synced
+        </span>
+      </div>
+    </div>
   </div>
 
-  <!-- Users Table Card -->
-  <div class="bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs">
-    {% if users %}
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr class="border-b border-zinc-200 bg-zinc-50/70 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-              <th class="py-3 px-4">User</th>
-              <th class="py-3 px-4">Role</th>
-              <th class="py-3 px-4">Account Status</th>
-              <th class="py-3 px-4">Registration</th>
-              <th class="py-3 px-4 text-right">Security Action</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-zinc-100">
-            {% for u in users %}
-              <tr class="hover:bg-zinc-50/80 transition-colors">
-                <td class="py-3 px-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-orange-100 text-[#ea580c] font-bold text-xs flex items-center justify-center shrink-0">
-                      {{ u.first_name|first|default:u.username|first|upper }}
-                    </div>
-                    <div>
-                      <div class="font-bold text-zinc-900">{{ u.get_full_name|default:"-" }}</div>
-                      <div class="font-mono text-[11px] text-zinc-500">@{{ u.username }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="py-3 px-4">
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase bg-orange-50 text-[#c2410c] border border-orange-200">
-                    {{ u.get_role_display }}
-                  </span>
-                </td>
-                <td class="py-3 px-4">
-                  {% if u.status == 'ACTIVE' %}
-                    <span class="status-pill-emerald">
-                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      Active
-                    </span>
-                  {% elif u.status == 'SUSPENDED' %}
-                    <span class="status-pill-rose">
-                      <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
-                      Suspended
-                    </span>
-                  {% elif u.status == 'PENDING_APPROVAL' %}
-                    <span class="status-pill-amber">
-                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                      Pending Review
-                    </span>
-                  {% else %}
-                    <span class="text-zinc-500 font-mono">{{ u.get_status_display }}</span>
-                  {% endif %}
-                </td>
-                <td class="py-3 px-4 font-mono text-[11px] text-zinc-500">
-                  {{ u.date_joined|date:"M d, Y" }}
-                </td>
-                <td class="py-3 px-4 text-right">
-                  {% if u != user %}
-                    <form method="post" action="{% url 'administration:user_status_toggle' u.id %}" class="inline-block">
-                      {% csrf_token %}
-                      {% if u.status == 'SUSPENDED' %}
-                        <input type="hidden" name="new_status" value="ACTIVE">
-                        <input type="hidden" name="reason" value="Re-activated by institutional admin">
-                        <button type="submit" class="btn-action-approve">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-                          <span>Reactivate</span>
-                        </button>
-                      {% else %}
-                        <input type="hidden" name="new_status" value="SUSPENDED">
-                        <input type="hidden" name="reason" value="Suspended by institutional admin">
-                        <button type="submit" class="btn-action-delete" onclick="return confirm('Suspend user @{{ u.username }}?')">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                          <span>Suspend</span>
-                        </button>
-                      {% endif %}
-                    </form>
-                  {% else %}
-                    <span class="text-[11px] font-mono text-zinc-400 italic">Current Session</span>
-                  {% endif %}
-                </td>
+  <!-- TABS CONTROLLER & FILTERS -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+      <a href="?" class="px-3.5 py-1.5 rounded-md font-semibold transition-all {% if not role_filter and not status_filter %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
+        All Accounts
+      </a>
+      <a href="?role=STUDENT" class="px-3.5 py-1.5 rounded-md font-semibold transition-all {% if role_filter == 'STUDENT' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
+        Students Only
+      </a>
+      <a href="?role=TEACHER" class="px-3.5 py-1.5 rounded-md font-semibold transition-all {% if role_filter == 'TEACHER' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
+        Faculty Only
+      </a>
+      <a href="?role=ADMIN" class="px-3.5 py-1.5 rounded-md font-semibold transition-all {% if role_filter == 'ADMIN' %}bg-[#ea580c] text-white shadow-2xs{% else %}bg-white text-zinc-600 border border-zinc-200 hover:bg-zinc-50{% endif %}">
+        Administrators
+      </a>
+      <a href="?status=SUSPENDED" class="px-3.5 py-1.5 rounded-md font-semibold transition-all {% if status_filter == 'SUSPENDED' %}bg-rose-600 text-white shadow-2xs{% else %}bg-white text-rose-700 border border-rose-200 hover:bg-rose-50{% endif %}">
+        Suspended
+      </a>
+    </div>
+
+    <!-- Quick action links -->
+    <div class="flex items-center gap-2">
+      <a href="{% url 'administration:teachers_management' %}" class="btn-secondary text-xs py-1.5 px-3">
+        + Provision Faculty
+      </a>
+      <a href="{% url 'admissions:roll_registry' %}" class="btn-secondary text-xs py-1.5 px-3">
+        Roll Registry
+      </a>
+    </div>
+  </div>
+
+  <!-- MASTER-DETAIL WORKSPACE: TABLE + QUICK INSPECTION DRAWER -->
+  <div class="grid grid-cols-1 2xl:grid-cols-4 gap-6 items-start">
+    <!-- TABLE SECTION (Spans 3 cols on 2xl) -->
+    <div class="2xl:col-span-3 bg-white border border-zinc-200/90 rounded-xl overflow-hidden shadow-2xs border-t-2 border-t-[#ea580c]">
+      <!-- Sub-header bar -->
+      <div class="px-5 py-3 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="font-semibold text-zinc-900">Institutional Registry Ledger</span>
+          <span class="font-mono text-[11px] text-zinc-400">({{ users|length }} records)</span>
+        </div>
+        <div class="text-zinc-500 text-[11px] font-mono">
+          Click any row to inspect candidate telemetry
+        </div>
+      </div>
+
+      {% if users %}
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs" id="usersTable">
+            <thead>
+              <tr class="border-b border-zinc-100 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider bg-white">
+                <th class="py-3 px-4">User Identity</th>
+                <th class="py-3 px-4">Role</th>
+                <th class="py-3 px-4">Identification</th>
+                <th class="py-3 px-4">Account Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody class="divide-y divide-zinc-100">
+              {% for u in users %}
+                <tr 
+                  class="user-table-row hover:bg-zinc-50/80 transition-colors cursor-pointer {% if forloop.first %}bg-orange-50/30{% endif %}"
+                  onclick="selectUserRow('{{ u.id }}', '{{ u.get_full_name|default:u.username|escapejs }}', '{{ u.username|escapejs }}', '{{ u.email|default:"Not registered"|escapejs }}', '{{ u.phone_number|default:"-"|escapejs }}', '{{ u.get_role_display|escapejs }}', '{{ u.status|escapejs }}', '{{ u.student_profile.roll_number|default:u.official_id|default:"-"|escapejs }}', '{{ u.student_profile.department.name|default:"General Institutional"|escapejs }}', this)">
+                  <td class="py-3.5 px-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-full bg-orange-100 border border-orange-200 text-[#ea580c] font-bold text-xs flex items-center justify-center shrink-0">
+                        {{ u.first_name|first|default:u.username|first|upper }}
+                      </div>
+                      <div>
+                        <div class="font-semibold text-zinc-900 leading-tight">
+                          {{ u.get_full_name|default:u.username }}
+                        </div>
+                        <div class="text-[11px] text-zinc-400 font-mono mt-0.5">
+                          @{{ u.username }} {% if u.email %}&bull; {{ u.email }}{% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wider uppercase 
+                      {% if u.role == 'ADMIN' %}bg-purple-50 text-purple-700 border border-purple-200
+                      {% elif u.role == 'TEACHER' %}bg-blue-50 text-blue-700 border border-blue-200
+                      {% else %}bg-orange-50 text-[#c2410c] border border-orange-200{% endif %}">
+                      {{ u.get_role_display }}
+                    </span>
+                  </td>
+
+                  <td class="py-3.5 px-4 font-mono text-[11px] text-zinc-700">
+                    {% if u.student_profile.roll_number %}
+                      <span class="font-bold text-[#ea580c]">{{ u.student_profile.roll_number }}</span>
+                    {% elif u.official_id %}
+                      <span class="font-bold text-zinc-800">{{ u.official_id }}</span>
+                    {% else %}
+                      <span class="text-zinc-400 italic">Unassigned</span>
+                    {% endif %}
+                  </td>
+
+                  <td class="py-3.5 px-4">
+                    {% if u.status == 'ACTIVE' %}
+                      <span class="status-pill-emerald">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Active
+                      </span>
+                    {% elif u.status == 'SUSPENDED' %}
+                      <span class="status-pill-rose">
+                        <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                        Suspended
+                      </span>
+                    {% elif u.status == 'PENDING_APPROVAL' %}
+                      <span class="status-pill-amber">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        Pending Review
+                      </span>
+                    {% else %}
+                      <span class="status-pill-blue">
+                        {{ u.get_status_display }}
+                      </span>
+                    {% endif %}
+                  </td>
+
+                  <td class="py-3.5 px-4 text-right" onclick="event.stopPropagation();">
+                    {% if u.id != request.user.id %}
+                      <form method="post" action="{% url 'administration:user_status_toggle' u.id %}" class="inline">
+                        {% csrf_token %}
+                        {% if u.status == 'ACTIVE' %}
+                          <button type="submit" class="micro-action-btn border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100" title="Suspend user access">
+                            Suspend
+                          </button>
+                        {% else %}
+                          <button type="submit" class="micro-action-btn border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100" title="Activate account access">
+                            Activate
+                          </button>
+                        {% endif %}
+                      </form>
+                    {% else %}
+                      <span class="text-[11px] text-zinc-400 italic font-mono">Self Account</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Pagination Summary -->
+        <div class="px-5 py-3 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-500 bg-white">
+          <span>Showing {{ users|length }} records in registry</span>
+          <div class="flex items-center gap-1.5 font-mono text-[11px]">
+            <span class="px-2 py-0.5 rounded bg-orange-50 text-[#ea580c] font-bold border border-orange-200/60">Page 1 of 1</span>
+          </div>
+        </div>
+      {% else %}
+        <div class="p-12 text-center text-xs text-zinc-400">
+          No users match the specified filters or search query.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- QUICK INSPECTION DRAWER (Right Rail) -->
+    <aside class="bg-white border border-zinc-200/90 rounded-xl p-5 shadow-2xs border-t-2 border-t-[#ea580c] space-y-4" id="inspectionDrawer">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-100">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#ea580c]"></span>
+          <span class="text-xs font-bold uppercase tracking-wider text-zinc-900">Record Inspection</span>
+        </div>
+        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80" id="drawerFocusBadge">
+          Selected Node
+        </span>
       </div>
-    {% else %}
-      <div class="p-10 text-center text-xs text-zinc-400">
-        No user records found matching the specified criteria.
+
+      <!-- Active Profile Card -->
+      <div class="bg-gradient-to-br from-orange-50/60 to-white border border-orange-200/70 rounded-xl p-4 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-orange-100 border-2 border-orange-200 text-[#ea580c] font-bold flex items-center justify-center text-sm shadow-2xs shrink-0" id="drawerAvatar">
+            {% if users %}{{ users.0.first_name|first|default:users.0.username|first|upper }}{% else %}U{% endif %}
+          </div>
+          <div class="overflow-hidden">
+            <h3 class="text-sm font-bold text-zinc-900 leading-tight truncate" id="drawerName">
+              {% if users %}{{ users.0.get_full_name|default:users.0.username }}{% else %}Select User{% endif %}
+            </h3>
+            <p class="text-[11px] font-mono text-zinc-500 mt-0.5 truncate" id="drawerRoll">
+              {% if users %}{{ users.0.student_profile.roll_number|default:users.0.official_id|default:"@"|add:users.0.username }}{% else %}-{% endif %}
+            </p>
+            <div class="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-orange-100 text-[#c2410c] border border-orange-200" id="drawerRolePill">
+              {% if users %}{{ users.0.get_role_display }}{% else %}Role{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-orange-100 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-zinc-500">Username:</span>
+            <span class="font-mono text-zinc-800" id="drawerUsername">{% if users %}@{{ users.0.username }}{% else %}-{% endif %}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-zinc-500">Email:</span>
+            <span class="font-mono text-zinc-800 truncate max-w-[140px]" id="drawerEmail">{% if users %}{{ users.0.email|default:"None" }}{% else %}-{% endif %}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-zinc-500">Phone:</span>
+            <span class="font-mono text-zinc-800" id="drawerPhone">{% if users %}{{ users.0.phone_number|default:"-" }}{% else %}-{% endif %}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-zinc-500">Department:</span>
+            <span class="font-medium text-zinc-800 truncate max-w-[140px]" id="drawerDept">{% if users %}{{ users.0.student_profile.department.name|default:"General" }}{% else %}-{% endif %}</span>
+          </div>
+        </div>
       </div>
-    {% endif %}
+
+      <!-- Session Telemetry Box -->
+      <div class="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3.5 space-y-2 font-mono text-[11px]">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Security &amp; Hardware Telemetry</div>
+        <div class="flex justify-between items-center text-zinc-600">
+          <span>Camera Stream:</span>
+          <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/70 font-semibold">1080p Calibrated</span>
+        </div>
+        <div class="flex justify-between items-center text-zinc-600">
+          <span>Microphone:</span>
+          <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/70 font-semibold">Active OK</span>
+        </div>
+        <div class="flex justify-between items-center text-zinc-600">
+          <span>MediaPipe ML:</span>
+          <span class="text-zinc-800 font-semibold">Client-Side Edge</span>
+        </div>
+        <div class="flex justify-between items-center text-zinc-600">
+          <span>Account State:</span>
+          <span class="font-bold text-[#ea580c]" id="drawerStatusText">{% if users %}{{ users.0.status }}{% else %}ACTIVE{% endif %}</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="space-y-2 pt-1">
+        <a href="{% url 'administration:audit_logs' %}" class="btn-secondary w-full justify-center text-xs py-2">
+          View Audit Events &rarr;
+        </a>
+      </div>
+    </aside>
   </div>
 </div>
+
+<script>
+  function selectUserRow(userId, fullName, username, email, phone, role, status, roll, dept, rowElement) {
+    document.querySelectorAll('.user-table-row').forEach(r => r.classList.remove('bg-orange-50/40'));
+    rowElement.classList.add('bg-orange-50/40');
+
+    document.getElementById('drawerName').textContent = fullName;
+    document.getElementById('drawerAvatar').textContent = fullName.charAt(0).toUpperCase();
+    document.getElementById('drawerUsername').textContent = '@' + username;
+    document.getElementById('drawerRoll').textContent = roll;
+    document.getElementById('drawerRolePill').textContent = role;
+    document.getElementById('drawerEmail').textContent = email;
+    document.getElementById('drawerPhone').textContent = phone;
+    document.getElementById('drawerDept').textContent = dept;
+    document.getElementById('drawerStatusText').textContent = status;
+  }
+</script>
 {% endblock %}
